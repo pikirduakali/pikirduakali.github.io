@@ -139,8 +139,8 @@
     let current = 0;
 
     function goTo(idx) {
-        if (idx < 0) idx = 0;
-        if (idx >= total) idx = total - 1;
+        if (idx < 0) idx = total - 1;
+        if (idx >= total) idx = 0;
         current = idx;
         container.scrollTo({ left: current * window.innerWidth, behavior: 'smooth' });
     }
