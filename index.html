@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #111; overflow-x: auto; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #111; overflow: hidden; }
 
         .container {
             display: flex;
@@ -64,6 +64,25 @@
 
         .hero { text-align: center; }
         .hero p { color: #888; font-size: 1.3rem; }
+
+        .arrow {
+            position: fixed;
+            top: 0;
+            z-index: 50;
+            width: 15%;
+            height: 100vh;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .arrow:hover { background: rgba(0,0,0,0.03); }
+        .arrow:active { background: rgba(0,0,0,0.06); }
+        .arrow-left { left: 0; }
+        .arrow-right { right: 0; }
     </style>
 </head>
 <body>
@@ -75,6 +94,9 @@
     <a href="#experience">Experience</a>
     <a href="#interest">Interest</a>
 </nav>
+
+<button class="arrow arrow-left" id="prevBtn" aria-label="Previous"></button>
+<button class="arrow arrow-right" id="nextBtn" aria-label="Next"></button>
 
 <div class="container">
     <section class="hero" id="hero">
@@ -111,42 +133,30 @@
 
 <script>
     const container = document.querySelector('.container');
-    let isDown = false, startX, scrollLeft, moved = false;
+    const sections = document.querySelectorAll('section');
+    const totalSections = sections.length;
 
-    container.addEventListener('mousedown', e => {
-        isDown = true;
-        moved = false;
-        startX = e.pageX - container.offsetLeft;
-        scrollLeft = container.scrollLeft;
+    function getCurrentIndex() {
+        return Math.round(container.scrollLeft / window.innerWidth);
+    }
+
+    function goToSection(index) {
+        if (index < 0) index = 0;
+        if (index >= totalSections) index = totalSections - 1;
+        container.scrollTo({ left: index * window.innerWidth, behavior: 'smooth' });
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        goToSection(getCurrentIndex() - 1);
     });
 
-    document.addEventListener('mouseup', () => {
-        isDown = false;
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        goToSection(getCurrentIndex() + 1);
     });
-
-    container.addEventListener('mousemove', e => {
-        if (!isDown) return;
-        const x = e.pageX - container.offsetLeft;
-        const walk = x - startX;
-        if (Math.abs(walk) > 5) {
-            moved = true;
-            container.scrollLeft = scrollLeft - walk * 1.5;
-            e.preventDefault();
-        }
-    });
-
-    container.addEventListener('click', e => {
-        if (moved) { e.stopPropagation(); e.preventDefault(); }
-    }, true);
 
     document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft') {
-            container.scrollBy({ left: -window.innerWidth, behavior: 'smooth' });
-            e.preventDefault();
-        } else if (e.key === 'ArrowRight') {
-            container.scrollBy({ left: window.innerWidth, behavior: 'smooth' });
-            e.preventDefault();
-        }
+        if (e.key === 'ArrowLeft') { goToSection(getCurrentIndex() - 1); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { goToSection(getCurrentIndex() + 1); e.preventDefault(); }
     });
 </script>
 </body>
