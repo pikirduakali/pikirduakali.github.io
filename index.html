@@ -52,6 +52,11 @@
         }
         nav a:hover { color: #000; }
 
+        img { max-width: 100%; border-radius: 12px; }
+        .profile-img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid #eee; }
+        .gallery { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+        .gallery img { width: 200px; height: 150px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
         h1 { font-size: 4rem; font-weight: 700; margin-bottom: 0.5rem; }
         h2 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; }
         p { color: #444; font-size: 1.1rem; text-align: center; max-width: 560px; line-height: 1.7; }
@@ -77,6 +82,7 @@
     </section>
 
     <section id="who-i-am">
+        <img src="images/foto-profil.jpg" alt="Profile" class="profile-img" onerror="this.style.display='none'">
         <h2>Who I Am</h2>
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam voluptatum quod, quia quibusdam quos quas.</p>
     </section>
@@ -94,6 +100,11 @@
     <section id="interest">
         <h2>Interest</h2>
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam voluptatum quod, quia quibusdam quos quas.</p>
+        <div class="gallery">
+            <img src="images/foto-1.jpg" alt="Photo 1" onerror="this.style.display='none'">
+            <img src="images/foto-2.jpg" alt="Photo 2" onerror="this.style.display='none'">
+            <img src="images/foto-3.jpg" alt="Photo 3" onerror="this.style.display='none'">
+        </div>
     </section>
 </div>
 
