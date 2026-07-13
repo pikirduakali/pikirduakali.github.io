@@ -79,8 +79,10 @@
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
+            font-size: 2rem;
+            color: rgba(0,0,0,0.15);
         }
-        .arrow:hover { background: rgba(0,0,0,0.03); }
+        .arrow:hover { background: rgba(0,0,0,0.03); color: rgba(0,0,0,0.4); }
         .arrow:active { background: rgba(0,0,0,0.06); }
         .arrow-left { left: 0; }
         .arrow-right { right: 0; }
@@ -108,8 +110,8 @@
     <a href="#interest">Interest</a>
 </nav>
 
-<button class="arrow arrow-left" id="prevBtn" aria-label="Previous"></button>
-<button class="arrow arrow-right" id="nextBtn" aria-label="Next"></button>
+<button class="arrow arrow-left" id="prevBtn" aria-label="Previous">&#8592;</button>
+<button class="arrow arrow-right" id="nextBtn" aria-label="Next">&#8594;</button>
 
 <div class="container">
     <section class="hero" id="hero">
