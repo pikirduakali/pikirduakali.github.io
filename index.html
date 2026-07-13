@@ -78,12 +78,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
             font-size: 2rem;
             color: rgba(0,0,0,0.15);
         }
-        .arrow:hover { background: rgba(0,0,0,0.03); color: rgba(0,0,0,0.4); }
-        .arrow:active { background: rgba(0,0,0,0.06); }
+        .arrow::before {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: transparent;
+            transition: background 0.2s;
+            z-index: -1;
+        }
+        .arrow:hover { color: rgba(0,0,0,0.4); }
+        .arrow:hover::before { background: rgba(0,0,0,0.04); }
         .arrow-left { left: 0; }
         .arrow-right { right: 0; }
 
