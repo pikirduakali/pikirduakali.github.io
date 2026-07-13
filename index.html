@@ -6,8 +6,8 @@
     <title>P2X</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #111; overflow: hidden; }
+        html, body { overflow: hidden; height: 100%; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #111; }
 
         .container {
             display: flex;
@@ -134,29 +134,27 @@
 <script>
     const container = document.querySelector('.container');
     const sections = document.querySelectorAll('section');
-    const totalSections = sections.length;
+    const total = sections.length;
 
-    function getCurrentIndex() {
-        return Math.round(container.scrollLeft / window.innerWidth);
+    function goTo(idx) {
+        if (idx < 0) idx = 0;
+        if (idx >= total) idx = total - 1;
+        sections[idx].scrollIntoView({ behavior: 'smooth', inline: 'start' });
     }
 
-    function goToSection(index) {
-        if (index < 0) index = 0;
-        if (index >= totalSections) index = totalSections - 1;
-        container.scrollTo({ left: index * window.innerWidth, behavior: 'smooth' });
+    function cur() {
+        let i = Math.round(container.scrollLeft / window.innerWidth);
+        if (i < 0) i = 0;
+        if (i >= total) i = total - 1;
+        return i;
     }
 
-    document.getElementById('prevBtn').addEventListener('click', () => {
-        goToSection(getCurrentIndex() - 1);
-    });
-
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        goToSection(getCurrentIndex() + 1);
-    });
+    document.getElementById('prevBtn').onclick = () => goTo(cur() - 1);
+    document.getElementById('nextBtn').onclick = () => goTo(cur() + 1);
 
     document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft') { goToSection(getCurrentIndex() - 1); e.preventDefault(); }
-        if (e.key === 'ArrowRight') { goToSection(getCurrentIndex() + 1); e.preventDefault(); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(cur() - 1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); goTo(cur() + 1); }
     });
 </script>
 </body>
