@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2X</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow: hidden; height: 100%; }
+        body { font-family: 'Jost', sans-serif; background: #fff; color: #111; text-transform: lowercase; }
+
+        .container {
+            display: flex;
+            width: 100%;
+            overflow: auto;
+            height: 100vh;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .container::-webkit-scrollbar { display: none; }
+
+        section {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1.2rem;
+            background: transparent;
+        }
+        nav a {
+            text-decoration: none;
+            color: #555;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #000; }
+        nav a.active { color: #1a237e; font-weight: 700; border-bottom: 2px solid #1a237e; padding-bottom: 0.2rem; }
+
+        img { max-width: 100%; border-radius: 12px; }
+        .profile-img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid #eee; }
+        .gallery { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+        .gallery img { width: 200px; height: 150px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+        h1 { font-size: 4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        h2 { font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem; }
+        p { color: #444; font-size: 1.1rem; text-align: center; max-width: 560px; line-height: 1.7; }
+
+        .hero { text-align: center; }
+        .hero p { color: #888; font-size: 1.3rem; }
+
+        .blog { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 900px; margin: 0 auto; width: 100vw; text-transform: none; }
+        .blog h2 { width: 100%; text-align: center; margin-bottom: 2rem; text-transform: lowercase; }
+        .blog-wrapper { display: flex; gap: 2rem; width: 100%; justify-content: center; }
+        .blog-archive { flex: 0 0 180px; text-align: center; }
+        .blog-archive h3 { font-size: 0.9rem; font-weight: 700; color: #1a237e; margin-bottom: 0.5rem; cursor: pointer; }
+        .blog-archive h3:hover { opacity: 0.7; }
+        .blog-archive .month { font-size: 0.8rem; color: #777; margin-left: 0.5rem; cursor: pointer; display: block; padding: 0.15rem 0; }
+        .blog-archive .month:hover { color: #1a237e; }
+        .blog-archive .month.active { color: #1a237e; font-weight: 700; }
+        .blog-list { flex: 1; text-align: center; }
+        .blog-item { padding: 0.8rem 0; border-bottom: 1px solid #eee; display: flex; gap: 1rem; align-items: baseline; justify-content: center; }
+        .blog-date { font-size: 0.8rem; color: #999; flex-shrink: 0; width: 80px; }
+        .blog-title { font-size: 1rem; color: #333; cursor: pointer; }
+        .blog-title:hover { color: #1a237e; }
+        @media (max-width: 768px) {
+            .blog-wrapper { flex-direction: column; gap: 1rem; }
+            .blog-archive { flex: none; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+            .blog-archive h3 { margin-right: 0.5rem; }
+            .blog-archive .month { margin-left: 0; }
+        }
+
+        .arrow {
+            position: fixed;
+            top: 0;
+            z-index: 50;
+            width: 15%;
+            height: 100vh;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: rgba(0,0,0,0.15);
+        }
+        .arrow::before {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: transparent;
+            transition: background 0.2s;
+            z-index: -1;
+        }
+        .arrow:hover { color: rgba(0,0,0,0.4); }
+        .arrow:hover::before { background: rgba(0,0,0,0.04); }
+        .arrow-left { left: 0; }
+        .arrow-right { right: 0; }
+
+        @media (max-width: 768px) {
+            nav { gap: 0.5rem; padding: 0.6rem; flex-wrap: wrap; }
+            nav a { font-size: 0.7rem; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.3rem; }
+            p { font-size: 0.9rem; padding: 0 0.5rem; }
+            section { padding: 3rem 0.8rem 1.5rem; }
+            .profile-img { width: 100px; height: 100px; }
+            .gallery img { width: 120px; height: 100px; }
+            .arrow { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#hero">Home</a>
+    <a href="#about-me">About Me</a>
+    <a href="#what-i-do">What I Do</a>
+    <a href="#experience">Experience</a>
+    <a href="#interest">Interest</a>
+    <a href="#articles">Articles</a>
+</nav>
+
+<button class="arrow arrow-left" id="prevBtn" aria-label="Previous">&#8592;</button>
+<button class="arrow arrow-right" id="nextBtn" aria-label="Next">&#8594;</button>
+
+<div class="container">
+    <section class="hero" id="hero">
+        <h1>Yep.</h1>
+        <p>It still under construction</p>
+    </section>
+
+    <section id="about-me">
+        <img src="images/foto-profil.jpg" alt="Profile" class="profile-img" onerror="this.style.display='none'">
+        <h2>About Me</h2>
+        <p>Better get back</p>
+    </section>
+
+    <section id="what-i-do">
+        <h2>What I Do</h2>
+        <p>I told you.</p>
+    </section>
+
+    <section id="experience">
+        <h2>Experience</h2>
+        <p>Guess its an Indonesian problem</p>
+    </section>
+
+    <section id="interest">
+        <h2>Interest</h2>
+        <p>This site is under construction, please.</p>
+        <div class="gallery">
+            <img src="images/foto-1.jpg" alt="Photo 1" onerror="this.style.display='none'">
+            <img src="images/foto-2.jpg" alt="Photo 2" onerror="this.style.display='none'">
+            <img src="images/foto-3.jpg" alt="Photo 3" onerror="this.style.display='none'">
+        </div>
+    </section>
+
+    <section id="articles" class="blog">
+        <h2>articles</h2>
+        <div class="blog-wrapper">
+            <div class="blog-archive" id="archive"></div>
+            <div class="blog-list" id="blogList"></div>
+        </div>
+    </section>
+</div>
+
+<script>
+    if (window.innerWidth > 768) {
+        const container = document.querySelector('.container');
+        const sections = document.querySelectorAll('section');
+        const total = sections.length;
+        let current = 0;
+
+        function goTo(idx) {
+            if (idx < 0) idx = total - 1;
+            if (idx >= total) idx = 0;
+            current = idx;
+            container.scrollTo({ left: current * window.innerWidth, behavior: 'smooth' });
+            document.querySelectorAll('nav a').forEach((a, i) => a.classList.toggle('active', i === current));
+        }
+        document.querySelectorAll('nav a')[0].classList.add('active');
+
+        document.getElementById('prevBtn').onclick = () => goTo(current - 1);
+        document.getElementById('nextBtn').onclick = () => goTo(current + 1);
+
+        document.querySelectorAll('nav a').forEach((a, i) => {
+            a.addEventListener('click', e => { e.preventDefault(); goTo(i); });
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+            if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
+        });
+    } else {
+        document.querySelectorAll('nav a')[0].classList.add('active');
+        document.querySelectorAll('nav a').forEach((a, i) => {
+            a.addEventListener('click', () => {
+                document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
+                a.classList.add('active');
+            });
+        });
+    }
+
+    fetch('articles.json').then(r => r.json()).then(articles => {
+        const archiveEl = document.getElementById('archive');
+        const listEl = document.getElementById('blogList');
+        let allArticles = articles.reverse();
+        let filterMonth = null, filterYear = null;
+
+        const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+        function groupByYearMonth() {
+            const groups = {};
+            allArticles.forEach(a => {
+                const [y, m] = a.date.split('-');
+                const key = `${y}-${m}`;
+                if (!groups[key]) groups[key] = { year: y, month: m, articles: [] };
+                groups[key].articles.push(a);
+            });
+            return Object.values(groups).sort((a, b) => b.year - a.year || b.month - a.month);
+        }
+
+        function render() {
+            const groups = groupByYearMonth();
+
+            archiveEl.innerHTML = '';
+            groups.forEach(g => {
+                const yKey = g.year;
+                const mKey = `${g.year}-${g.month}`;
+                const yearEl = document.createElement('h3');
+                yearEl.textContent = g.year;
+                yearEl.onclick = () => { filterYear = filterYear === yKey ? null : yKey; filterMonth = null; render(); };
+                if (filterYear === yKey) yearEl.style.opacity = '0.7';
+                archiveEl.appendChild(yearEl);
+
+                const monthEl = document.createElement('span');
+                monthEl.className = 'month' + (filterMonth === mKey ? ' active' : '');
+                monthEl.textContent = months[parseInt(g.month)-1];
+                monthEl.onclick = () => { filterMonth = filterMonth === mKey ? null : mKey; filterYear = null; render(); };
+                archiveEl.appendChild(monthEl);
+            });
+
+            const filtered = allArticles.filter(a => {
+                const mKey = a.date.slice(0, 7);
+                const yKey = a.date.slice(0, 4);
+                if (filterMonth) return mKey === filterMonth;
+                if (filterYear) return yKey === filterYear;
+                return true;
+            });
+
+            listEl.innerHTML = filtered.length ? '' : '<p style="color:#999;font-size:0.9rem;text-align:center;">no articles found.</p>';
+            filtered.forEach(a => {
+                const item = document.createElement('div');
+                item.className = 'blog-item';
+                const d = a.date.split('-').reverse().join('-');
+                item.innerHTML = `<span class="blog-date">${d}</span><span class="blog-title">${a.title}</span>`;
+                item.onclick = () => alert(a.content || 'no content yet.');
+                listEl.appendChild(item);
+            });
+        }
+
+        render();
+    }).catch(() => document.getElementById('blogList').innerHTML = '<p style="color:#999;font-size:0.9rem;">no articles yet.</p>');
+</script>
+</body>
+</html>
