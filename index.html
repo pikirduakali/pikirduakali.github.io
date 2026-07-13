@@ -12,8 +12,7 @@
         .container {
             display: flex;
             width: 500vw;
-            scroll-snap-type: x mandatory;
-            overflow-x: auto;
+            overflow: hidden;
             height: 100vh;
         }
 
@@ -26,7 +25,6 @@
             justify-content: center;
             align-items: center;
             padding: 2rem;
-            scroll-snap-align: start;
             overflow-y: auto;
         }
 
@@ -135,26 +133,21 @@
     const container = document.querySelector('.container');
     const sections = document.querySelectorAll('section');
     const total = sections.length;
+    let current = 0;
 
     function goTo(idx) {
         if (idx < 0) idx = 0;
         if (idx >= total) idx = total - 1;
-        sections[idx].scrollIntoView({ behavior: 'smooth', inline: 'start' });
+        current = idx;
+        container.scrollTo({ left: current * window.innerWidth, behavior: 'smooth' });
     }
 
-    function cur() {
-        let i = Math.round(container.scrollLeft / window.innerWidth);
-        if (i < 0) i = 0;
-        if (i >= total) i = total - 1;
-        return i;
-    }
-
-    document.getElementById('prevBtn').onclick = () => goTo(cur() - 1);
-    document.getElementById('nextBtn').onclick = () => goTo(cur() + 1);
+    document.getElementById('prevBtn').onclick = () => goTo(current - 1);
+    document.getElementById('nextBtn').onclick = () => goTo(current + 1);
 
     document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(cur() - 1); }
-        if (e.key === 'ArrowRight') { e.preventDefault(); goTo(cur() + 1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
     });
 </script>
 </body>
