@@ -12,9 +12,12 @@
         .container {
             display: flex;
             width: 500vw;
-            overflow: hidden;
+            overflow: auto;
             height: 100vh;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .container::-webkit-scrollbar { display: none; }
 
         section {
             width: 100vw;
