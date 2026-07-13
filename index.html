@@ -53,6 +53,7 @@
             transition: color 0.2s;
         }
         nav a:hover { color: #000; }
+        nav a.active { color: #1a237e; font-weight: 700; border-bottom: 2px solid #1a237e; padding-bottom: 0.2rem; }
 
         img { max-width: 100%; border-radius: 12px; }
         .profile-img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid #eee; }
@@ -143,10 +144,16 @@
         if (idx >= total) idx = 0;
         current = idx;
         container.scrollTo({ left: current * window.innerWidth, behavior: 'smooth' });
+        document.querySelectorAll('nav a').forEach((a, i) => a.classList.toggle('active', i === current));
     }
+    document.querySelectorAll('nav a')[0].classList.add('active');
 
     document.getElementById('prevBtn').onclick = () => goTo(current - 1);
     document.getElementById('nextBtn').onclick = () => goTo(current + 1);
+
+    document.querySelectorAll('nav a').forEach((a, i) => {
+        a.addEventListener('click', e => { e.preventDefault(); goTo(i); });
+    });
 
     document.addEventListener('keydown', e => {
         if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
