@@ -120,11 +120,7 @@
         scrollLeft = container.scrollLeft;
     });
 
-    container.addEventListener('mouseleave', () => {
-        isDown = false;
-    });
-
-    container.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', () => {
         isDown = false;
     });
 
@@ -134,13 +130,24 @@
         const walk = x - startX;
         if (Math.abs(walk) > 5) {
             moved = true;
-            container.scrollLeft = scrollLeft - walk;
+            container.scrollLeft = scrollLeft - walk * 1.5;
+            e.preventDefault();
         }
     });
 
     container.addEventListener('click', e => {
         if (moved) { e.stopPropagation(); e.preventDefault(); }
     }, true);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') {
+            container.scrollBy({ left: -window.innerWidth, behavior: 'smooth' });
+            e.preventDefault();
+        } else if (e.key === 'ArrowRight') {
+            container.scrollBy({ left: window.innerWidth, behavior: 'smooth' });
+            e.preventDefault();
+        }
+    });
 </script>
 </body>
 </html>
