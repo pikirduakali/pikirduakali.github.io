@@ -327,7 +327,7 @@
       link.addEventListener('click', () => { mobileMenu.classList.remove('open'); toggle.textContent = 'Menu'; });
     });
 
-    function tick() { document.getElementById('clockTick').textContent = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' }); }
+    function tick() { document.getElementById('clockTick').textContent = new Date().toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }); }
     tick(); setInterval(tick, 1000);
   </script>
 </body>
