@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Showcase — P2X</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤨</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --background: #0e0e0e;
+      --foreground: #f0ede8;
+      --card: #181818;
+      --muted-foreground: #7a7770;
+      --accent: #e83d2a;
+      --border: rgba(240, 237, 232, 0.1);
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--background); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .page { max-width: 1024px; margin: 0 auto; padding: 64px 80px; }
+    .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); text-decoration: none; margin-bottom: 48px; transition: color 0.2s; }
+    .back:hover { color: var(--foreground); }
+
+    h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 8px; }
+    .subtitle { font-size: 15px; color: var(--muted-foreground); margin-bottom: 64px; }
+
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 48px; }
+    .filter-btn { font-size: 12px; padding: 6px 14px; border: 1px solid var(--border); background: none; color: var(--muted-foreground); cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; }
+    .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--foreground); }
+
+    .showcase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-bottom: 64px; }
+    .showcase-card { background: var(--background); padding: 24px; transition: background 0.2s; display: flex; flex-direction: column; }
+    .showcase-card:hover { background: var(--card); }
+    .showcase-thumb { width: 100%; aspect-ratio: 4/3; background: var(--card); margin-bottom: 16px; overflow: hidden; }
+    .showcase-thumb img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); opacity: 0.8; transition: filter 0.5s, opacity 0.5s; }
+    .showcase-card:hover .showcase-thumb img { filter: grayscale(0); opacity: 1; }
+    .showcase-tag { font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+    .showcase-card h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .showcase-card p { font-size: 13px; color: var(--muted-foreground); line-height: 1.6; margin-bottom: 16px; flex: 1; }
+    .showcase-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-foreground); text-decoration: none; transition: color 0.2s; }
+    .showcase-btn:hover { color: var(--accent); }
+    .showcase-btn svg { transition: transform 0.2s; }
+    .showcase-btn:hover svg { transform: translateX(3px); }
+
+    @media (max-width: 768px) { .page { padding: 48px 24px; } .showcase-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a href="index.html" class="back">&larr; back to home</a>
+    <h1>Showcase</h1>
+    <p class="subtitle">Design projects I've poured myself into — branding, print, and digital.</p>
+
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="branding">Branding</button>
+      <button class="filter-btn" data-filter="print">Print</button>
+      <button class="filter-btn" data-filter="digital">Digital</button>
+      <button class="filter-btn" data-filter="packaging">Packaging</button>
+    </div>
+
+    <div class="showcase-grid" id="showcaseGrid"></div>
+  </div>
+
+  <script>
+    const projects = [
+      { category: 'branding', tag: 'Branding', img: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&h=375&fit=crop&auto=format', title: 'Roastery Rebrand', desc: 'Full brand identity including logo, stationery, and brand guidelines for a local specialty coffee roaster.' },
+      { category: 'print', tag: 'Print', img: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=500&h=375&fit=crop&auto=format', title: 'Menu System', desc: 'Food & beverage menu layout, food photography direction, and print production management.' },
+      { category: 'digital', tag: 'Digital', img: 'https://images.unsplash.com/photo-1613909207039-6b173b4c7c5e?w=500&h=375&fit=crop&auto=format', title: 'Social Media Kit', desc: 'Campaign visuals, Instagram templates, and content strategy for F&B brand.' },
+      { category: 'packaging', tag: 'Packaging', img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&h=375&fit=crop&auto=format', title: 'Coffee Bag Series', desc: 'Packaging design for a single-origin coffee line — three variants, one visual system.' },
+      { category: 'branding', tag: 'Branding', img: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=375&fit=crop&auto=format', title: 'Cafe Identity', desc: 'Visual identity for a new cafe concept — logo, signage, uniforms, and interior graphics.' },
+      { category: 'print', tag: 'Print', img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=500&h=375&fit=crop&auto=format', title: 'Lookbook', desc: 'Seasonal lookbook layout with art direction, product styling, and prepress oversight.' },
+      { category: 'digital', tag: 'Digital', img: 'https://images.unsplash.com/photo-1557838923-2985c318be48?w=500&h=375&fit=crop&auto=format', title: 'Landing Page', desc: 'Designed and built a product landing page for a limited-edition beverage launch.' },
+      { category: 'packaging', tag: 'Packaging', img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=500&h=375&fit=crop&auto=format', title: 'Gift Set', desc: 'Holiday gift box packaging with custom illustration, structural design, and print coordination.' },
+      { category: 'branding', tag: 'Branding', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f2?w=500&h=375&fit=crop&auto=format', title: 'Merch Line', desc: 'Branded merchandise — t-shirts, totes, mugs, and stickers for a consumer brand.' },
+      { category: 'print', tag: 'Print', img: 'https://images.unsplash.com/photo-1561715272-a1dea7a0f145?w=500&h=375&fit=crop&auto=format', title: 'Brochure Set', desc: 'Corporate brochure and service menu for a B2B hospitality provider.' },
+      { category: 'digital', tag: 'Digital', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=375&fit=crop&auto=format', title: 'Email Templates', desc: 'Responsive email templates for weekly promotions and product drops.' },
+      { category: 'packaging', tag: 'Packaging', img: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500&h=375&fit=crop&auto=format', title: 'Bottle Label', desc: 'Label design for a craft beverage line — from concept to print-ready files.' },
+    ];
+
+    let currentFilter = 'all';
+    const grid = document.getElementById('showcaseGrid');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    function render() {
+      const filtered = currentFilter === 'all' ? projects : projects.filter(p => p.category === currentFilter);
+      grid.innerHTML = '';
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'showcase-card';
+        card.innerHTML = `
+          <div class="showcase-thumb"><img src="${p.img}" alt="${p.title}"></div>
+          <div class="showcase-tag">${p.tag}</div>
+          <h3>${p.title}</h3>
+          <p>${p.desc}</p>
+          <a href="#" class="showcase-btn">view project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>`;
+        card.querySelector('.showcase-btn').addEventListener('click', e => { e.preventDefault(); alert('project detail coming soon.'); });
+        grid.appendChild(card);
+      });
+    }
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
