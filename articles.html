@@ -62,12 +62,7 @@
 
     <div class="filters" style="gap:12px;align-items:center;flex-wrap:wrap">
       <span style="font-size:11px;color:var(--muted-foreground);letter-spacing:0.1em;text-transform:uppercase">sort</span>
-      <div style="display:flex;gap:8px" id="tagFilters">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="essay">Essay</button>
-        <button class="filter-btn" data-filter="tech">Tech</button>
-        <button class="filter-btn" data-filter="design">Design</button>
-      </div>
+      <select class="filter-select" id="tagSelect"><option value="all">all</option><option value="essay">essay</option><option value="tech">tech</option><option value="design">design</option></select>
       <select class="filter-select" id="yearSelect"><option value="">all years</option></select>
       <select class="filter-select" id="monthSelect"><option value="">all months</option></select>
     </div>
@@ -94,7 +89,6 @@
 
     let tagFilter = 'all', yearFilter = null, monthFilter = null;
     const listEl = document.getElementById('articleList');
-    const tagBtns = document.querySelectorAll('#tagFilters .filter-btn');
 
     const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 
@@ -105,8 +99,11 @@
     }
 
     function populateSelects() {
+      const tSel = document.getElementById('tagSelect');
       const ySel = document.getElementById('yearSelect');
       const mSel = document.getElementById('monthSelect');
+
+      tSel.value = tagFilter;
 
       ySel.innerHTML = '<option value="">all years</option>';
       getYears().forEach(y => {
@@ -179,14 +176,10 @@
       });
     }
 
-    tagBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tagBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        tagFilter = btn.dataset.filter;
-        render();
-      });
-    });
+    document.getElementById('tagSelect').onchange = function() {
+      tagFilter = this.value;
+      render();
+    };
 
     populateSelects();
     render();
