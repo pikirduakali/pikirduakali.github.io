@@ -1,0 +1,16 @@
+On Building Things That Last
+Essay | 13 jul 2026
+
+Most things break. The interesting question is whether that was the point.
+
+I've been thinking a lot about permanence lately. Not in a philosophical, "what is the meaning of all this" kind of way — more like, why do some things stick around while others fall apart the moment you look away?
+
+In software, we call it technical debt. In the physical world, we call it entropy. In life, we call it Tuesday.
+
+The things that last aren't necessarily the most elegant. They're the ones built with the understanding that they will be maintained. That someone will come back to fix, patch, and improve them. That they exist within a system, not in isolation.
+
+A well-made cup of coffee doesn't last more than fifteen minutes. But the ritual of making it — the grinder, the scale, the pour-over technique — that sticks around because it's part of a routine worth repeating.
+
+Maybe that's the secret. Build things worth maintaining. Be things worth coming back to.
+
+Or maybe I'm overthinking this. Wouldn't be the first time.

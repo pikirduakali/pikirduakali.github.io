@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article — P2X</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤨</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --background: #0e0e0e;
+      --foreground: #f0ede8;
+      --card: #181818;
+      --muted-foreground: #7a7770;
+      --accent: #e83d2a;
+      --border: rgba(240, 237, 232, 0.1);
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--background); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .page { max-width: 680px; margin: 0 auto; padding: 64px 80px; }
+    .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); text-decoration: none; margin-bottom: 48px; transition: color 0.2s; }
+    .back:hover { color: var(--foreground); }
+
+    .article-tag { font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+    .article-date { font-size: 12px; color: var(--muted-foreground); margin-bottom: 32px; }
+    h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.15; margin-bottom: 32px; }
+    .content { font-size: 17px; color: var(--foreground); line-height: 1.8; }
+    .content p { margin-bottom: 1.5em; }
+
+    .not-found { text-align: center; padding: 80px 0; }
+    .not-found h2 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 16px; }
+    .not-found p { color: var(--muted-foreground); }
+
+    @media (max-width: 768px) { .page { padding: 48px 24px; } }
+  </style>
+</head>
+<body>
+  <div class="page" id="page">
+    <a href="articles.html" class="back">&larr; back to articles</a>
+    <div id="articleContent"></div>
+  </div>
+
+  <script>
+    const slug = new URLSearchParams(window.location.search).get('slug');
+    const container = document.getElementById('articleContent');
+
+    if (!slug) {
+      container.innerHTML = '<div class="not-found"><h2>no article specified</h2><p>go back and pick one.</p></div>';
+    } else {
+      fetch(`articles/${slug}.txt`)
+        .then(r => {
+          if (!r.ok) throw new Error('not found');
+          return r.text();
+        })
+        .then(text => {
+          const lines = text.split('\n').map(l => l.trim());
+          const title = lines[0] || 'untitled';
+          const meta = lines[1] || '';
+          const [tag, date] = meta.split('|').map(s => s.trim());
+          const body = lines.slice(2).filter(l => l !== '').map(l => `<p>${l}</p>`).join('');
+
+          container.innerHTML = `
+            <div class="article-tag">${tag || 'note'}</div>
+            <h1>${title}</h1>
+            <div class="article-date">${date || ''}</div>
+            <div class="content">${body}</div>`;
+        })
+        .catch(() => {
+          container.innerHTML = '<div class="not-found"><h2>article not found</h2><p>the file might be missing or the slug is wrong.</p></div>';
+        });
+    }
+  </script>
+</body>
+</html>

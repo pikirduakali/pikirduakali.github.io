@@ -1,0 +1,16 @@
+The Quiet Power of Boring Infrastructure
+Tech | 28 jan 2026
+
+Invisible systems are the only ones worth admiring.
+
+Nobody claps when the power stays on. Nobody tweets about how the water pressure was perfect today. The things that work exactly as expected are the things we notice least.
+
+I think good design works the same way.
+
+The best POS system I ever used at a cafe was one I barely thought about. It just worked. The buttons were where I expected them. The modifier keys made sense. It didn't try to be clever or beautiful — it tried to be fast, and it succeeded.
+
+Boring infrastructure is reliable. It's predictable. It doesn't surprise you.
+
+There's a lesson there for how we build anything: websites, businesses, relationships. The flashy stuff gets attention. The boring stuff gets results.
+
+I'll take boring over broken any day.
