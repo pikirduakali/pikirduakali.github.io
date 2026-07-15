@@ -36,6 +36,8 @@
     .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 48px; }
     .filter-btn { font-size: 12px; padding: 6px 14px; border: 1px solid var(--border); background: none; color: var(--muted-foreground); cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; }
     .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--foreground); }
+    .filter-select { font-size: 12px; padding: 6px 14px; border: 1px solid var(--border); background: var(--background); color: var(--muted-foreground); cursor: pointer; font-family: var(--font-body); outline: none; }
+    .filter-select:hover, .filter-select:focus { border-color: var(--accent); color: var(--foreground); }
 
     .year-group { margin-bottom: 40px; }
     .year-label { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--accent); margin-bottom: 20px; }
@@ -64,8 +66,11 @@
       <button class="filter-btn" data-filter="tech">Tech</button>
       <button class="filter-btn" data-filter="design">Design</button>
     </div>
-    <div class="filters" id="yearFilters"></div>
-    <div class="filters" id="monthFilters" style="margin-bottom:32px"></div>
+    <div class="filters" style="gap:12px;align-items:center">
+      <span style="font-size:11px;color:var(--muted-foreground);letter-spacing:0.1em;text-transform:uppercase">sort</span>
+      <select class="filter-select" id="yearSelect"><option value="">all years</option></select>
+      <select class="filter-select" id="monthSelect"><option value="">all months</option></select>
+    </div>
 
     <div id="articleList"></div>
   </div>
@@ -90,8 +95,6 @@
     let tagFilter = 'all', yearFilter = null, monthFilter = null;
     const listEl = document.getElementById('articleList');
     const tagBtns = document.querySelectorAll('#filters .filter-btn');
-    const yearEl = document.getElementById('yearFilters');
-    const monthEl = document.getElementById('monthFilters');
 
     const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 
@@ -101,43 +104,40 @@
         .sort((a,b) => months.indexOf(a) - months.indexOf(b));
     }
 
-    function getMonthNum(m) { return String(months.indexOf(m) + 1).padStart(2, '0'); }
+    function populateSelects() {
+      const ySel = document.getElementById('yearSelect');
+      const mSel = document.getElementById('monthSelect');
 
-    function renderFilters() {
-      yearEl.innerHTML = '<button class="filter-btn' + (!yearFilter ? ' active' : '') + '" data-year="all">All years</button>';
+      ySel.innerHTML = '<option value="">all years</option>';
       getYears().forEach(y => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn' + (yearFilter === y ? ' active' : '');
-        btn.textContent = y;
-        btn.addEventListener('click', () => {
-          yearFilter = yearFilter === y ? null : y;
-          monthFilter = null;
-          renderFilters();
-          render();
-        });
-        yearEl.appendChild(btn);
+        const opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        if (yearFilter === y) opt.selected = true;
+        ySel.appendChild(opt);
       });
 
-      monthEl.innerHTML = '';
-      if (yearFilter) {
-        const allBtn = document.createElement('button');
-        allBtn.className = 'filter-btn' + (!monthFilter ? ' active' : '');
-        allBtn.textContent = 'all months';
-        allBtn.addEventListener('click', () => { monthFilter = null; renderFilters(); render(); });
-        monthEl.appendChild(allBtn);
+      ySel.onchange = () => {
+        yearFilter = ySel.value || null;
+        monthFilter = null;
+        mSel.value = '';
+        render();
+        populateSelects();
+      };
 
+      mSel.innerHTML = '<option value="">all months</option>';
+      if (yearFilter) {
         getMonths(yearFilter).forEach(m => {
-          const btn = document.createElement('button');
-          btn.className = 'filter-btn' + (monthFilter === m ? ' active' : '');
-          btn.textContent = m;
-          btn.addEventListener('click', () => {
-            monthFilter = monthFilter === m ? null : m;
-            renderFilters();
-            render();
-          });
-          monthEl.appendChild(btn);
+          const opt = document.createElement('option');
+          opt.value = m; opt.textContent = m;
+          if (monthFilter === m) opt.selected = true;
+          mSel.appendChild(opt);
         });
       }
+
+      mSel.onchange = () => {
+        monthFilter = mSel.value || null;
+        render();
+      };
     }
 
     function render() {
@@ -188,7 +188,7 @@
       });
     });
 
-    renderFilters();
+    populateSelects();
     render();
   </script>
 </body>
