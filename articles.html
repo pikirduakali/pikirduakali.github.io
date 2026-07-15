@@ -62,9 +62,9 @@
 
     <div class="filters" style="gap:12px;align-items:center;flex-wrap:wrap">
       <span style="font-size:11px;color:var(--muted-foreground);letter-spacing:0.1em;text-transform:uppercase">sort</span>
-      <select class="filter-select" id="tagSelect"><option value="all">all</option><option value="essay">essay</option><option value="tech">tech</option><option value="design">design</option></select>
-      <select class="filter-select" id="yearSelect"><option value="">all years</option></select>
-      <select class="filter-select" id="monthSelect"><option value="">all months</option></select>
+      <select class="filter-select" id="tagSelect"><option value="all">All</option><option value="essay">Essay</option><option value="tech">Tech</option><option value="design">Design</option></select>
+      <select class="filter-select" id="yearSelect"><option value="">All Years</option></select>
+      <select class="filter-select" id="monthSelect"><option value="">All Months</option></select>
     </div>
 
     <div id="articleList"></div>
@@ -105,7 +105,7 @@
 
       tSel.value = tagFilter;
 
-      ySel.innerHTML = '<option value="">all years</option>';
+      ySel.innerHTML = '<option value="">All Years</option>';
       getYears().forEach(y => {
         const opt = document.createElement('option');
         opt.value = y; opt.textContent = y;
@@ -121,7 +121,7 @@
         render();
       };
 
-      mSel.innerHTML = '<option value="">all months</option>';
+      mSel.innerHTML = '<option value="">All Months</option>';
       if (yearFilter) {
         getMonths(yearFilter).forEach(m => {
           const opt = document.createElement('option');
