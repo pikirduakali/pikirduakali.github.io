@@ -68,7 +68,7 @@
     @keyframes bob { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(6px); opacity: 1; } }
 
     .btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; border: 1px solid var(--border); padding: 10px 20px; color: var(--muted-foreground); text-decoration: none; background: none; cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; position: relative; overflow: hidden; }
-    .btn:hover { border-color: var(--foreground); color: var(--foreground); }
+    .btn:hover { border-color: var(--accent); color: var(--foreground); }
     .btn svg { transition: transform 0.2s; }
     .btn:hover svg { transform: translateX(4px); }
     .btn-shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(240,237,232,0.08) 50%, transparent 100%); transform: translateX(-100%); animation: shimmer 5s ease-in-out infinite; }
