@@ -64,6 +64,8 @@
       <button class="filter-btn" data-filter="tech">Tech</button>
       <button class="filter-btn" data-filter="design">Design</button>
     </div>
+    <div class="filters" id="yearFilters"></div>
+    <div class="filters" id="monthFilters" style="margin-bottom:32px"></div>
 
     <div id="articleList"></div>
   </div>
@@ -85,12 +87,65 @@
       { tag: 'Essay', date: '22 jun 2024', title: 'The Coffee Shop as a Classroom', excerpt: 'I learned more about business behind the bar than in any boardroom.', year: 2024, slug: 'the-coffee-shop-as-a-classroom' },
     ];
 
-    let currentFilter = 'all';
+    let tagFilter = 'all', yearFilter = null, monthFilter = null;
     const listEl = document.getElementById('articleList');
-    const filterBtns = document.querySelectorAll('.filter-btn');
+    const tagBtns = document.querySelectorAll('#filters .filter-btn');
+    const yearEl = document.getElementById('yearFilters');
+    const monthEl = document.getElementById('monthFilters');
+
+    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+
+    function getYears() { return [...new Set(articles.map(a => a.year))].sort((a,b) => b - a); }
+    function getMonths(year) {
+      return [...new Set(articles.filter(a => a.year === year).map(a => a.date.split(' ')[1]))]
+        .sort((a,b) => months.indexOf(a) - months.indexOf(b));
+    }
+
+    function getMonthNum(m) { return String(months.indexOf(m) + 1).padStart(2, '0'); }
+
+    function renderFilters() {
+      yearEl.innerHTML = '<button class="filter-btn' + (!yearFilter ? ' active' : '') + '" data-year="all">All years</button>';
+      getYears().forEach(y => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn' + (yearFilter === y ? ' active' : '');
+        btn.textContent = y;
+        btn.addEventListener('click', () => {
+          yearFilter = yearFilter === y ? null : y;
+          monthFilter = null;
+          renderFilters();
+          render();
+        });
+        yearEl.appendChild(btn);
+      });
+
+      monthEl.innerHTML = '';
+      if (yearFilter) {
+        const allBtn = document.createElement('button');
+        allBtn.className = 'filter-btn' + (!monthFilter ? ' active' : '');
+        allBtn.textContent = 'all months';
+        allBtn.addEventListener('click', () => { monthFilter = null; renderFilters(); render(); });
+        monthEl.appendChild(allBtn);
+
+        getMonths(yearFilter).forEach(m => {
+          const btn = document.createElement('button');
+          btn.className = 'filter-btn' + (monthFilter === m ? ' active' : '');
+          btn.textContent = m;
+          btn.addEventListener('click', () => {
+            monthFilter = monthFilter === m ? null : m;
+            renderFilters();
+            render();
+          });
+          monthEl.appendChild(btn);
+        });
+      }
+    }
 
     function render() {
-      const filtered = currentFilter === 'all' ? articles : articles.filter(a => a.tag.toLowerCase() === currentFilter);
+      let filtered = articles;
+      if (tagFilter !== 'all') filtered = filtered.filter(a => a.tag.toLowerCase() === tagFilter);
+      if (yearFilter) filtered = filtered.filter(a => a.year === yearFilter);
+      if (monthFilter) filtered = filtered.filter(a => a.date.split(' ')[1] === monthFilter);
+
       const groups = {};
       filtered.forEach(a => {
         if (!groups[a.year]) groups[a.year] = [];
@@ -98,7 +153,12 @@
       });
 
       listEl.innerHTML = '';
-      Object.keys(groups).sort((a, b) => b - a).forEach(year => {
+      const sortedYears = Object.keys(groups).sort((a, b) => b - a);
+      if (!sortedYears.length) {
+        listEl.innerHTML = '<p style="color:var(--muted-foreground);text-align:center;padding:40px 0;">no articles found.</p>';
+        return;
+      }
+      sortedYears.forEach(year => {
         const group = document.createElement('div');
         group.className = 'year-group';
         group.innerHTML = `<div class="year-label">${year}</div>`;
@@ -119,15 +179,16 @@
       });
     }
 
-    filterBtns.forEach(btn => {
+    tagBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
+        tagBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentFilter = btn.dataset.filter;
+        tagFilter = btn.dataset.filter;
         render();
       });
     });
 
+    renderFilters();
     render();
   </script>
 </body>
