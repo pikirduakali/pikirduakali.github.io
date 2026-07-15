@@ -71,7 +71,7 @@
     .btn:hover { border-color: var(--foreground); color: var(--foreground); }
     .btn svg { transition: transform 0.2s; }
     .btn:hover svg { transform: translateX(4px); }
-    .btn-shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(240,237,232,0.08) 50%, transparent 100%); transform: translateX(-100%); animation: shimmer 3s ease-in-out infinite; }
+    .btn-shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(240,237,232,0.08) 50%, transparent 100%); transform: translateX(-100%); animation: shimmer 4s ease-in-out infinite; }
     @keyframes shimmer { 100% { transform: translateX(100%); } }
 
     h2.display { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 64px; }
@@ -285,7 +285,7 @@
           <span class="showcase-btn">View project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
         </a>
       </div>
-      <div style="max-width:896px"><a href="showcase.html" class="btn" style="width:100%;justify-content:space-between">All projects <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+      <div style="max-width:896px"><a href="showcase.html" class="btn btn-shimmer" style="width:100%;justify-content:space-between">All projects <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
     <section id="articles">
@@ -296,7 +296,7 @@
         <a class="article-item" href="article.html?slug=the-quiet-power-of-boring-infrastructure"><div class="article-meta"><div class="article-meta-left"><span class="article-tag">Tech</span><span class="article-date">Jan 2024</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">The Quiet Power of Boring Infrastructure</div><div class="article-excerpt">Invisible systems are the only ones worth admiring.</div></a>
         <a class="article-item" href="article.html?slug=designing-for-yourself-first"><div class="article-meta"><div class="article-meta-left"><span class="article-tag">Design</span><span class="article-date">Nov 2023</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">Designing for Yourself First</div><div class="article-excerpt">If you wouldn't use it daily, you probably shouldn't ship it.</div></a>
       </div>
-      <div style="max-width:896px"><a href="articles.html" class="btn" style="width:100%;justify-content:space-between">All articles <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+      <div style="max-width:896px"><a href="articles.html" class="btn btn-shimmer" style="width:100%;justify-content:space-between">All articles <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
     <footer>
