@@ -33,9 +33,9 @@
     h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 8px; }
     .subtitle { font-size: 15px; color: var(--muted-foreground); margin-bottom: 64px; }
 
-    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 48px; }
-    .filter-btn { font-size: 12px; padding: 6px 14px; border: 1px solid var(--border); background: none; color: var(--muted-foreground); cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; }
-    .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--foreground); }
+    .filters { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 48px; }
+    .filter-select { font-size: 12px; padding: 6px 14px; border: 1px solid var(--border); background: var(--background); color: var(--muted-foreground); cursor: pointer; font-family: var(--font-body); outline: none; }
+    .filter-select:hover, .filter-select:focus { border-color: var(--accent); color: var(--foreground); }
 
     .showcase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-bottom: 64px; }
     .showcase-card { background: var(--background); padding: 24px; transition: background 0.2s; display: flex; flex-direction: column; }
@@ -60,12 +60,9 @@
     <h1>Showcase</h1>
     <p class="subtitle">Design projects I've poured myself into — branding, print, and digital.</p>
 
-    <div class="filters" id="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="branding">Branding</button>
-      <button class="filter-btn" data-filter="print">Print</button>
-      <button class="filter-btn" data-filter="digital">Digital</button>
-      <button class="filter-btn" data-filter="packaging">Packaging</button>
+    <div class="filters">
+      <span style="font-size:11px;color:var(--muted-foreground);letter-spacing:0.1em;text-transform:uppercase">sort</span>
+      <select class="filter-select" id="catSelect"><option value="all">all</option><option value="branding">branding</option><option value="print">print</option><option value="digital">digital</option><option value="packaging">packaging</option></select>
     </div>
 
     <div class="showcase-grid" id="showcaseGrid"></div>
@@ -73,26 +70,26 @@
 
   <script>
     const projects = [
-      { category: 'branding', tag: 'Branding', img: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&h=375&fit=crop&auto=format', title: 'Roastery Rebrand', desc: 'Full brand identity including logo, stationery, and brand guidelines for a local specialty coffee roaster.' },
-      { category: 'print', tag: 'Print', img: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=500&h=375&fit=crop&auto=format', title: 'Menu System', desc: 'Food & beverage menu layout, food photography direction, and print production management.' },
-      { category: 'digital', tag: 'Digital', img: 'https://images.unsplash.com/photo-1613909207039-6b173b4c7c5e?w=500&h=375&fit=crop&auto=format', title: 'Social Media Kit', desc: 'Campaign visuals, Instagram templates, and content strategy for F&B brand.' },
-      { category: 'packaging', tag: 'Packaging', img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&h=375&fit=crop&auto=format', title: 'Coffee Bag Series', desc: 'Packaging design for a single-origin coffee line — three variants, one visual system.' },
-      { category: 'branding', tag: 'Branding', img: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=375&fit=crop&auto=format', title: 'Cafe Identity', desc: 'Visual identity for a new cafe concept — logo, signage, uniforms, and interior graphics.' },
-      { category: 'print', tag: 'Print', img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=500&h=375&fit=crop&auto=format', title: 'Lookbook', desc: 'Seasonal lookbook layout with art direction, product styling, and prepress oversight.' },
-      { category: 'digital', tag: 'Digital', img: 'https://images.unsplash.com/photo-1557838923-2985c318be48?w=500&h=375&fit=crop&auto=format', title: 'Landing Page', desc: 'Designed and built a product landing page for a limited-edition beverage launch.' },
-      { category: 'packaging', tag: 'Packaging', img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=500&h=375&fit=crop&auto=format', title: 'Gift Set', desc: 'Holiday gift box packaging with custom illustration, structural design, and print coordination.' },
-      { category: 'branding', tag: 'Branding', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f2?w=500&h=375&fit=crop&auto=format', title: 'Merch Line', desc: 'Branded merchandise — t-shirts, totes, mugs, and stickers for a consumer brand.' },
-      { category: 'print', tag: 'Print', img: 'https://images.unsplash.com/photo-1561715272-a1dea7a0f145?w=500&h=375&fit=crop&auto=format', title: 'Brochure Set', desc: 'Corporate brochure and service menu for a B2B hospitality provider.' },
-      { category: 'digital', tag: 'Digital', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=375&fit=crop&auto=format', title: 'Email Templates', desc: 'Responsive email templates for weekly promotions and product drops.' },
-      { category: 'packaging', tag: 'Packaging', img: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500&h=375&fit=crop&auto=format', title: 'Bottle Label', desc: 'Label design for a craft beverage line — from concept to print-ready files.' },
+      { category: 'branding', tag: 'Branding', slug: 'roastery-rebrand', img: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&h=375&fit=crop&auto=format', title: 'Roastery Rebrand', desc: 'Full brand identity including logo, stationery, and brand guidelines for a local specialty coffee roaster.' },
+      { category: 'print', tag: 'Print', slug: 'menu-system', img: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=500&h=375&fit=crop&auto=format', title: 'Menu System', desc: 'Food & beverage menu layout, food photography direction, and print production management.' },
+      { category: 'digital', tag: 'Digital', slug: 'social-media-kit', img: 'https://images.unsplash.com/photo-1613909207039-6b173b4c7c5e?w=500&h=375&fit=crop&auto=format', title: 'Social Media Kit', desc: 'Campaign visuals, Instagram templates, and content strategy for F&B brand.' },
+      { category: 'packaging', tag: 'Packaging', slug: 'coffee-bag-series', img: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&h=375&fit=crop&auto=format', title: 'Coffee Bag Series', desc: 'Packaging design for a single-origin coffee line — three variants, one visual system.' },
+      { category: 'branding', tag: 'Branding', slug: 'cafe-identity', img: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=375&fit=crop&auto=format', title: 'Cafe Identity', desc: 'Visual identity for a new cafe concept — logo, signage, uniforms, and interior graphics.' },
+      { category: 'print', tag: 'Print', slug: 'lookbook', img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=500&h=375&fit=crop&auto=format', title: 'Lookbook', desc: 'Seasonal lookbook layout with art direction, product styling, and prepress oversight.' },
+      { category: 'digital', tag: 'Digital', slug: 'landing-page', img: 'https://images.unsplash.com/photo-1557838923-2985c318be48?w=500&h=375&fit=crop&auto=format', title: 'Landing Page', desc: 'Designed and built a product landing page for a limited-edition beverage launch.' },
+      { category: 'packaging', tag: 'Packaging', slug: 'gift-set', img: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=500&h=375&fit=crop&auto=format', title: 'Gift Set', desc: 'Holiday gift box packaging with custom illustration, structural design, and print coordination.' },
+      { category: 'branding', tag: 'Branding', slug: 'merch-line', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f2?w=500&h=375&fit=crop&auto=format', title: 'Merch Line', desc: 'Branded merchandise — t-shirts, totes, mugs, and stickers for a consumer brand.' },
+      { category: 'print', tag: 'Print', slug: 'brochure-set', img: 'https://images.unsplash.com/photo-1561715272-a1dea7a0f145?w=500&h=375&fit=crop&auto=format', title: 'Brochure Set', desc: 'Corporate brochure and service menu for a B2B hospitality provider.' },
+      { category: 'digital', tag: 'Digital', slug: 'email-templates', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=375&fit=crop&auto=format', title: 'Email Templates', desc: 'Responsive email templates for weekly promotions and product drops.' },
+      { category: 'packaging', tag: 'Packaging', slug: 'bottle-label', img: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500&h=375&fit=crop&auto=format', title: 'Bottle Label', desc: 'Label design for a craft beverage line — from concept to print-ready files.' },
     ];
 
-    let currentFilter = 'all';
     const grid = document.getElementById('showcaseGrid');
-    const filterBtns = document.querySelectorAll('.filter-btn');
+    const catSelect = document.getElementById('catSelect');
 
     function render() {
-      const filtered = currentFilter === 'all' ? projects : projects.filter(p => p.category === currentFilter);
+      const v = catSelect.value;
+      const filtered = v === 'all' ? projects : projects.filter(p => p.category === v);
       grid.innerHTML = '';
       filtered.forEach(p => {
         const card = document.createElement('div');
@@ -102,21 +99,12 @@
           <div class="showcase-tag">${p.tag}</div>
           <h3>${p.title}</h3>
           <p>${p.desc}</p>
-          <a href="#" class="showcase-btn">view project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>`;
-        card.querySelector('.showcase-btn').addEventListener('click', e => { e.preventDefault(); alert('project detail coming soon.'); });
+          <a href="${p.slug ? 'project.html?slug=' + p.slug : '#'}" class="showcase-btn">view project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>`;
         grid.appendChild(card);
       });
     }
 
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFilter = btn.dataset.filter;
-        render();
-      });
-    });
-
+    catSelect.addEventListener('change', render);
     render();
   </script>
 </body>
