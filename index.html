@@ -29,7 +29,7 @@
     ::-webkit-scrollbar-thumb { background: var(--border); }
 
     aside { position: fixed; top: 0; left: 0; height: 100%; width: 224px; border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 40px 32px; z-index: 30; }
-    .logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 40px; display: block; text-decoration: none; transition: color 0.2s; }
+    .logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 40px; display: block; text-decoration: none; transition: color 0.2s; }
     .logo:hover { color: var(--foreground); }
     nav { display: flex; flex-direction: column; gap: 4px; }
     nav a { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 14px; color: var(--muted-foreground); text-decoration: none; transition: color 0.2s; }
@@ -42,7 +42,7 @@
 
     .mobile-nav { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 30; background: rgba(14,14,14,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
     .mobile-nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; }
-    .mobile-nav-bar span { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); }
+    .mobile-nav-bar span { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
     .menu-toggle { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--muted-foreground); font-family: var(--font-body); transition: color 0.2s; }
     .menu-toggle:hover { color: var(--foreground); }
     .mobile-menu { display: none; border-top: 1px solid var(--border); padding: 8px 24px 24px; }
@@ -182,7 +182,7 @@
 
   <div class="mobile-nav">
     <div class="mobile-nav-bar">
-      <span>P2X</span>
+      <a href="#home" style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);text-decoration:none">P2X</a>
       <button class="menu-toggle" id="menu-toggle">Menu</button>
     </div>
     <div class="mobile-menu" id="mobile-menu">
