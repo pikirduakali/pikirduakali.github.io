@@ -28,6 +28,9 @@
       --font-display: 'Bricolage Grotesque', sans-serif;
     }
 
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
     html { scroll-behavior: smooth; font-size: 16px; }
     body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; overflow-x: hidden; }
     ::-webkit-scrollbar { width: 4px; }
@@ -227,7 +230,7 @@
   </div>
 
   <main>
-    <section id="home">
+    <section id="home" class="reveal">
       <div style="max-width:896px">
         <p style="font-size:13px;color:var(--accent);margin-bottom:4px;letter-spacing:0.1em;text-transform:uppercase;"><strong>Pram Suwandi</strong></p>
         <p class="hero-eyebrow">F&B Ops · Design · Whatever else</p>
@@ -238,7 +241,7 @@
       <div class="scroll-hint">scroll →</div>
     </section>
 
-    <section id="about">
+    <section id="about" class="reveal">
       <div class="section-label"><span class="num">01</span><span class="line"></span><span class="text">About Me</span></div>
       <h2 class="display">I'm a craftsman who sometimes<br>takes things too seriously.</h2>
       <div class="about-grid">
@@ -253,7 +256,7 @@
       </div>
     </section>
 
-    <section id="what-i-do">
+    <section id="what-i-do" class="reveal">
       <div class="section-label"><span class="num">02</span><span class="line"></span><span class="text">What I Do</span></div>
       <h2 class="display">I turn ambiguous problems<br>into something shippable.</h2>
       <div class="services-grid">
@@ -263,7 +266,7 @@
       </div>
     </section>
 
-    <section id="experience">
+    <section id="experience" class="reveal">
       <div class="section-label"><span class="num">03</span><span class="line"></span><span class="text">Experience</span></div>
       <h2 class="display">Places I've worked.<br>Things I've survived.</h2>
       <div class="exp-list">
@@ -276,7 +279,7 @@
       <div style="max-width:896px;margin-top:12px"><a href="experiences.html" class="btn-row">All experiences <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
-    <section id="interests">
+    <section id="interests" class="reveal">
       <div class="section-label"><span class="num">04</span><span class="line"></span><span class="text">Interests</span></div>
       <h2 class="display">What I do when<br>no one is watching.</h2>
       <div class="photo-row">
@@ -295,7 +298,7 @@
       </div>
     </section>
 
-    <section id="showcase">
+    <section id="showcase" class="reveal">
       <div class="section-label"><span class="num">05</span><span class="line"></span><span class="text">Showcase</span></div>
       <h2 class="display">All the projects<br>I've poured myself into.</h2>
       <div class="showcase-grid">
@@ -321,7 +324,7 @@
       <div style="max-width:896px"><a href="showcase.html" class="btn-row">All projects <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
-    <section id="articles">
+    <section id="articles" class="reveal">
       <div class="section-label"><span class="num">06</span><span class="line"></span><span class="text">Articles</span></div>
       <h2 class="display">Thoughts, written down<br>before I forgot them.</h2>
       <div class="article-list">
@@ -359,6 +362,13 @@
       const open = mobileMenu.classList.toggle('open');
       toggle.textContent = open ? 'Close' : 'Menu';
     });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     mobileMenu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => { mobileMenu.classList.remove('open'); toggle.textContent = 'Menu'; });
     });
