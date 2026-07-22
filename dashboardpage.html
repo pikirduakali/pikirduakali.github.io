@@ -94,8 +94,8 @@
       transition: border-color 0.2s, color 0.2s;
     }
     .dash-toolbar-right button:hover { border-color: var(--accent); color: var(--foreground); }
-    .btn-download, .btn-copy { border-color: var(--accent) !important; color: var(--accent) !important; }
-    .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
+    .btn-download, .btn-copy, .btn-help { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .btn-download:hover, .btn-copy:hover, .btn-help:hover { background: var(--accent); color: var(--foreground) !important; }
 
     .entry-output {
       display: none; margin-top: 20px; padding: 16px; background: #111;
@@ -148,15 +148,6 @@
       pointer-events: none;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
-
-    /* Help button */
-    .help-btn {
-      position: fixed; top: 16px; right: 16px; z-index: 50;
-      background: none; border: 1px solid var(--border); color: var(--muted-foreground);
-      font-size: 11px; padding: 6px 14px; cursor: pointer; font-family: var(--font-body);
-      letter-spacing: 0.1em; text-transform: uppercase; transition: border-color 0.2s, color 0.2s;
-    }
-    .help-btn:hover { border-color: var(--accent); color: var(--foreground); }
 
     /* Help modal */
     .help-overlay {
@@ -222,6 +213,7 @@
     <div class="dash-toolbar">
       <span class="slug-hint" id="slugHint">slug: —</span>
       <div class="dash-toolbar-right">
+        <button id="btnHelp" class="btn-help">How to Import</button>
         <button id="btnPreviewToggle">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
@@ -264,8 +256,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
-<button class="help-btn" id="helpBtn">How to Import</button>
 
 <div class="help-overlay" id="helpOverlay">
   <div class="help-modal">
@@ -518,7 +508,7 @@
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
   });
 
-  document.getElementById('helpBtn').addEventListener('click', () => {
+  document.getElementById('btnHelp').addEventListener('click', () => {
     document.getElementById('helpOverlay').classList.add('open');
   });
   document.getElementById('helpClose').addEventListener('click', () => {
