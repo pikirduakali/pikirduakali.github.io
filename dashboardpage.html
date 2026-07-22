@@ -234,7 +234,11 @@
           </div>
           <div class="field" style="max-width:140px">
             <label>Tag</label>
-            <select id="fieldTag"><option>Essay</option><option>Tech</option><option>Design</option></select>
+            <div style="display:flex;gap:4px">
+              <select id="fieldTag" style="flex:1"></select>
+              <input type="text" id="newTagInput" placeholder="new" style="width:54px;background:var(--card);border:1px solid var(--border);color:var(--foreground);padding:10px 8px;font-size:12px;font-family:var(--font-body);outline:none" />
+              <button id="addTagBtn" style="background:none;border:1px solid var(--border);color:var(--muted-foreground);padding:8px 10px;cursor:pointer;font-size:14px;transition:border-color 0.2s">+</button>
+            </div>
           </div>
           <div class="field" style="max-width:160px">
             <label>Date</label>
@@ -401,7 +405,13 @@
         const body = lines.slice(2).filter(l => l !== '').join('\n\n');
 
         document.getElementById('fieldTitle').value = title;
-        document.getElementById('fieldTag').value = tag || 'Essay';
+        const tagSel = document.getElementById('fieldTag');
+        if (tag && ![...tagSel.options].some(o => o.value === tag)) {
+          const opt = document.createElement('option');
+          opt.value = tag; opt.textContent = tag;
+          tagSel.appendChild(opt);
+        }
+        tagSel.value = tag || 'Essay';
         if (date) {
           document.getElementById('fieldDate').value = toRawDate(date);
         }
@@ -567,7 +577,36 @@
   // unlock();
 
   // Init
+  populateTags();
   updatePreview();
+
+  function populateTags() {
+    const sel = document.getElementById('fieldTag');
+    const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
+    const all = ['Essay', 'Tech', 'Design', ...custom];
+    sel.innerHTML = all.map(t => `<option value="${t}">${t}</option>`).join('');
+  }
+
+  document.getElementById('addTagBtn').addEventListener('click', () => {
+    const input = document.getElementById('newTagInput');
+    const name = input.value.trim();
+    if (!name) return;
+    const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
+    if (custom.includes(name) || ['Essay','Tech','Design'].includes(name)) {
+      toast('tag already exists');
+      return;
+    }
+    custom.push(name);
+    localStorage.setItem('p2x_custom_tags', JSON.stringify(custom));
+    populateTags();
+    document.getElementById('fieldTag').value = name;
+    input.value = '';
+    updatePreview();
+    toast(`tag "${name}" added`);
+  });
+  document.getElementById('newTagInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('addTagBtn').click();
+  });
 </script>
 </body>
 </html>
