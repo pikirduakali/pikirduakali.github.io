@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Experience — P2X</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤨</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --background: #0e0e0e;
+      --foreground: #f0ede8;
+      --card: #181818;
+      --muted-foreground: #7a7770;
+      --accent: #e83d2a;
+      --border: rgba(240, 237, 232, 0.1);
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--background); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .page { max-width: 896px; margin: 0 auto; padding: 64px 80px; }
+    .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); text-decoration: none; margin-bottom: 48px; transition: color 0.2s; }
+    .back:hover { color: var(--foreground); }
+
+    h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 8px; }
+    .subtitle { font-size: 15px; color: var(--muted-foreground); margin-bottom: 64px; }
+
+    .exp-item { padding: 32px 0; border-bottom: 1px solid var(--border); transition: padding-left 0.2s; }
+    .exp-item:hover { padding-left: 8px; }
+    .exp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 12px; }
+    .exp-role { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+    .exp-company { color: var(--accent); font-weight: 500; font-size: 15px; }
+    .exp-period { font-size: 11px; font-family: monospace; color: var(--muted-foreground); white-space: nowrap; padding-top: 4px; }
+    .exp-desc { font-size: 14px; color: var(--muted-foreground); line-height: 1.7; max-width: 640px; }
+    .exp-highlights { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .exp-highlight { font-size: 11px; padding: 4px 10px; border: 1px solid var(--border); color: var(--muted-foreground); }
+
+    @media (max-width: 768px) { .page { padding: 48px 24px; } .exp-header { flex-direction: column; gap: 4px; } .exp-period { white-space: normal; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a href="index.html" class="back">&larr; Back to Home</a>
+    <h1>Experience</h1>
+    <p class="subtitle">Places I've worked. Things I've survived.</p>
+
+    <div id="expList"></div>
+  </div>
+
+  <script>
+    const experiences = [
+      {
+        role: 'Creative Lead',
+        company: 'PT. Akhir Permainan Semesta (Tobarworld)',
+        period: '2024 — 2026',
+        desc: 'I make the face of the brand & the products. Still surprised it works.',
+        highlights: ['Brand Direction', 'Product Design', 'Creative Strategy']
+      },
+      {
+        role: 'Area Supervisor & Trainer',
+        company: 'PT. Solomon Utama (Wake Cup Coffee & Roastery, Anak Bakmie, Pick Cup Indonesia)',
+        period: '2021 — 2022',
+        desc: 'I trained, I visited, I counted, I planned. Was I even operating the whole ops?',
+        highlights: ['Operations Training', 'Multi-Unit Management', 'Quality Control', 'Menu Development']
+      },
+      {
+        role: 'Area Supervisor',
+        company: 'PT. Exquise Boga Mulia (Exquise Pattisserie)',
+        period: '— 2021',
+        desc: 'Learned what not to do. Invaluable.',
+        highlights: ['Team Supervision', 'Inventory Management']
+      },
+      {
+        role: 'Store Manager',
+        company: 'PT. Aroma Parama Visesa (Caribou Coffee Indonesia)',
+        period: '2017 — 2020',
+        desc: 'This has been a \'build me\' episode from start to finish. I can almost see the whole thing now.',
+        highlights: ['Full Store Ops', 'P&L Ownership', 'Team Development', 'Customer Experience']
+      },
+      {
+        role: 'Audit Staff',
+        company: 'PT. KAP Heliantono & Rekan (KAP Heliantono & Rekan)',
+        period: '2015 — 2017',
+        desc: 'Roamed across Indonesia, learned to count along the way. Neat.',
+        highlights: ['Financial Audit', 'Client Reporting', 'Field Operations']
+      }
+    ];
+
+    const list = document.getElementById('expList');
+    experiences.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'exp-item';
+      item.innerHTML = `
+        <div class="exp-header">
+          <div>
+            <div class="exp-role">${e.role}</div>
+            <div class="exp-company">${e.company}</div>
+          </div>
+          <div class="exp-period">${e.period}</div>
+        </div>
+        <div class="exp-desc">${e.desc}</div>
+        ${e.highlights.length ? `<div class="exp-highlights">${e.highlights.map(h => `<span class="exp-highlight">${h}</span>`).join('')}</div>` : ''}`;
+      list.appendChild(item);
+    });
+  </script>
+</body>
+</html>
