@@ -91,6 +91,16 @@
       { tag: 'Essay', date: '22 jun 2024', title: 'The Coffee Shop as a Classroom', excerpt: 'I learned more about business behind the bar than in any boardroom.', year: 2024, slug: 'the-coffee-shop-as-a-classroom' },
     ];
 
+    function fmtDate(d) {
+      if (!d) return '';
+      const parts = d.split(' ');
+      if (parts.length < 3) return d;
+      const day = parts[0].padStart(2, '0');
+      const month = parts[1].charAt(0).toUpperCase() + parts[1].slice(1).toLowerCase();
+      const year = parts[2];
+      return `${day}/${month}/${year}`;
+    }
+
     let tagFilter = 'all', yearFilter = null, monthFilter = null;
     const listEl = document.getElementById('articleList');
 
@@ -170,7 +180,7 @@
           item.innerHTML = `
             <div class="article-meta">
               <span class="article-tag">${a.tag}</span>
-              <span class="article-date">${a.date}</span>
+              <span class="article-date">${fmtDate(a.date)}</span>
             </div>
             <div class="article-title">${a.title}</div>
             <div class="article-excerpt">${a.excerpt}</div>`;

@@ -72,10 +72,19 @@
           const [tag, date] = meta.split('|').map(s => s.trim());
           const body = lines.slice(2).filter(l => l !== '').map(l => `<p>${l}</p>`).join('');
 
+          function fmtDate(d) {
+            if (!d) return '';
+            const parts = d.split(' ');
+            if (parts.length < 3) return d;
+            const day = parts[0].padStart(2, '0');
+            const month = parts[1].charAt(0).toUpperCase() + parts[1].slice(1).toLowerCase();
+            const year = parts[2];
+            return `${day}/${month}/${year}`;
+          }
           container.innerHTML = `
             <div class="article-tag">${tag || 'note'}</div>
             <h1>${title}</h1>
-            <div class="article-date">${date || ''}</div>
+            <div class="article-date">${fmtDate(date)}</div>
             <div class="content">${body}</div>`;
         })
         .catch(() => {
