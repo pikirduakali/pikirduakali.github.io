@@ -526,7 +526,11 @@
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
     const panel = document.getElementById('previewPanel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    const btn = document.getElementById('btnPreviewToggle');
+    const hidden = panel.style.display === 'none';
+    panel.style.display = hidden ? 'block' : 'none';
+    btn.style.color = hidden ? '' : 'var(--accent)';
+    btn.style.borderColor = hidden ? '' : 'var(--accent)';
   });
 
   document.getElementById('btnHelp').addEventListener('click', () => {
