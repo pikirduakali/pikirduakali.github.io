@@ -73,21 +73,14 @@
     .scroll-hint { position: absolute; bottom: 32px; right: 64px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); writing-mode: vertical-rl; animation: bob 2s ease-in-out infinite; }
     @keyframes bob { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(6px); opacity: 1; } }
 
-    .btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted-foreground); text-decoration: none; font-family: var(--font-body); transition: color 0.2s; }
-    .btn:hover { color: var(--foreground); }
+    .btn { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: var(--accent); text-decoration: none; font-family: var(--font-body); transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.7; }
     .btn svg { transition: transform 0.2s; }
     .btn:hover svg { transform: translateX(4px); }
-    .btn-shimmer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(240,237,232,0.08) 50%, transparent 100%); transform: translateX(-100%); animation: shimmer 5s ease-in-out infinite; }
-    @keyframes shimmer { 100% { transform: translateX(100%); } }
-    .btn-dot { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted-foreground); text-decoration: none; font-family: var(--font-body); transition: color 0.2s; position: relative; overflow: hidden; }
-    .btn-dot::before { content: '•'; color: var(--accent); font-size: 20px; line-height: 1; }
-    .btn-dot:hover { color: var(--foreground); }
-    .btn-dot svg { transition: transform 0.2s; }
-    .btn-dot:hover svg { transform: translateX(4px); }
-    .btn-row { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 16px 0; border-top: 1px solid var(--border); text-decoration: none; color: var(--muted-foreground); transition: color 0.2s; font-family: var(--font-body); font-size: 14px; }
-    .btn-row:hover { color: var(--accent); }
-    .btn-row .row-left { display: flex; align-items: center; gap: 8px; }
-    .btn-row .row-left::before { content: '•'; color: var(--accent); font-size: 20px; line-height: 1; }
+    .btn-shimmer { background: linear-gradient(90deg, var(--accent) 0%, var(--foreground) 50%, var(--accent) 100%); background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: textShimmer 5s ease-in-out infinite; }
+    @keyframes textShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .btn-row { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 16px 0; border-top: 1px solid var(--border); text-decoration: none; color: var(--accent); transition: opacity 0.2s; font-family: var(--font-body); font-size: 14px; }
+    .btn-row:hover { opacity: 0.7; }
     .btn-row svg { transition: transform 0.2s; }
     .btn-row:hover svg { transform: translateX(4px); }
 
@@ -240,7 +233,7 @@
         <p class="hero-eyebrow">F&B Ops · Design · Whatever else</p>
         <h1 class="hero-title">Not trying to impress.<br><span class="accent">Just trying to make it work.</span></h1>
         <p class="hero-body">I brew, I draw, I think about systems, and occasionally write something worth reading. Based somewhere with decent coffee.</p>
-        <a href="#about" class="btn-dot btn-shimmer">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a href="#about" class="btn btn-shimmer">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
       <div class="scroll-hint">scroll →</div>
     </section>
@@ -280,7 +273,7 @@
         <div class="exp-item"><div><div class="exp-role">Store Manager <span class="exp-company">@ PT. Aroma Parama Visesa (Caribou Coffee Indonesia) </span></div><div class="exp-note">This has been a 'build me' episode from start to finish. I can almost see the whole thing now.</div></div><div class="exp-period">2017 — 2020</div></div>
         <div class="exp-item"><div><div class="exp-role">Audit Staff <span class="exp-company">@ PT. KAP Heliantono & Rekan (KAP Heliantono & Rekan)</span></div><div class="exp-note">Roamed across Indonesia, learned to count along the way. Neat.</div></div><div class="exp-period">2015 — 2017</div></div>
       </div>
-      <div style="max-width:896px;margin-top:12px"><a href="experiences.html" class="btn-row"><span class="row-left">All experiences</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+      <div style="max-width:896px;margin-top:12px"><a href="experiences.html" class="btn-row">All experiences <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
     <section id="interests">
@@ -325,7 +318,7 @@
           <span class="showcase-btn">View project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
         </a>
       </div>
-      <div style="max-width:896px"><a href="showcase.html" class="btn-row"><span class="row-left">All projects</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+      <div style="max-width:896px"><a href="showcase.html" class="btn-row">All projects <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
     <section id="articles">
@@ -336,7 +329,7 @@
         <a class="article-item" href="article.html?slug=the-quiet-power-of-boring-infrastructure"><div class="article-meta"><div class="article-meta-left"><span class="article-tag">Tech</span><span class="article-date">Jan 2024</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">The Quiet Power of Boring Infrastructure</div><div class="article-excerpt">Invisible systems are the only ones worth admiring.</div></a>
         <a class="article-item" href="article.html?slug=designing-for-yourself-first"><div class="article-meta"><div class="article-meta-left"><span class="article-tag">Design</span><span class="article-date">Nov 2023</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">Designing for Yourself First</div><div class="article-excerpt">If you wouldn't use it daily, you probably shouldn't ship it.</div></a>
       </div>
-      <div style="max-width:896px"><a href="articles.html" class="btn-row"><span class="row-left">All articles</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+      <div style="max-width:896px"><a href="articles.html" class="btn-row">All articles <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
     <footer>
