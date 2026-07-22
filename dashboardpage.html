@@ -149,6 +149,45 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
+    /* Help button */
+    .help-btn {
+      position: fixed; top: 16px; right: 16px; z-index: 50;
+      background: none; border: 1px solid var(--border); color: var(--muted-foreground);
+      font-size: 11px; padding: 6px 14px; cursor: pointer; font-family: var(--font-body);
+      letter-spacing: 0.1em; text-transform: uppercase; transition: border-color 0.2s, color 0.2s;
+    }
+    .help-btn:hover { border-color: var(--accent); color: var(--foreground); }
+
+    /* Help modal */
+    .help-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 300; align-items: center; justify-content: center;
+    }
+    .help-overlay.open { display: flex; }
+    .help-modal {
+      background: var(--card); border: 1px solid var(--border); max-width: 560px;
+      width: 90%; max-height: 80vh; overflow-y: auto; padding: 40px;
+    }
+    .help-modal h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--accent); }
+    .help-modal ol { list-style: decimal; padding-left: 20px; }
+    .help-modal li { font-size: 14px; color: var(--muted-foreground); line-height: 1.8; margin-bottom: 12px; }
+    .help-modal li strong { color: var(--foreground); }
+    .help-modal code {
+      display: inline-block; background: #111; border: 1px solid var(--border);
+      padding: 2px 6px; font-size: 12px; color: var(--accent);
+    }
+    .help-modal .help-note {
+      margin-top: 24px; padding: 16px; background: #111; border: 1px solid var(--border);
+      font-size: 13px; color: var(--muted-foreground); line-height: 1.7;
+    }
+    .help-modal .help-note strong { color: var(--foreground); }
+    .help-close {
+      margin-top: 24px; background: none; border: 1px solid var(--border);
+      color: var(--muted-foreground); padding: 8px 24px; font-size: 13px;
+      cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s;
+    }
+    .help-close:hover { border-color: var(--accent); color: var(--foreground); }
+
     @media (max-width: 768px) {
       .dash-sidebar { display: none; }
       .dash-body { flex-direction: column; padding: 20px; }
@@ -225,6 +264,33 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<button class="help-btn" id="helpBtn">How to Import</button>
+
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <h2>How to Import</h2>
+    <ol>
+      <li><strong>Compose</strong> — Isi title, tag, date, dan body artikel lo.</li>
+      <li><strong>Download .txt</strong> — Klik "Download .txt" buat dapet file artikel.</li>
+      <li><strong>Taruh file</strong> — Pindahin file <code>.txt</code> ke folder <code>articles/</code> di project lo.</li>
+      <li><strong>Copy entry</strong> — Klik "Copy entry" buat copy baris JavaScript.</li>
+      <li><strong>Buka articles.html</strong> — Buka file <code>articles.html</code> di editor lo.</li>
+      <li><strong>Cari array articles</strong> — Cari bagian ini:<br>
+        <code>const articles = [<br>
+        &nbsp;&nbsp;...<br>
+        &nbsp;&nbsp;{ tag: '...', ... },<br>
+        ];</code>
+      </li>
+      <li><strong>Paste</strong> — Tempel entry yang di-copy <strong>sebelum baris <code>];</code></strong>.</li>
+      <li><strong>Push</strong> — Commit & push ke GitHub. Selesai!</li>
+    </ol>
+    <div class="help-note">
+      <strong>Apa itu array?</strong> Array itu daftar. Di <code>articles.html</code>, array <code>articles</code> (mulai dari <code>const articles = [</code> sampai <code>];</code>) adalah daftar semua artikel lo. Setiap baris di dalemnya adalah 1 artikel. Data entry yang lo copy dari dashboard tinggal lo tempelin di dalem kurung <code>[ ]</code>, sebelum <code>];</code>.
+    </div>
+    <button class="help-close" id="helpClose">Got it</button>
+  </div>
+</div>
 
 <script>
   const PASSKEY = 'p2xadmin';
@@ -450,6 +516,16 @@
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
     const panel = document.getElementById('previewPanel');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('helpBtn').addEventListener('click', () => {
+    document.getElementById('helpOverlay').classList.add('open');
+  });
+  document.getElementById('helpClose').addEventListener('click', () => {
+    document.getElementById('helpOverlay').classList.remove('open');
+  });
+  document.getElementById('helpOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) document.getElementById('helpOverlay').classList.remove('open');
   });
 
   // Auto-unlock for demo (remove in prod)
