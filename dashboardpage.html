@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — P2X</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤨</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --background: #0e0e0e;
+      --foreground: #f0ede8;
+      --card: #181818;
+      --muted-foreground: #7a7770;
+      --accent: #e83d2a;
+      --border: rgba(240, 237, 232, 0.1);
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+    }
+    html { font-size: 16px; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--background); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    /* Lockscreen */
+    #lockscreen {
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: var(--background); z-index: 100;
+    }
+    .lock-box { text-align: center; }
+    .lock-box h1 { font-family: var(--font-display); font-size: 2rem; font-weight: 700; margin-bottom: 8px; color: var(--accent); }
+    .lock-box p { font-size: 14px; color: var(--muted-foreground); margin-bottom: 32px; }
+    .lock-input {
+      background: var(--card); border: 1px solid var(--border); color: var(--foreground);
+      padding: 12px 16px; font-size: 14px; font-family: var(--font-body); width: 240px;
+      outline: none; transition: border-color 0.2s; text-align: center;
+    }
+    .lock-input:focus { border-color: var(--accent); }
+    .lock-btn {
+      display: block; margin: 12px auto 0; background: none; border: 1px solid var(--accent);
+      color: var(--accent); padding: 10px 32px; font-size: 14px; cursor: pointer;
+      font-family: var(--font-body); transition: background 0.2s;
+    }
+    .lock-btn:hover { background: var(--accent); color: var(--foreground); }
+    .lock-error { font-size: 12px; color: var(--accent); margin-top: 12px; min-height: 20px; }
+
+    /* Dashboard layout */
+    #dashboard { display: none; height: 100vh; }
+    #dashboard.open { display: flex; }
+
+    /* Sidebar */
+    .dash-sidebar {
+      width: 280px; border-right: 1px solid var(--border); display: flex;
+      flex-direction: column; flex-shrink: 0;
+    }
+    .dash-sidebar-header {
+      padding: 24px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .dash-sidebar-header h2 { font-family: var(--font-display); font-size: 16px; color: var(--accent); }
+    .btn-new {
+      background: none; border: 1px solid var(--accent); color: var(--accent);
+      font-size: 11px; padding: 6px 12px; cursor: pointer; font-family: var(--font-body);
+      transition: background 0.2s;
+    }
+    .btn-new:hover { background: var(--accent); color: var(--foreground); }
+    .article-list { flex: 1; overflow-y: auto; padding: 12px 0; }
+    .article-list-item {
+      display: block; width: 100%; text-align: left; padding: 10px 20px;
+      background: none; border: none; color: var(--muted-foreground); cursor: pointer;
+      font-size: 13px; font-family: var(--font-body); transition: color 0.2s, background 0.2s;
+      border-bottom: 1px solid transparent;
+    }
+    .article-list-item:hover { color: var(--foreground); background: var(--card); }
+    .article-list-item.active { color: var(--accent); border-bottom-color: var(--border); }
+    .article-list-item .list-tag { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+    .article-list-item .list-date { font-size: 10px; color: var(--muted-foreground); margin-left: 8px; }
+
+    /* Main editor */
+    .dash-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .dash-toolbar {
+      padding: 16px 32px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .dash-toolbar .slug-hint { font-size: 11px; color: var(--muted-foreground); font-family: monospace; }
+    .dash-toolbar-right { display: flex; gap: 8px; }
+    .dash-toolbar-right button {
+      background: none; border: 1px solid var(--border); color: var(--muted-foreground);
+      padding: 8px 16px; font-size: 12px; cursor: pointer; font-family: var(--font-body);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .dash-toolbar-right button:hover { border-color: var(--accent); color: var(--foreground); }
+    .btn-download { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .btn-download:hover { background: var(--accent); color: var(--foreground) !important; }
+
+    .dash-body { flex: 1; overflow-y: auto; padding: 32px; display: flex; gap: 32px; }
+    .editor-panel { flex: 1; min-width: 0; }
+    .preview-panel { flex: 1; min-width: 0; }
+
+    .field { margin-bottom: 20px; }
+    .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-foreground); margin-bottom: 6px; }
+    .field input, .field select, .field textarea {
+      width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--foreground);
+      padding: 10px 14px; font-size: 14px; font-family: var(--font-body); outline: none;
+      transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+    .field textarea { min-height: 320px; resize: vertical; font-size: 14px; line-height: 1.7; }
+    .field-row { display: flex; gap: 16px; }
+    .field-row .field { flex: 1; }
+
+    .field select { cursor: pointer; }
+    .field select option { background: var(--card); color: var(--foreground); }
+
+    /* Preview */
+    .preview-pane {
+      background: var(--card); border: 1px solid var(--border); padding: 32px; min-height: 400px;
+    }
+    .preview-pane .preview-tag { font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+    .preview-pane .preview-title { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.15; margin-bottom: 16px; }
+    .preview-pane .preview-date { font-size: 12px; color: var(--muted-foreground); margin-bottom: 32px; }
+    .preview-pane .preview-body { font-size: 17px; color: var(--foreground); line-height: 1.8; }
+    .preview-pane .preview-body p { margin-bottom: 1.5em; }
+    .preview-empty { color: var(--muted-foreground); text-align: center; padding: 60px 0; font-size: 14px; }
+
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; background: var(--card); border: 1px solid var(--border);
+      padding: 12px 20px; font-size: 13px; color: var(--foreground); z-index: 200;
+      opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .dash-sidebar { display: none; }
+      .dash-body { flex-direction: column; padding: 20px; }
+      .dash-toolbar { padding: 12px 20px; }
+      .dash-toolbar .slug-hint { display: none; }
+      .field-row { flex-direction: column; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="lockscreen">
+  <div class="lock-box">
+    <h1>P2X</h1>
+    <p>Enter passkey to continue</p>
+    <input type="password" class="lock-input" id="passInput" placeholder="passkey" autofocus />
+    <button class="lock-btn" id="passBtn">Unlock</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="dash-sidebar">
+    <div class="dash-sidebar-header">
+      <h2>Articles</h2>
+      <button class="btn-new" id="btnNew">+ New</button>
+    </div>
+    <div class="article-list" id="articleList"></div>
+  </div>
+
+  <div class="dash-main">
+    <div class="dash-toolbar">
+      <span class="slug-hint" id="slugHint">slug: —</span>
+      <div class="dash-toolbar-right">
+        <button id="btnPreviewToggle">Preview</button>
+        <button id="btnDownload" class="btn-download">Download .txt</button>
+      </div>
+    </div>
+
+    <div class="dash-body">
+      <div class="editor-panel">
+        <div class="field-row">
+          <div class="field">
+            <label>Title</label>
+            <input type="text" id="fieldTitle" placeholder="Article title" />
+          </div>
+          <div class="field" style="max-width:140px">
+            <label>Tag</label>
+            <select id="fieldTag"><option>Essay</option><option>Tech</option><option>Design</option></select>
+          </div>
+          <div class="field" style="max-width:160px">
+            <label>Date</label>
+            <input type="date" id="fieldDate" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Body</label>
+          <textarea id="fieldBody" placeholder="Write your article here...&#10;&#10;Each paragraph is separated by a blank line."></textarea>
+        </div>
+      </div>
+
+      <div class="preview-panel" id="previewPanel">
+        <div class="preview-pane" id="previewPane">
+          <div class="preview-empty">Preview will appear here</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const PASSKEY = 'p2xadmin';
+
+  const articles = [
+    { tag: 'Essay', date: '26 jun 2026', title: 'This is an Example', slug: 'this-is-an-example' },
+    { tag: 'Essay', date: '13 jul 2026', title: 'On Building Things That Last', slug: 'on-building-things-that-last' },
+    { tag: 'Essay', date: '11 jun 2026', title: 'The Art of Doing Nothing', slug: 'the-art-of-doing-nothing' },
+    { tag: 'Tech', date: '28 jan 2026', title: 'The Quiet Power of Boring Infrastructure', slug: 'the-quiet-power-of-boring-infrastructure' },
+    { tag: 'Design', date: '5 nov 2025', title: 'Designing for Yourself First', slug: 'designing-for-yourself-first' },
+    { tag: 'Essay', date: '19 sep 2025', title: 'Why I Stopped Trying to Optimize Everything', slug: 'why-i-stopped-trying-to-optimize-everything' },
+    { tag: 'Tech', date: '2 aug 2025', title: 'Notes on Running a One-Person Tech Stack', slug: 'notes-on-running-a-one-person-tech-stack' },
+    { tag: 'Design', date: '14 apr 2025', title: 'Good Enough is Better Than Perfect', slug: 'good-enough-is-better-than-perfect' },
+    { tag: 'Essay', date: '21 feb 2025', title: 'What Working in F&B Taught Me About People', slug: 'what-working-in-fb-taught-me-about-people' },
+    { tag: 'Tech', date: '7 dec 2024', title: 'My Love-Hate Relationship with Automation', slug: 'my-love-hate-relationship-with-automation' },
+    { tag: 'Design', date: '15 oct 2024', title: 'Why Less is Still More', slug: 'why-less-is-still-more' },
+    { tag: 'Essay', date: '3 aug 2024', title: 'On Leaving and Starting Over', slug: 'on-leaving-and-starting-over' },
+    { tag: 'Essay', date: '22 jun 2024', title: 'The Coffee Shop as a Classroom', slug: 'the-coffee-shop-as-a-classroom' },
+  ];
+
+  let currentSlug = null;
+  let isNew = false;
+
+  // Lockscreen
+  document.getElementById('passBtn').addEventListener('click', unlock);
+  document.getElementById('passInput').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+  function unlock() {
+    const val = document.getElementById('passInput').value;
+    if (val === PASSKEY) {
+      document.getElementById('lockscreen').style.display = 'none';
+      document.getElementById('dashboard').classList.add('open');
+      renderList();
+      loadArticle(articles[0].slug);
+    } else {
+      document.getElementById('lockError').textContent = 'wrong passkey';
+    }
+  }
+
+  function renderList() {
+    const el = document.getElementById('articleList');
+    el.innerHTML = articles.map(a => `
+      <button class="article-list-item${a.slug === currentSlug ? ' active' : ''}" data-slug="${a.slug}">
+        <div><span class="list-tag">${a.tag}</span><span class="list-date">${fmtDate(a.date)}</span></div>
+        <div style="margin-top:2px">${a.title}</div>
+      </button>
+    `).join('');
+    el.querySelectorAll('.article-list-item').forEach(btn => {
+      btn.addEventListener('click', () => loadArticle(btn.dataset.slug));
+    });
+  }
+
+  function fmtDate(d) {
+    if (!d) return '';
+    const parts = d.split(' ');
+    if (parts.length < 3) return d;
+    return `${parts[0].padStart(2, '0')}/${parts[1].charAt(0).toUpperCase() + parts[1].slice(1).toLowerCase()}/${parts[2]}`;
+  }
+
+  function slugify(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'untitled';
+  }
+
+  function toRawDate(str) {
+    const months = {jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+    const parts = str.split(' ');
+    if (parts.length < 3) return '';
+    const m = months[parts[1].toLowerCase()] || '01';
+    return `${parts[2]}-${m}-${parts[0].padStart(2, '0')}`;
+  }
+
+  function fromRawDate(str) {
+    if (!str) return '';
+    const d = str.split('-');
+    if (d.length < 3) return '';
+    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const m = months[parseInt(d[1]) - 1] || 'jan';
+    const day = parseInt(d[2]);
+    return `${m} ${day} ${d[0]}`;
+  }
+
+  function loadArticle(slug) {
+    currentSlug = slug;
+    isNew = false;
+    renderList();
+    document.getElementById('slugHint').textContent = `slug: ${slug}`;
+
+    fetch(`articles/${slug}.txt`)
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(text => {
+        const lines = text.split('\n').map(l => l.trim());
+        const title = lines[0] || '';
+        const meta = lines[1] || '';
+        const [tag, date] = meta.split('|').map(s => s.trim());
+        const body = lines.slice(2).filter(l => l !== '').join('\n\n');
+
+        document.getElementById('fieldTitle').value = title;
+        document.getElementById('fieldTag').value = tag || 'Essay';
+        if (date) {
+          document.getElementById('fieldDate').value = toRawDate(date);
+        }
+        document.getElementById('fieldBody').value = body;
+        updatePreview();
+      })
+      .catch(() => {
+        toast('could not load article file');
+      });
+  }
+
+  function newArticle() {
+    isNew = true;
+    currentSlug = null;
+    renderList();
+    document.getElementById('fieldTitle').value = '';
+    document.getElementById('fieldTag').value = 'Essay';
+    document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('fieldBody').value = '';
+    document.getElementById('slugHint').textContent = 'slug: —';
+    updatePreview();
+  }
+
+  function getFormData() {
+    const title = document.getElementById('fieldTitle').value.trim() || 'untitled';
+    const tag = document.getElementById('fieldTag').value;
+    const rawDate = document.getElementById('fieldDate').value;
+    const body = document.getElementById('fieldBody').value;
+    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    let dateStr;
+    if (rawDate) {
+      const d = rawDate.split('-');
+      const m = months[parseInt(d[1]) - 1] || 'jan';
+      const day = parseInt(d[2]);
+      dateStr = `${day} ${m} ${d[0]}`;
+    } else {
+      const now = new Date();
+      dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+    const slug = slugify(title);
+    return { title, tag, date: dateStr, body, slug };
+  }
+
+  function generateTxt(data) {
+    const bodyLines = data.body.split('\n').filter(l => l.trim() !== '');
+    return `${data.title}\n${data.tag} | ${data.date}\n\n${bodyLines.join('\n\n')}`;
+  }
+
+  function updatePreview() {
+    const data = getFormData();
+    const pane = document.getElementById('previewPane');
+    if (!data.title && !data.body) {
+      pane.innerHTML = '<div class="preview-empty">Preview will appear here</div>';
+      return;
+    }
+    const bodyHtml = data.body.split('\n\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+    pane.innerHTML = `
+      <div class="preview-tag">${data.tag}</div>
+      <div class="preview-title">${data.title}</div>
+      <div class="preview-date">${fmtDate(data.date)}</div>
+      <div class="preview-body">${bodyHtml}</div>
+    `;
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2500);
+  }
+
+  // Event listeners
+  document.getElementById('btnNew').addEventListener('click', newArticle);
+  document.getElementById('fieldTitle').addEventListener('input', () => {
+    if (isNew) {
+      const slug = slugify(document.getElementById('fieldTitle').value);
+      document.getElementById('slugHint').textContent = `slug: ${slug || '—'}`;
+    }
+    updatePreview();
+  });
+  document.getElementById('fieldTag').addEventListener('change', updatePreview);
+  document.getElementById('fieldDate').addEventListener('input', updatePreview);
+  document.getElementById('fieldBody').addEventListener('input', updatePreview);
+
+  document.getElementById('btnDownload').addEventListener('click', () => {
+    const data = getFormData();
+    const content = generateTxt(data);
+    const slug = data.slug;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${slug}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast(`downloaded ${slug}.txt`);
+  });
+
+  document.getElementById('btnPreviewToggle').addEventListener('click', () => {
+    const panel = document.getElementById('previewPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // Auto-unlock for demo (remove in prod)
+  // unlock();
+
+  // Init
+  updatePreview();
+</script>
+</body>
+</html>
