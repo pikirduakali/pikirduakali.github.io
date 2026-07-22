@@ -94,10 +94,11 @@
       transition: border-color 0.2s, color 0.2s;
     }
     .dash-toolbar-right button:hover { border-color: var(--accent); color: var(--foreground); }
-    .btn-download, .btn-copy, .btn-help { border-color: var(--accent) !important; color: var(--accent) !important; }
-    .btn-download:hover, .btn-copy:hover, .btn-help:hover { background: var(--accent); color: var(--foreground) !important; }
-    .btn-delete { border-color: #555 !important; color: #777 !important; }
-    .btn-delete:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .btn-download, .btn-copy { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
+    .btn-help, .btn-delete { border-color: #555 !important; color: #777 !important; }
+    .btn-help:hover, .btn-delete:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .btn-preview-on { border-color: var(--accent) !important; color: var(--accent) !important; }
 
     .entry-output {
       display: none; margin-top: 20px; padding: 16px; background: #111;
@@ -526,7 +527,10 @@
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
     const panel = document.getElementById('previewPanel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    const btn = document.getElementById('btnPreviewToggle');
+    const hidden = panel.style.display === 'none';
+    panel.style.display = hidden ? 'block' : 'none';
+    btn.classList.toggle('btn-preview-on', hidden);
   });
 
   document.getElementById('btnHelp').addEventListener('click', () => {
