@@ -96,6 +96,8 @@
     .dash-toolbar-right button:hover { border-color: var(--accent); color: var(--foreground); }
     .btn-download, .btn-copy, .btn-help { border-color: var(--accent) !important; color: var(--accent) !important; }
     .btn-download:hover, .btn-copy:hover, .btn-help:hover { background: var(--accent); color: var(--foreground) !important; }
+    .btn-delete { border-color: #555 !important; color: #777 !important; }
+    .btn-delete:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
 
     .entry-output {
       display: none; margin-top: 20px; padding: 16px; background: #111;
@@ -213,6 +215,7 @@
     <div class="dash-toolbar">
       <span class="slug-hint" id="slugHint">slug: —</span>
       <div class="dash-toolbar-right">
+        <button id="btnDelete" class="btn-delete" title="Delete article (disabled for new)">Delete</button>
         <button id="btnHelp" class="btn-help">How to Import</button>
         <button id="btnPreviewToggle">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
@@ -282,8 +285,26 @@
   </div>
 </div>
 
+<!-- Delete confirmation -->
+<div class="help-overlay" id="deleteOverlay">
+  <div class="help-modal">
+    <h2 style="color:var(--accent)">Delete Article</h2>
+    <p style="font-size:14px;color:var(--muted-foreground);margin-bottom:16px">To delete <strong id="deleteTitle" style="color:var(--foreground)"></strong>, do these manually:</p>
+    <ol>
+      <li><strong>Remove file</strong> — Hapus file <code id="deleteFile">articles/slug.txt</code> dari folder project.</li>
+      <li><strong>Remove entry</strong> — Hapus baris ini dari <code>articles.html</code>:<br>
+        <code id="deleteEntry" style="display:block;margin-top:6px;padding:8px;background:#0e0e0e;font-size:11px;word-break:break-all;"></code>
+      </li>
+      <li><strong>Push</strong> — Commit & push ke GitHub.</li>
+    </ol>
+    <div style="margin-top:20px;display:flex;gap:12px">
+      <button class="help-close" id="deleteClose" style="margin-top:0">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  const PASSKEY = 'p2xadmin';
+  const PASSKEY = 'qqqq';
 
   const articles = [
     { tag: 'Essay', date: '26 jun 2026', title: 'This is an Example', slug: 'this-is-an-example' },
@@ -516,6 +537,24 @@
   });
   document.getElementById('helpOverlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) document.getElementById('helpOverlay').classList.remove('open');
+  });
+
+  document.getElementById('btnDelete').addEventListener('click', () => {
+    if (isNew || !currentSlug) { toast('save first before deleting'); return; }
+    const data = getFormData();
+    document.getElementById('deleteTitle').textContent = data.title;
+    document.getElementById('deleteFile').textContent = `articles/${currentSlug}.txt`;
+    const year = data.date.split(' ')[2] || '2026';
+    const excerpt = data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '';
+    const entry = `{ tag: '${data.tag}', date: '${data.date}', title: '${data.title.replace(/'/g, "\\'")}', excerpt: '${excerpt.replace(/'/g, "\\'")}', year: ${year}, slug: '${currentSlug}' },`;
+    document.getElementById('deleteEntry').textContent = entry;
+    document.getElementById('deleteOverlay').classList.add('open');
+  });
+  document.getElementById('deleteClose').addEventListener('click', () => {
+    document.getElementById('deleteOverlay').classList.remove('open');
+  });
+  document.getElementById('deleteOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) document.getElementById('deleteOverlay').classList.remove('open');
   });
 
   // Auto-unlock for demo (remove in prod)
