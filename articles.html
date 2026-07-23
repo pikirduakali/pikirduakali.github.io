@@ -75,22 +75,7 @@
   </div>
 
   <script>
-    const articles = [
-      { tag: 'Essay', date: '23 jul 2026', title: 'Artikel terbaru nih bos senggol dong', excerpt: 'Oke ini adalah contoh artikel terbaru', year: 2026, slug: 'artikel-terbaru-nih-bos-senggol-dong' },
-      { tag: 'Essay', date: '26 jun 2026', title: 'This is an Example', excerpt: 'Cuma contoh doang.', year: 2026, slug: 'this-is-an-example' },
-      { tag: 'Essay', date: '13 jul 2026', title: 'On Building Things That Last', excerpt: 'Most things break. The interesting question is whether that was the point.', year: 2026, slug: 'on-building-things-that-last' },
-      { tag: 'Essay', date: '11 jun 2026', title: 'The Art of Doing Nothing', excerpt: 'Sometimes the most productive thing is to sit still and let your brain defrag.', year: 2026, slug: 'the-art-of-doing-nothing' },
-      { tag: 'Tech', date: '28 jan 2026', title: 'The Quiet Power of Boring Infrastructure', excerpt: 'Invisible systems are the only ones worth admiring.', year: 2026, slug: 'the-quiet-power-of-boring-infrastructure' },
-      { tag: 'Design', date: '5 nov 2025', title: 'Designing for Yourself First', excerpt: "If you wouldn't use it daily, you probably shouldn't ship it.", year: 2025, slug: 'designing-for-yourself-first' },
-      { tag: 'Essay', date: '19 sep 2025', title: 'Why I Stopped Trying to Optimize Everything', excerpt: 'Life is messy. Your productivity system should be too.', year: 2025, slug: 'why-i-stopped-trying-to-optimize-everything' },
-      { tag: 'Tech', date: '2 aug 2025', title: 'Notes on Running a One-Person Tech Stack', excerpt: 'When you are the whole IT department, you learn what actually matters.', year: 2025, slug: 'notes-on-running-a-one-person-tech-stack' },
-      { tag: 'Design', date: '14 apr 2025', title: 'Good Enough is Better Than Perfect', excerpt: 'Shipping beats perfection. Every single time.', year: 2025, slug: 'good-enough-is-better-than-perfect' },
-      { tag: 'Essay', date: '21 feb 2025', title: 'What Working in F&B Taught Me About People', excerpt: 'Turns out, human behavior is predictable if you watch long enough.', year: 2025, slug: 'what-working-in-fb-taught-me-about-people' },
-      { tag: 'Tech', date: '7 dec 2024', title: 'My Love-Hate Relationship with Automation', excerpt: 'I automated my coffee brewing. Then I went back to manual.', year: 2024, slug: 'my-love-hate-relationship-with-automation' },
-      { tag: 'Design', date: '15 oct 2024', title: 'Why Less is Still More', excerpt: 'Minimalism is not a trend. It is a constraint that forces clarity.', year: 2024, slug: 'why-less-is-still-more' },
-      { tag: 'Essay', date: '3 aug 2024', title: 'On Leaving and Starting Over', excerpt: 'Every career change feels like falling. Until you land.', year: 2024, slug: 'on-leaving-and-starting-over' },
-      { tag: 'Essay', date: '22 jun 2024', title: 'The Coffee Shop as a Classroom', excerpt: 'I learned more about business behind the bar than in any boardroom.', year: 2024, slug: 'the-coffee-shop-as-a-classroom' },
-    ];
+    let articles = [];
 
     function fmtDate(d) {
       if (!d) return '';
@@ -196,8 +181,11 @@
       render();
     };
 
-    populateSelects();
-    render();
+    fetch('articles.json').then(r => r.json()).then(data => {
+      articles = data;
+      populateSelects();
+      render();
+    });
   </script>
 </body>
 </html>

@@ -289,18 +289,13 @@
       <li><strong>Download .txt</strong> — Klik "Download .txt" buat dapet file artikel.</li>
       <li><strong>Taruh file</strong> — Pindahin file <code>.txt</code> ke folder <code>articles/</code> di project lo.</li>
       <li><strong>Copy entry</strong> — Klik "Copy entry" buat copy baris JavaScript.</li>
-      <li><strong>Buka articles.html</strong> — Buka file <code>articles.html</code> di editor lo.</li>
-      <li><strong>Cari array articles</strong> — Cari bagian ini:<br>
-        <code>const articles = [<br>
-        &nbsp;&nbsp;...<br>
-        &nbsp;&nbsp;{ tag: '...', ... },<br>
-        ];</code>
-      </li>
-      <li><strong>Paste</strong> — Tempel entry yang di-copy <strong>sebelum baris <code>];</code></strong>.</li>
+      <li><strong>Buka articles.json</strong> — Buka file <code>articles.json</code> di editor lo.</li>
+      <li><strong>Cari array</strong> — Cari bagian daftar artikel di dalem <code>articles.json</code>.</li>
+      <li><strong>Paste</strong> — Tempel entry yang di-copy <strong>di dalem kurung <code>[ ]</code></strong>, pisah pake koma.</li>
       <li><strong>Push</strong> — Commit & push ke GitHub. Selesai!</li>
     </ol>
     <div class="help-note">
-      <strong>Apa itu array?</strong> Array itu daftar. Di <code>articles.html</code>, array <code>articles</code> (mulai dari <code>const articles = [</code> sampai <code>];</code>) adalah daftar semua artikel lo. Setiap baris di dalemnya adalah 1 artikel. Data entry yang lo copy dari dashboard tinggal lo tempelin di dalem kurung <code>[ ]</code>, sebelum <code>];</code>.
+      <strong>Apa itu JSON?</strong> JSON itu format data buat nyimpen daftar artikel. File <code>articles.json</code> isinya daftar semua artikel lo. Setiap entry yang lo copy dari dashboard tinggal lo tempelin di dalem kurung <code>[ ]</code>, pisah pake koma.
     </div>
     <button class="help-close" id="helpClose">Got it</button>
   </div>
@@ -313,7 +308,7 @@
     <p style="font-size:14px;color:var(--muted-foreground);margin-bottom:16px">To delete <strong id="deleteTitle" style="color:var(--foreground)"></strong>, do these manually:</p>
     <ol>
       <li><strong>Remove file</strong> — Hapus file <code id="deleteFile">articles/slug.txt</code> dari folder project.</li>
-      <li><strong>Remove entry</strong> — Hapus baris ini dari <code>articles.html</code>:<br>
+      <li><strong>Remove entry</strong> — Hapus entry ini dari <code>articles.json</code>:<br>
         <code id="deleteEntry" style="display:block;margin-top:6px;padding:8px;background:#0e0e0e;font-size:11px;word-break:break-all;"></code>
       </li>
       <li><strong>Push</strong> — Commit & push ke GitHub.</li>
@@ -554,7 +549,7 @@
     const year = data.date.split(' ')[2] || '2026';
     const excerpt = data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '';
     const date = capDate(data.date);
-    const entry = `{ tag: '${data.tag}', date: '${date}', title: '${data.title.replace(/'/g, "\\'")}', excerpt: '${excerpt.replace(/'/g, "\\'")}', year: ${year}, slug: '${data.slug}' },`;
+    const entry = `{ "tag": "${data.tag}", "date": "${date}", "title": "${data.title.replace(/"/g, '\\"')}", "excerpt": "${excerpt.replace(/"/g, '\\"')}", "year": ${year}, "slug": "${data.slug}" },`;
     document.getElementById('entryCode').textContent = entry;
     document.getElementById('entryOutput').classList.add('show');
   }

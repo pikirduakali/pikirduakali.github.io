@@ -327,11 +327,7 @@
     <section id="articles" class="reveal">
       <div class="section-label"><span class="num">06</span><span class="line"></span><span class="text">Articles</span></div>
       <h2 class="display">Thoughts, written down<br>before I forgot them.</h2>
-      <div class="article-list">
-        <a class="article-item" href="article.html?slug=on-building-things-that-last"><div class="article-meta"><div class="article-meta-left"><span class="article-tag">Essay</span><span class="article-date">13/Jul/2026</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">On Building Things That Last</div><div class="article-excerpt">Most things break. The interesting question is whether that was the point.</div></a>
-        <a class="article-item" href="article.html?slug=the-quiet-power-of-boring-infrastructure"><div class="article-meta"><div class="article-meta-left"><span class="article-tag">Tech</span><span class="article-date">28/Jan/2026</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">The Quiet Power of Boring Infrastructure</div><div class="article-excerpt">Invisible systems are the only ones worth admiring.</div></a>
-        <a class="article-item" href="article.html?slug=designing-for-yourself-first"><div class="article-meta"><div class="article-meta-left"><span class="article-tag">Design</span><span class="article-date">05/Nov/2025</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">Designing for Yourself First</div><div class="article-excerpt">If you wouldn't use it daily, you probably shouldn't ship it.</div></a>
-      </div>
+      <div class="article-list" id="homeArticleList"></div>
       <div style="max-width:896px"><a href="articles.html" class="btn-row">All articles <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
@@ -369,6 +365,28 @@
       });
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    function fmtDate(d) {
+      if (!d) return '';
+      const parts = d.split(' ');
+      if (parts.length < 3) return d;
+      const day = parts[0].padStart(2, '0');
+      const month = parts[1].charAt(0).toUpperCase() + parts[1].slice(1).toLowerCase();
+      const year = parts[2];
+      return `${day}/${month}/${year}`;
+    }
+
+    fetch('articles.json').then(r => r.json()).then(articles => {
+      const list = document.getElementById('homeArticleList');
+      articles.sort((a, b) => new Date(b.date.split(' ').reverse().join('-')) - new Date(a.date.split(' ').reverse().join('-')));
+      articles.slice(0, 3).forEach(a => {
+        const el = document.createElement('a');
+        el.className = 'article-item';
+        el.href = `article.html?slug=${a.slug}`;
+        el.innerHTML = `<div class="article-meta"><div class="article-meta-left"><span class="article-tag">${a.tag}</span><span class="article-date">${fmtDate(a.date)}</span></div><svg class="article-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div><div class="article-title">${a.title}</div><div class="article-excerpt">${a.excerpt}</div>`;
+        list.appendChild(el);
+      });
+    });
     mobileMenu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => { mobileMenu.classList.remove('open'); toggle.textContent = 'Menu'; });
     });
