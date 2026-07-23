@@ -94,8 +94,8 @@
       transition: border-color 0.2s, color 0.2s;
     }
     .dash-toolbar-right button:hover { border-color: var(--accent); color: var(--foreground); }
-    .btn-help, .btn-delete, .btn-preview { border-color: #555 !important; color: #777 !important; }
-    .btn-help:hover, .btn-delete:hover, .btn-preview:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .btn-help, .btn-preview { border-color: #555 !important; color: #777 !important; }
+    .btn-help:hover, .btn-preview:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
     .btn-download, .btn-copy { border-color: var(--accent) !important; color: var(--accent) !important; }
     .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
 
@@ -232,7 +232,6 @@
     <div class="dash-toolbar">
       <span class="slug-hint" id="slugHint">slug: —</span>
       <div class="dash-toolbar-right">
-        <button id="btnDelete" class="btn-delete" title="Delete article (disabled for new)">Delete</button>
         <button id="btnHelp" class="btn-help">How to Import</button>
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
@@ -286,38 +285,28 @@
     <h2>How to Import</h2>
     <ol>
       <li><strong>Compose</strong> — Isi title, tag, date, dan body artikel lo.</li>
-      <li><strong>Download .txt</strong> — Klik "Download .txt" buat dapet file artikel.</li>
+      <li><strong>Download .txt</strong> — Klik "Download .txt" → dapet file <code>namafile.txt</code>.</li>
       <li><strong>Taruh file</strong> — Pindahin file <code>.txt</code> ke folder <code>articles/</code> di project lo.</li>
-      <li><strong>Copy entry</strong> — Klik "Copy entry" buat copy baris JavaScript.</li>
+      <li><strong>Copy entry</strong> — Klik "Copy entry" → otomatis ke-copy format JSON.</li>
       <li><strong>Buka articles.json</strong> — Buka file <code>articles.json</code> di editor lo.</li>
-      <li><strong>Cari array</strong> — Cari bagian daftar artikel di dalem <code>articles.json</code>.</li>
-      <li><strong>Paste</strong> — Tempel entry yang di-copy <strong>di dalem kurung <code>[ ]</code></strong>, pisah pake koma.</li>
-      <li><strong>Push</strong> — Commit & push ke GitHub. Selesai!</li>
+      <li><strong>Paste</strong> — Tempel di dalem kurung <code>[ ]</code>, setelah entry terakhir (sebelum <code>]</code>), jangan lupa koma.</li>
+      <li><strong>Push</strong> — <code>git add . && git commit -m "add artikel baru" && git push</code></li>
+    </ol>
+    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to Delete</h2>
+    <ol>
+      <li><strong>Download .txt dulu</strong> — Klik artikel yang mau dihapus, catet slug-nya.</li>
+      <li><strong>Hapus file</strong> — Hapus file <code>articles/namafile.txt</code> dari project lo.</li>
+      <li><strong>Hapus entry</strong> — Buka <code>articles.json</code>, hapus baris entry artikel itu (termasuk koma sebelumnya).</li>
+      <li><strong>Push</strong> — <code>git add . && git commit -m "delete artikel" && git push</code></li>
     </ol>
     <div class="help-note">
-      <strong>Apa itu JSON?</strong> JSON itu format data buat nyimpen daftar artikel. File <code>articles.json</code> isinya daftar semua artikel lo. Setiap entry yang lo copy dari dashboard tinggal lo tempelin di dalem kurung <code>[ ]</code>, pisah pake koma.
+      <strong>Tips:</strong> Format entry JSON selalu pake <strong>double quotes</strong> (<code>"</code>). Kalo ada error pas di-push, cek lagi pastiin koma dan kutipnya bener.
     </div>
     <button class="help-close" id="helpClose">Got it</button>
   </div>
 </div>
 
-<!-- Delete confirmation -->
-<div class="help-overlay" id="deleteOverlay">
-  <div class="help-modal">
-    <h2 style="color:var(--accent)">Delete Article</h2>
-    <p style="font-size:14px;color:var(--muted-foreground);margin-bottom:16px">To delete <strong id="deleteTitle" style="color:var(--foreground)"></strong>, do these manually:</p>
-    <ol>
-      <li><strong>Remove file</strong> — Hapus file <code id="deleteFile">articles/slug.txt</code> dari folder project.</li>
-      <li><strong>Remove entry</strong> — Hapus entry ini dari <code>articles.json</code>:<br>
-        <code id="deleteEntry" style="display:block;margin-top:6px;padding:8px;background:#0e0e0e;font-size:11px;word-break:break-all;"></code>
-      </li>
-      <li><strong>Push</strong> — Commit & push ke GitHub.</li>
-    </ol>
-    <div style="margin-top:20px;display:flex;gap:12px">
-      <button class="help-close" id="deleteClose" style="margin-top:0">Cancel</button>
-    </div>
-  </div>
-</div>
+
 
 <script>
   const PASSKEY = 'qqqq';
@@ -571,24 +560,6 @@
   });
   document.getElementById('helpOverlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) document.getElementById('helpOverlay').classList.remove('open');
-  });
-
-  document.getElementById('btnDelete').addEventListener('click', () => {
-    if (isNew || !currentSlug) { toast('save first before deleting'); return; }
-    const data = getFormData();
-    document.getElementById('deleteTitle').textContent = data.title;
-    document.getElementById('deleteFile').textContent = `articles/${currentSlug}.txt`;
-    const year = data.date.split(' ')[2] || '2026';
-    const excerpt = data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '';
-    const entry = `{ tag: '${data.tag}', date: '${data.date}', title: '${data.title.replace(/'/g, "\\'")}', excerpt: '${excerpt.replace(/'/g, "\\'")}', year: ${year}, slug: '${currentSlug}' },`;
-    document.getElementById('deleteEntry').textContent = entry;
-    document.getElementById('deleteOverlay').classList.add('open');
-  });
-  document.getElementById('deleteClose').addEventListener('click', () => {
-    document.getElementById('deleteOverlay').classList.remove('open');
-  });
-  document.getElementById('deleteOverlay').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) document.getElementById('deleteOverlay').classList.remove('open');
   });
 
   // Auto-unlock for demo (remove in prod)
