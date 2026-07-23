@@ -213,7 +213,7 @@
   <div class="lock-box">
     <h1>P2X</h1>
     <p>Life is too short, so stay awake for it</p>
-      <input type="password" class="lock-input" id="passInput" placeholder="Write anything here..." autofocus />
+      <input type="text" class="lock-input" id="passInput" placeholder="Write anything here..." autofocus />
       <button class="lock-btn" id="passBtn">Send</button>
     <div class="lock-error" id="lockError"></div>
   </div>
@@ -358,7 +358,7 @@
       renderList();
       loadArticle(articles[0].slug);
     } else {
-      document.getElementById('lockError').textContent = 'wrong passkey';
+      document.getElementById('lockError').textContent = 'Message sent';
     }
   }
 
