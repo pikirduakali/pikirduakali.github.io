@@ -472,7 +472,9 @@
 
   function generateTxt(data) {
     const bodyLines = data.body.split('\n').filter(l => l.trim() !== '');
-    return `${data.title}\n${data.tag} | ${data.date}\n\n${bodyLines.join('\n\n')}`;
+    const parts = data.date.split(' ');
+    const date = parts.length >= 3 ? `${parts[0]} ${parts[1].charAt(0).toUpperCase() + parts[1].slice(1)} ${parts[2]}` : data.date;
+    return `${data.title}\n${data.tag} | ${date}\n\n${bodyLines.join('\n\n')}`;
   }
 
   function updatePreview() {
@@ -543,10 +545,16 @@
     document.getElementById('btnCopyEntry').click();
   });
 
+  function capDate(d) {
+    const p = d.split(' ');
+    return p.length >= 3 ? `${p[0]} ${p[1].charAt(0).toUpperCase() + p[1].slice(1)} ${p[2]}` : d;
+  }
+
   function showEntry(data) {
     const year = data.date.split(' ')[2] || '2026';
     const excerpt = data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '';
-    const entry = `{ tag: '${data.tag}', date: '${data.date}', title: '${data.title.replace(/'/g, "\\'")}', excerpt: '${excerpt.replace(/'/g, "\\'")}', year: ${year}, slug: '${data.slug}' },`;
+    const date = capDate(data.date);
+    const entry = `{ tag: '${data.tag}', date: '${date}', title: '${data.title.replace(/'/g, "\\'")}', excerpt: '${excerpt.replace(/'/g, "\\'")}', year: ${year}, slug: '${data.slug}' },`;
     document.getElementById('entryCode').textContent = entry;
     document.getElementById('entryOutput').classList.add('show');
   }
