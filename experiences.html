@@ -39,6 +39,11 @@
 
     .exp-item { padding: 32px 0; border-bottom: 1px solid var(--border); transition: padding-left 0.2s; }
     .exp-item:hover { padding-left: 8px; }
+    .exp-row { display: flex; gap: 16px; align-items: flex-start; }
+    .exp-logo { width: 32px; height: 32px; flex-shrink: 0; margin-top: 2px; }
+    .exp-logo img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); opacity: 0.7; transition: filter 0.4s, opacity 0.4s; }
+    .exp-item:hover .exp-logo img { filter: grayscale(0); opacity: 1; }
+    .exp-content { flex: 1; min-width: 0; }
     .exp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 12px; }
     .exp-role { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
     .exp-company { color: var(--accent); font-weight: 500; font-size: 15px; }
@@ -66,35 +71,40 @@
         company: 'PT. Akhir Permainan Semesta (Tobarworld)',
         period: '2024 — 2026',
         desc: 'I make the face of the brand & the products. Still surprised it works.',
-        highlights: ['Brand Direction', 'Product Design', 'Creative Strategy']
+        highlights: ['Brand Direction', 'Product Design', 'Creative Strategy'],
+        logo: 'tobarworld'
       },
       {
         role: 'Area Supervisor & Trainer',
         company: 'PT. Solomon Utama (Wake Cup Coffee & Roastery, Anak Bakmie, Pick Cup Indonesia)',
         period: '2021 — 2022',
         desc: 'I trained, I visited, I counted, I planned. Was I even operating the whole ops?',
-        highlights: ['Operations Training', 'Multi-Unit Management', 'Quality Control', 'Menu Development']
+        highlights: ['Operations Training', 'Multi-Unit Management', 'Quality Control', 'Menu Development'],
+        logo: 'wake-cup'
       },
       {
         role: 'Area Supervisor',
         company: 'PT. Exquise Boga Mulia (Exquise Pattisserie)',
         period: '— 2021',
         desc: 'Learned what not to do. Invaluable.',
-        highlights: ['Team Supervision', 'Inventory Management']
+        highlights: ['Team Supervision', 'Inventory Management'],
+        logo: 'exquise'
       },
       {
         role: 'Store Manager',
         company: 'PT. Aroma Parama Visesa (Caribou Coffee Indonesia)',
         period: '2017 — 2020',
         desc: 'This has been a \'build me\' episode from start to finish. I can almost see the whole thing now.',
-        highlights: ['Full Store Ops', 'P&L Ownership', 'Team Development', 'Customer Experience']
+        highlights: ['Full Store Ops', 'P&L Ownership', 'Team Development', 'Customer Experience'],
+        logo: 'caribou'
       },
       {
         role: 'Audit Staff',
         company: 'PT. KAP Heliantono & Rekan (KAP Heliantono & Rekan)',
         period: '2015 — 2017',
         desc: 'Roamed across Indonesia, learned to count along the way. Neat.',
-        highlights: ['Financial Audit', 'Client Reporting', 'Field Operations']
+        highlights: ['Financial Audit', 'Client Reporting', 'Field Operations'],
+        logo: 'kap-heliantono'
       }
     ];
 
@@ -103,15 +113,20 @@
       const item = document.createElement('div');
       item.className = 'exp-item';
       item.innerHTML = `
-        <div class="exp-header">
-          <div>
-            <div class="exp-role">${e.role}</div>
-            <div class="exp-company">${e.company}</div>
+        <div class="exp-row">
+          <div class="exp-logo"><img src="logos/${e.logo}.svg" alt="${e.company}" /></div>
+          <div class="exp-content">
+            <div class="exp-header">
+              <div>
+                <div class="exp-role">${e.role}</div>
+                <div class="exp-company">${e.company}</div>
+              </div>
+              <div class="exp-period">${e.period}</div>
+            </div>
+            <div class="exp-desc">${e.desc}</div>
+            ${e.highlights.length ? `<div class="exp-highlights">${e.highlights.map(h => `<span class="exp-highlight">${h}</span>`).join('')}</div>` : ''}
           </div>
-          <div class="exp-period">${e.period}</div>
-        </div>
-        <div class="exp-desc">${e.desc}</div>
-        ${e.highlights.length ? `<div class="exp-highlights">${e.highlights.map(h => `<span class="exp-highlight">${h}</span>`).join('')}</div>` : ''}`;
+        </div>`;
       list.appendChild(item);
     });
   </script>
