@@ -132,6 +132,21 @@
     .field select { cursor: pointer; }
     .field select option { background: var(--card); color: var(--foreground); }
 
+    .tag-row { display: flex; gap: 0; }
+    .tag-row select { flex: 1; border-radius: 0; }
+    .tag-row input {
+      width: 48px; background: var(--card); border: 1px solid var(--border); border-left: none;
+      color: var(--foreground); padding: 10px 6px; font-size: 11px; font-family: var(--font-body);
+      outline: none; text-align: center;
+    }
+    .tag-row input:focus { border-color: var(--accent); }
+    .tag-row button {
+      background: var(--card); border: 1px solid var(--border); border-left: none;
+      color: var(--muted-foreground); padding: 8px 10px; cursor: pointer; font-size: 15px;
+      font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; line-height: 1;
+    }
+    .tag-row button:hover { border-color: var(--accent); color: var(--accent); }
+
     /* Preview */
     .preview-pane {
       background: var(--card); border: 1px solid var(--border); padding: 32px;
@@ -234,10 +249,10 @@
           </div>
           <div class="field" style="max-width:200px">
             <label>Tag</label>
-            <div style="display:flex;gap:4px">
-              <select id="fieldTag" style="flex:1"></select>
-              <input type="text" id="newTagInput" placeholder="new" style="width:54px;background:var(--card);border:1px solid var(--border);color:var(--foreground);padding:10px 8px;font-size:12px;font-family:var(--font-body);outline:none" />
-              <button id="addTagBtn" style="background:none;border:1px solid var(--border);color:var(--muted-foreground);padding:8px 10px;cursor:pointer;font-size:14px;transition:border-color 0.2s">+</button>
+            <div class="tag-row">
+              <select id="fieldTag"></select>
+              <input type="text" id="newTagInput" placeholder="new" />
+              <button id="addTagBtn">+</button>
             </div>
           </div>
           <div class="field" style="max-width:160px">
