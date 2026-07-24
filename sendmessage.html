@@ -246,17 +246,12 @@
   <div class="dash-main">
     <div class="dash-toolbar">
       <span class="slug-hint" id="slugHint">slug: —</span>
-      <div class="dash-toolbar-right mode-article mode-project">
-        <a href="index.html#articles" class="btn-home">Home</a>
+      <div class="dash-toolbar-right">
+        <a href="index.html" class="btn-home" id="btnHome">Home</a>
         <button id="btnHelp" class="btn-help">How to</button>
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
-      </div>
-      <div class="dash-toolbar-right mode-content" style="display:none">
-        <a href="index.html" class="btn-home">View homepage</a>
-        <button id="btnHelp" class="btn-help">How to</button>
-        <button id="btnCopyContentJson" class="btn-download">Copy full JSON</button>
       </div>
     </div>
 
@@ -432,10 +427,15 @@ Ini paragraf setelah gambar.</pre>
       document.getElementById('btnNew').style.display = isContent ? 'none' : '';
       document.getElementById('dashHeaderLabel').textContent = isContent ? 'Site Content' : (mode === 'article' ? 'Articles' : 'Projects');
       document.getElementById('slugHint').style.display = isContent ? 'none' : '';
+      document.getElementById('btnHome').href = isContent ? 'index.html' : 'index.html#articles';
 
       if (isContent) {
+        document.getElementById('entryOutput').classList.remove('show');
         renderContentForm();
       } else {
+        document.getElementById('previewPanel').style.display = 'block';
+        document.getElementById('btnPreviewToggle').style.color = '';
+        document.getElementById('btnPreviewToggle').style.borderColor = '';
         clearForm();
         renderList();
         updatePreview();
@@ -720,6 +720,21 @@ Ini paragraf setelah gambar.</pre>
   document.getElementById('fieldBody').addEventListener('input', updatePreview);
 
   document.getElementById('btnDownload').addEventListener('click', () => {
+    if (currentMode === 'content') {
+      if (!contentData || !Object.keys(contentData).length) { toast('content not loaded yet'); return; }
+      const json = JSON.stringify(contentData, null, 2);
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'site-content.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('downloaded site-content.json');
+      return;
+    }
     const data = getFormData();
     const content = generateTxt(data);
     const slug = data.slug;
@@ -737,6 +752,19 @@ Ini paragraf setelah gambar.</pre>
   });
 
   document.getElementById('btnCopyEntry').addEventListener('click', () => {
+    if (currentMode === 'content') {
+      if (!contentData || !Object.keys(contentData).length) {
+        toast('content not loaded yet — please wait');
+        return;
+      }
+      const json = JSON.stringify(contentData, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        toast('full site-content copied to clipboard');
+      }).catch(() => {
+        toast('could not copy — select manually');
+      });
+      return;
+    }
     const data = getFormData();
     showEntry(data);
     const code = document.getElementById('entryCode');
@@ -751,16 +779,11 @@ Ini paragraf setelah gambar.</pre>
     document.getElementById('btnCopyEntry').click();
   });
 
-  document.getElementById('btnCopyContentJson').addEventListener('click', () => {
-    const json = JSON.stringify(contentData, null, 2);
-    navigator.clipboard.writeText(json).then(() => {
-      toast('full JSON copied to clipboard');
-    }).catch(() => {
-      toast('could not copy — select manually');
-    });
-  });
-
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
+    if (currentMode === 'content') {
+      window.open('index.html', '_blank');
+      return;
+    }
     const panel = document.getElementById('previewPanel');
     const btn = document.getElementById('btnPreviewToggle');
     const hidden = panel.style.display === 'none';
