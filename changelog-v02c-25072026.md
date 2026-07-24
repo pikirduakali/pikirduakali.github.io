@@ -4,6 +4,18 @@
 
 ### Added
 - File changelog ini
+- `projects.json` — single source of truth untuk project metadata
+- Dashboard dual-mode (Articles / Projects) — tab system di sidebar, masing-masing punya form sendiri
+- Project editor di dashboard (category dropdown, thumbnail URL, body)
+- Hero image support: field **Thumbnail URL** di dashboard buat article & project, otomatis jadi gambar hero di halaman
+- `article.html` support `img:` inline images (sama kaya project viewer)
+- How to Add Images — tutorial lengkap di help modal
+
+### Changed
+- `index.html` showcase section — dari hardcoded jadi fetch `projects.json`
+- `showcase.html` — dari hardcoded array jadi fetch `projects.json`
+- `sendmessage.html` help modal — restructure dengan section Articles, Projects, Images, Delete
+- About Me deskripsi — lebih konkret dengan mention menu, brand, team training
 
 ## [v1.0] - 2026-07
 
