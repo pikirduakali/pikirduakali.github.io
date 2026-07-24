@@ -15,7 +15,7 @@
 - `index.html` showcase section — dari hardcoded jadi fetch `projects.json`
 - `showcase.html` — dari hardcoded array jadi fetch `projects.json`
 - `sendmessage.html` help modal — restructure dengan section Articles, Projects, Images, Delete
-- About Me deskripsi — lebih konkret dengan mention menu, brand, team training
+- About Me deskripsi — update ke versi final: "9+ years leading F&B ops..." + closing "The function matters. The result matters more."
 
 ## [v1.0] - 2026-07
 
