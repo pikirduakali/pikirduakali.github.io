@@ -10,6 +10,9 @@
 - Hero image support: field **Thumbnail URL** di dashboard buat article & project, otomatis jadi gambar hero di halaman
 - `article.html` support `img:` inline images (sama kaya project viewer)
 - How to Add Images — tutorial lengkap di help modal
+- `site-content.json` — single source of truth buat SEMUA teks di homepage
+- Dashboard Content tab — edit semua teks homepage dari dashboard (Hero, About, Services, Experience, Interests, Showcase, Articles, Footer)
+- `index.html` — `data-content` attribute + fetch `site-content.json` pas loading
 
 ### Changed
 - `index.html` showcase section — dari hardcoded jadi fetch `projects.json`

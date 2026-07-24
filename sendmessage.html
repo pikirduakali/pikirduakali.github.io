@@ -234,6 +234,7 @@
     <div class="dash-tabs">
       <button class="dash-tab active" data-mode="article">Articles</button>
       <button class="dash-tab" data-mode="project">Projects</button>
+      <button class="dash-tab" data-mode="content">Content</button>
     </div>
     <div class="dash-sidebar-header">
       <h2 id="dashHeaderLabel">Articles</h2>
@@ -245,12 +246,17 @@
   <div class="dash-main">
     <div class="dash-toolbar">
       <span class="slug-hint" id="slugHint">slug: —</span>
-      <div class="dash-toolbar-right">
+      <div class="dash-toolbar-right mode-article mode-project">
         <a href="index.html#articles" class="btn-home">Home</a>
         <button id="btnHelp" class="btn-help">How to</button>
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
+      </div>
+      <div class="dash-toolbar-right mode-content" style="display:none">
+        <a href="index.html" class="btn-home">View homepage</a>
+        <button id="btnHelp" class="btn-help">How to</button>
+        <button id="btnCopyContentJson" class="btn-download">Copy full JSON</button>
       </div>
     </div>
 
@@ -301,6 +307,9 @@
         <div class="preview-pane" id="previewPane">
           <div class="preview-empty">Preview will appear here</div>
         </div>
+      </div>
+      <div class="content-panel mode-content" id="contentPanel" style="display:none;flex:1;overflow-y:auto">
+        <p style="color:var(--muted-foreground);font-size:14px">Loading content...</p>
       </div>
     </div>
   </div>
@@ -408,12 +417,75 @@ Ini paragraf setelah gambar.</pre>
       document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
       document.querySelectorAll('.mode-article').forEach(el => el.style.display = mode === 'article' ? '' : 'none');
       document.querySelectorAll('.mode-project').forEach(el => el.style.display = mode === 'project' ? '' : 'none');
-      document.getElementById('dashHeaderLabel').textContent = mode === 'article' ? 'Articles' : 'Projects';
-      clearForm();
-      renderList();
-      updatePreview();
+      document.querySelectorAll('.mode-content').forEach(el => el.style.display = mode === 'content' ? '' : 'none');
+
+      const isContent = mode === 'content';
+      document.getElementById('entryList').style.display = isContent ? 'none' : '';
+      document.getElementById('btnNew').style.display = isContent ? 'none' : '';
+      document.getElementById('dashHeaderLabel').textContent = isContent ? 'Site Content' : (mode === 'article' ? 'Articles' : 'Projects');
+      document.getElementById('slugHint').style.display = isContent ? 'none' : '';
+
+      if (isContent) {
+        renderContentForm();
+      } else {
+        clearForm();
+        renderList();
+        updatePreview();
+      }
     });
   });
+
+  const contentGroups = [
+    { name: 'Hero', keys: ['hero-name', 'hero-tagline', 'hero-title', 'hero-body', 'hero-cta'] },
+    { name: 'About', keys: ['about-label', 'about-heading', 'about-text-1', 'about-text-2'] },
+    { name: 'Services', keys: ['services-label', 'services-heading', 'service-1-title', 'service-1-desc', 'service-2-title', 'service-2-desc', 'service-3-title', 'service-3-desc'] },
+    { name: 'Experience', keys: ['experience-label', 'experience-heading', 'experience-cta'] },
+    { name: 'Interests', keys: ['interests-label', 'interests-heading'] },
+    { name: 'Showcase', keys: ['showcase-label', 'showcase-heading', 'showcase-cta'] },
+    { name: 'Articles', keys: ['articles-label', 'articles-heading', 'articles-cta'] },
+    { name: 'Footer', keys: ['footer-text'] },
+  ];
+
+  function keyLabel(key) {
+    return key.split('-').slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+
+  function isLongText(key) {
+    return ['hero-body', 'about-text-1', 'about-text-2', 'service-1-desc', 'service-2-desc', 'service-3-desc', 'footer-text'].includes(key);
+  }
+
+  let contentData = {};
+
+  function renderContentForm() {
+    fetch('site-content.json').then(r => r.json()).then(data => {
+      contentData = data;
+      const panel = document.getElementById('contentPanel');
+      let html = '<div style="padding:4px 0 32px">';
+      contentGroups.forEach(g => {
+        html += `<div style="margin-bottom:28px"><h3 style="font-family:var(--font-display);font-size:14px;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em">${g.name}</h3>`;
+        g.keys.forEach(k => {
+          const val = data[k] || '';
+          const label = keyLabel(k);
+          if (isLongText(k)) {
+            html += `<div class="field"><label>${label}</label><textarea class="content-field" data-key="${k}" style="min-height:80px">${val.replace(/</g, '&lt;')}</textarea></div>`;
+          } else {
+            html += `<div class="field"><label>${label}</label><input type="text" class="content-field" data-key="${k}" value="${val.replace(/"/g, '&quot;').replace(/</g, '&lt;')}" /></div>`;
+          }
+        });
+        html += '</div>';
+      });
+      html += '</div>';
+      panel.innerHTML = html;
+
+      document.querySelectorAll('.content-field').forEach(el => {
+        el.addEventListener('input', () => {
+          contentData[el.dataset.key] = el.value;
+        });
+      });
+    }).catch(() => {
+      document.getElementById('contentPanel').innerHTML = '<p style="color:var(--accent);font-size:14px">Failed to load site-content.json</p>';
+    });
+  }
 
   function renderList() {
     const el = document.getElementById('entryList');
@@ -669,6 +741,15 @@ Ini paragraf setelah gambar.</pre>
 
   document.getElementById('copyEntryHint').addEventListener('click', () => {
     document.getElementById('btnCopyEntry').click();
+  });
+
+  document.getElementById('btnCopyContentJson').addEventListener('click', () => {
+    const json = JSON.stringify(contentData, null, 2);
+    navigator.clipboard.writeText(json).then(() => {
+      toast('full JSON copied to clipboard');
+    }).catch(() => {
+      toast('could not copy — select manually');
+    });
   });
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {

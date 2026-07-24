@@ -1,0 +1,38 @@
+{
+  "hero-name": "Pram Suwandi",
+  "hero-tagline": "F&B Ops · Design · Whatever else",
+  "hero-title": "Not trying to impress.<br><span class=\"accent\">Just trying to make it work.</span>",
+  "hero-body": "I brew, I draw, I think about systems, and occasionally write something worth reading. Based somewhere with decent coffee.",
+  "hero-cta": "Learn more",
+
+  "about-label": "About Me",
+  "about-heading": "I make things. And I make<br>sure they work.",
+  "about-text-1": "9+ years leading F&B operations, 4 years in digital creative — and a creative practitioner since 2010. I don't just make things look good, I make the numbers make sense. Menus that move product, brand identities that fit the budget, teams that don't quit. Data-driven when it counts, creative when it matters.",
+  "about-text-2": "The function matters. The result matters more.",
+
+  "services-label": "What I Do",
+  "services-heading": "I turn ambiguous problems<br>into something shippable.",
+  "service-1-title": "Brewing",
+  "service-1-desc": "Ex-Full-time Barista. Now I prefer cheap caffeine over so-called exclusive coffee — I've done enough, seriously.",
+  "service-2-title": "Design",
+  "service-2-desc": "I create things based on brief. At least that's how we started the project. The rest? Just give me some space, and let me cook.",
+  "service-3-title": "Thinking",
+  "service-3-desc": "Business, operations, planning, executing and occasionally being the person who asks \"why are we still doing this?\", or \"is this useful?\"",
+
+  "experience-label": "Experience",
+  "experience-heading": "Places I've worked.<br>Things I've survived.",
+  "experience-cta": "All experiences",
+
+  "interests-label": "Interests",
+  "interests-heading": "What I do when<br>no one is watching.",
+
+  "showcase-label": "Showcase",
+  "showcase-heading": "All the projects<br>I've poured myself into.",
+  "showcase-cta": "All projects",
+
+  "articles-label": "Articles",
+  "articles-heading": "Thoughts, written down<br>before I forgot them.",
+  "articles-cta": "All articles",
+
+  "footer-text": "\u00a9 2026 P2X is pikirduakali\u2122 \u2014 Built with intention and mild self-doubt."
+}
