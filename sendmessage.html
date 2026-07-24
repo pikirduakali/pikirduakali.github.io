@@ -61,6 +61,10 @@
       padding: 16px 20px; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
+    .dash-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .dash-tab { flex: 1; background: none; border: none; color: var(--muted-foreground); padding: 10px 0; font-size: 12px; cursor: pointer; font-family: var(--font-body); transition: color 0.2s, border-color 0.2s; border-bottom: 2px solid transparent; }
+    .dash-tab:hover { color: var(--foreground); }
+    .dash-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     .dash-sidebar-header h2 { font-family: var(--font-display); font-size: 16px; color: var(--accent); }
     .btn-new {
       background: none; border: 1px solid var(--accent); color: var(--accent);
@@ -225,13 +229,17 @@
   </div>
 </div>
 
-<div id="dashboard">
+  <div id="dashboard">
   <div class="dash-sidebar">
+    <div class="dash-tabs">
+      <button class="dash-tab active" data-mode="article">Articles</button>
+      <button class="dash-tab" data-mode="project">Projects</button>
+    </div>
     <div class="dash-sidebar-header">
-      <h2>Articles</h2>
+      <h2 id="dashHeaderLabel">Articles</h2>
       <button class="btn-new" id="btnNew">+ New</button>
     </div>
-    <div class="article-list" id="articleList"></div>
+    <div class="article-list" id="entryList"></div>
   </div>
 
   <div class="dash-main">
@@ -249,11 +257,11 @@
     <div class="dash-body">
       <div class="editor-panel">
         <div class="field-row">
-          <div class="field">
+          <div class="field" style="flex:2">
             <label>Title</label>
-            <input type="text" id="fieldTitle" placeholder="Article title" />
+            <input type="text" id="fieldTitle" placeholder="Title" />
           </div>
-          <div class="field" style="max-width:170px">
+          <div class="field mode-article" style="max-width:170px">
             <label>Tag</label>
             <div class="tag-row">
               <select id="fieldTag"></select>
@@ -261,14 +269,27 @@
               <button id="addTagBtn">+</button>
             </div>
           </div>
-          <div class="field" style="max-width:160px">
+          <div class="field mode-article" style="max-width:160px">
             <label>Date</label>
             <input type="date" id="fieldDate" />
           </div>
+          <div class="field mode-project" style="display:none;max-width:170px">
+            <label>Category</label>
+            <select id="fieldCategory">
+              <option value="Branding">Branding</option>
+              <option value="Print">Print</option>
+              <option value="Digital">Digital</option>
+              <option value="Packaging">Packaging</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Thumbnail URL <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(optional — will appear as hero image at the top)</span></label>
+          <input type="text" id="fieldThumb" placeholder="https://i.ibb.co.com/..." />
         </div>
         <div class="field">
           <label>Body</label>
-          <textarea id="fieldBody" placeholder="Write your article here...&#10;&#10;Each paragraph is separated by a blank line."></textarea>
+          <textarea id="fieldBody" placeholder="Write your content here...&#10;&#10;Each paragraph separated by a blank line.&#10;Add inline images with img:https://... on its own line."></textarea>
         </div>
         <div class="entry-output" id="entryOutput">
           <span class="copy-hint" id="copyEntryHint">click to copy</span>
@@ -289,22 +310,43 @@
 
 <div class="help-overlay" id="helpOverlay">
   <div class="help-modal">
-    <h2>How to</h2>
+    <h2>How to — Articles</h2>
     <ol>
-      <li><strong>Compose</strong> — Isi title, tag, date, dan body artikel lo.</li>
-      <li><strong>Download .txt</strong> — Klik "Download .txt" → dapet file <code>namafile.txt</code>.</li>
-      <li><strong>Taruh file</strong> — Pindahin file <code>.txt</code> ke folder <code>articles/</code> di project lo.</li>
-      <li><strong>Copy entry</strong> — Klik "Copy entry" → otomatis ke-copy format JSON.</li>
-      <li><strong>Buka articles.json</strong> — Buka file <code>articles.json</code> di editor lo.</li>
-      <li><strong>Paste</strong> — Tempel di dalem kurung <code>[ ]</code>, setelah entry terakhir (sebelum <code>]</code>), jangan lupa koma.</li>
-      <li><strong>Push</strong> — <code>git add . && git commit -m "add artikel baru" && git push</code></li>
+      <li><strong>Compose</strong> — Isi title, tag, date, hero image (opsional), dan body.</li>
+      <li><strong>Download .txt</strong> → <code>articles/namafile.txt</code>.</li>
+      <li><strong>Copy entry</strong> → Paste ke <code>articles.json</code>.</li>
+      <li><strong>Push</strong> — <code>git add . && git commit -m "add artikel" && git push</code></li>
+    </ol>
+    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Projects</h2>
+    <ol>
+      <li><strong>Switch tab</strong> — Klik "Projects" di sidebar buat mode project.</li>
+      <li><strong>Compose</strong> — Isi title, category, hero image (opsional), dan body.</li>
+      <li><strong>Download .txt</strong> → <code>projects/namafile.txt</code>.</li>
+      <li><strong>Copy entry</strong> — Paste ke <code>projects.json</code>.</li>
+      <li><strong>Push</strong> — Sama kayak artikel.</li>
+    </ol>
+    <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to Add Images</h2>
+    <p style="font-size:14px;color:var(--muted-foreground);margin-bottom:16px;line-height:1.7">Supported in both Articles and Projects. Caranya:</p>
+    <ol>
+      <li><strong>Upload gambar lo</strong> ke image hosting (ImgBB, imgur, Unsplash, atau GitHub issue attachment etc.), dapetin URL langsungnya.</li>
+      <li><strong>Hero image</strong> — Isi field <strong>"Thumbnail URL"</strong> di dashboard. URL itu otomatis kepake sebagai gambar hero di bagian atas halaman (tampil full-width, 16:9).</li>
+      <li><strong>Inline image</strong> — Di body editor, tulis di baris sendiri: <code style="word-break:break-all">img:https://namahosting.com/gambar-lo.jpg</code></li>
+      <li><strong>Contoh body dengan gambar inline:</strong>
+        <pre style="background:#111;border:1px solid var(--border);padding:12px;margin-top:8px;font-size:13px;color:var(--muted-foreground);line-height:1.7;white-space:pre-wrap">Ini paragraf pertama.
+
+img:https://i.ibb.co.com/gambar-saya.webp
+
+Ini paragraf setelah gambar.</pre>
+      </li>
+      <li><strong>Gambar inline</strong> — Akan tampil full-width dengan aspect ratio 16:9 di tengah konten. Bisa di artikel maupun project.</li>
+      <li><strong>Tips:</strong> Pake hosting gambar yang support hotlinking (ImgBB, imgur, Unsplash direct link). Hindari Google Drive atau shared drive karena biasanya gak muncul.</li>
     </ol>
     <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to Delete</h2>
     <ol>
-      <li><strong>Download .txt dulu</strong> — Klik artikel yang mau dihapus, catet slug-nya.</li>
-      <li><strong>Hapus file</strong> — Hapus file <code>articles/namafile.txt</code> dari project lo.</li>
-      <li><strong>Hapus entry</strong> — Buka <code>articles.json</code>, hapus baris entry artikel itu (termasuk koma sebelumnya).</li>
-      <li><strong>Push</strong> — <code>git add . && git commit -m "delete artikel" && git push</code></li>
+      <li><strong>Download .txt dulu</strong> — Klik entry yang mau dihapus, catet slug-nya.</li>
+      <li><strong>Hapus file</strong> — Hapus file <code>articles/namafile.txt</code> atau <code>projects/namafile.txt</code>.</li>
+      <li><strong>Hapus entry</strong> — Buka <code>articles.json</code> atau <code>projects.json</code>, hapus baris entry itu.</li>
+      <li><strong>Push</strong> — <code>git add . && git commit -m "delete entry" && git push</code></li>
     </ol>
     <div class="help-note">
       <strong>Tips:</strong> Format entry JSON selalu pake <strong>double quotes</strong> (<code>"</code>). Kalo ada error pas di-push, cek lagi pastiin koma dan kutipnya bener.
@@ -317,6 +359,9 @@
 
 <script>
   const PASSKEY = 'qqqq';
+  let currentMode = 'article';
+  let currentSlug = null;
+  let isNew = false;
 
   const articles = [
     { tag: 'Essay', date: '26 jun 2026', title: 'This is an Example', slug: 'this-is-an-example' },
@@ -334,10 +379,8 @@
     { tag: 'Essay', date: '22 jun 2024', title: 'The Coffee Shop as a Classroom', slug: 'the-coffee-shop-as-a-classroom' },
   ];
 
-  let currentSlug = null;
-  let isNew = false;
+  let projects = [];
 
-  // Lockscreen
   document.getElementById('passBtn').addEventListener('click', unlock);
   document.getElementById('passInput').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
 
@@ -346,23 +389,53 @@
     if (val === PASSKEY) {
       document.getElementById('lockscreen').style.display = 'none';
       document.getElementById('dashboard').classList.add('open');
+      fetch('projects.json').then(r => r.json()).then(p => { projects = p; }).catch(() => {});
       renderList();
-      loadArticle(articles[0].slug);
+      if (articles.length) loadEntry(articles[0].slug);
     } else {
       document.getElementById('lockError').textContent = 'Message sent';
     }
   }
 
+  // Tab switching
+  document.querySelectorAll('.dash-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const mode = tab.dataset.mode;
+      if (mode === currentMode) return;
+      currentMode = mode;
+      currentSlug = null;
+      isNew = false;
+      document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+      document.querySelectorAll('.mode-article').forEach(el => el.style.display = mode === 'article' ? '' : 'none');
+      document.querySelectorAll('.mode-project').forEach(el => el.style.display = mode === 'project' ? '' : 'none');
+      document.getElementById('dashHeaderLabel').textContent = mode === 'article' ? 'Articles' : 'Projects';
+      clearForm();
+      renderList();
+      updatePreview();
+    });
+  });
+
   function renderList() {
-    const el = document.getElementById('articleList');
-    el.innerHTML = articles.map(a => `
-      <button class="article-list-item${a.slug === currentSlug ? ' active' : ''}" data-slug="${a.slug}">
-        <div><span class="list-tag">${a.tag}</span><span class="list-date">${fmtDate(a.date)}</span></div>
-        <div style="margin-top:2px">${a.title}</div>
-      </button>
-    `).join('');
+    const el = document.getElementById('entryList');
+    const items = currentMode === 'article' ? articles : projects;
+    if (!items.length) { el.innerHTML = ''; return; }
+    el.innerHTML = items.map(i => {
+      if (currentMode === 'article') {
+        const a = i;
+        return `<button class="article-list-item${a.slug === currentSlug ? ' active' : ''}" data-slug="${a.slug}">
+          <div><span class="list-tag">${a.tag}</span><span class="list-date">${fmtDate(a.date)}</span></div>
+          <div style="margin-top:2px">${a.title}</div>
+        </button>`;
+      } else {
+        const p = i;
+        return `<button class="article-list-item${p.slug === currentSlug ? ' active' : ''}" data-slug="${p.slug}">
+          <div><span class="list-tag">${p.tag}</span></div>
+          <div style="margin-top:2px">${p.title}</div>
+        </button>`;
+      }
+    }).join('');
     el.querySelectorAll('.article-list-item').forEach(btn => {
-      btn.addEventListener('click', () => loadArticle(btn.dataset.slug));
+      btn.addEventListener('click', () => loadEntry(btn.dataset.slug));
     });
   }
 
@@ -385,87 +458,119 @@
     return `${parts[2]}-${m}-${parts[0].padStart(2, '0')}`;
   }
 
-  function fromRawDate(str) {
-    if (!str) return '';
-    const d = str.split('-');
-    if (d.length < 3) return '';
-    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-    const m = months[parseInt(d[1]) - 1] || 'jan';
-    const day = parseInt(d[2]);
-    return `${m} ${day} ${d[0]}`;
+  function clearForm() {
+    document.getElementById('fieldTitle').value = '';
+    document.getElementById('fieldBody').value = '';
+    document.getElementById('fieldTag').value = 'Essay';
+    document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('fieldCategory').value = 'Branding';
+    document.getElementById('fieldThumb').value = '';
+    document.getElementById('slugHint').textContent = 'slug: —';
+    document.getElementById('entryOutput').classList.remove('show');
   }
 
-  function loadArticle(slug) {
+  function loadEntry(slug) {
     currentSlug = slug;
     isNew = false;
     renderList();
     document.getElementById('slugHint').textContent = `slug: ${slug}`;
 
-    fetch(`articles/${slug}.txt`)
+    const folder = currentMode === 'article' ? 'articles' : 'projects';
+    fetch(`${folder}/${slug}.txt`)
       .then(r => { if (!r.ok) throw new Error(); return r.text(); })
       .then(text => {
         const lines = text.split('\n').map(l => l.trim());
         const title = lines[0] || '';
         const meta = lines[1] || '';
-        const [tag, date] = meta.split('|').map(s => s.trim());
-        const body = lines.slice(2).filter(l => l !== '').join('\n\n');
+        const parts = meta.split('|').map(s => s.trim());
 
         document.getElementById('fieldTitle').value = title;
-        const tagSel = document.getElementById('fieldTag');
-        if (tag && ![...tagSel.options].some(o => o.value === tag)) {
-          const opt = document.createElement('option');
-          opt.value = tag; opt.textContent = tag;
-          tagSel.appendChild(opt);
+
+          if (currentMode === 'article') {
+            const [tag, date] = parts;
+            const tagSel = document.getElementById('fieldTag');
+            if (tag && ![...tagSel.options].some(o => o.value === tag)) {
+              const opt = document.createElement('option');
+              opt.value = tag; opt.textContent = tag;
+              tagSel.appendChild(opt);
+            }
+            tagSel.value = tag || 'Essay';
+            if (date) document.getElementById('fieldDate').value = toRawDate(date);
+            const imgLine = lines[2] || '';
+            const thumb = imgLine.startsWith('img:') ? imgLine.slice(4) : '';
+            document.getElementById('fieldThumb').value = thumb;
+            const bodyStart = thumb ? 3 : 2;
+            const body = lines.slice(bodyStart).filter(l => l !== '').join('\n\n');
+            document.getElementById('fieldBody').value = body;
+          } else {
+          const [category] = parts;
+          document.getElementById('fieldCategory').value = category || 'Branding';
+          const imgLine = lines[2] || '';
+          const thumb = imgLine.startsWith('img:') ? imgLine.slice(4) : '';
+          document.getElementById('fieldThumb').value = thumb;
+          const body = lines.slice(3).filter(l => l !== '').join('\n\n');
+          document.getElementById('fieldBody').value = body;
         }
-        tagSel.value = tag || 'Essay';
-        if (date) {
-          document.getElementById('fieldDate').value = toRawDate(date);
-        }
-        document.getElementById('fieldBody').value = body;
         updatePreview();
       })
       .catch(() => {
-        toast('could not load article file');
+        toast(`could not load ${currentMode} file`);
       });
   }
 
-  function newArticle() {
+  function newEntry() {
     isNew = true;
     currentSlug = null;
     renderList();
-    document.getElementById('fieldTitle').value = '';
-    document.getElementById('fieldTag').value = 'Essay';
-    document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('fieldBody').value = '';
-    document.getElementById('slugHint').textContent = 'slug: —';
+    clearForm();
     updatePreview();
   }
 
   function getFormData() {
     const title = document.getElementById('fieldTitle').value.trim() || 'untitled';
-    const tag = document.getElementById('fieldTag').value;
-    const rawDate = document.getElementById('fieldDate').value;
     const body = document.getElementById('fieldBody').value;
-    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-    let dateStr;
-    if (rawDate) {
-      const d = rawDate.split('-');
-      const m = months[parseInt(d[1]) - 1] || 'jan';
-      const day = parseInt(d[2]);
-      dateStr = `${day} ${m} ${d[0]}`;
-    } else {
-      const now = new Date();
-      dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-    }
     const slug = slugify(title);
-    return { title, tag, date: dateStr, body, slug };
+
+    if (currentMode === 'article') {
+      const tag = document.getElementById('fieldTag').value;
+      const rawDate = document.getElementById('fieldDate').value;
+      const thumb = document.getElementById('fieldThumb').value.trim();
+      const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+      let dateStr;
+      if (rawDate) {
+        const d = rawDate.split('-');
+        const m = months[parseInt(d[1]) - 1] || 'jan';
+        const day = parseInt(d[2]);
+        dateStr = `${day} ${m} ${d[0]}`;
+      } else {
+        const now = new Date();
+        dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      }
+      return { title, tag, date: dateStr, body, slug, thumb, mode: 'article' };
+    } else {
+      const category = document.getElementById('fieldCategory').value;
+      const thumb = document.getElementById('fieldThumb').value.trim();
+      return { title, category, thumb, body, slug, mode: 'project' };
+    }
   }
 
   function generateTxt(data) {
-    const bodyLines = data.body.split('\n').filter(l => l.trim() !== '');
-    const parts = data.date.split(' ');
-    const date = parts.length >= 3 ? `${parts[0]} ${parts[1].charAt(0).toUpperCase() + parts[1].slice(1)} ${parts[2]}` : data.date;
-    return `${data.title}\n${data.tag} | ${date}\n\n${bodyLines.join('\n\n')}`;
+    if (data.mode === 'article') {
+      const bodyLines = data.body.split('\n').filter(l => l.trim() !== '');
+      const parts = data.date.split(' ');
+      const date = parts.length >= 3 ? `${parts[0]} ${parts[1].charAt(0).toUpperCase() + parts[1].slice(1)} ${parts[2]}` : data.date;
+      let txt = `${data.title}\n${data.tag} | ${date}\n`;
+      if (data.thumb) txt += `img:${data.thumb}\n`;
+      txt += `\n${bodyLines.join('\n\n')}`;
+      return txt;
+    } else {
+      const bodyLines = data.body.split('\n').filter(l => l.trim() !== '');
+      const year = new Date().getFullYear();
+      let txt = `${data.title}\n${data.category} | ${year}\n`;
+      if (data.thumb) txt += `img:${data.thumb}\n`;
+      txt += `\n${bodyLines.join('\n\n')}`;
+      return txt;
+    }
   }
 
   function updatePreview() {
@@ -475,13 +580,24 @@
       pane.innerHTML = '<div class="preview-empty">Preview will appear here</div>';
       return;
     }
-    const bodyHtml = data.body.split('\n\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
-    pane.innerHTML = `
-      <div class="preview-tag">${data.tag}</div>
-      <div class="preview-title">${data.title}</div>
-      <div class="preview-date">${fmtDate(data.date)}</div>
-      <div class="preview-body">${bodyHtml}</div>
-    `;
+    if (data.mode === 'article') {
+      const bodyHtml = data.body.split('\n\n').filter(l => l.trim()).map(l => l.startsWith('img:') ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:24px 0;overflow:hidden"><img src="${l.slice(4)}" style="width:100%;height:100%;object-fit:cover"></div>` : `<p>${l}</p>`).join('');
+      pane.innerHTML = `
+        ${data.thumb ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin-bottom:24px;overflow:hidden"><img src="${data.thumb}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1);opacity:0.8"></div>` : ''}
+        <div class="preview-tag">${data.tag}</div>
+        <div class="preview-title">${data.title}</div>
+        <div class="preview-date">${fmtDate(data.date)}</div>
+        <div class="preview-body">${bodyHtml}</div>
+      `;
+    } else {
+      const bodyHtml = data.body.split('\n\n').filter(l => l.trim()).map(l => l.startsWith('img:') ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:24px 0;overflow:hidden"><img src="${l.slice(4)}" style="width:100%;height:100%;object-fit:cover"></div>` : `<p>${l}</p>`).join('');
+      pane.innerHTML = `
+        <div class="preview-tag">${data.category}</div>
+        <div class="preview-title">${data.title}</div>
+        ${data.thumb ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:16px 0 24px;overflow:hidden"><img src="${data.thumb}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1);opacity:0.8"></div>` : ''}
+        <div class="preview-body">${bodyHtml}</div>
+      `;
+    }
   }
 
   function toast(msg) {
@@ -491,8 +607,25 @@
     setTimeout(() => el.classList.remove('show'), 2500);
   }
 
+  function showEntry(data) {
+    if (data.mode === 'article') {
+      const year = data.date.split(' ')[2] || '2026';
+      const excerpt = data.body.split('\n\n').filter(l => l.trim() && !l.startsWith('img:'))[0]?.slice(0, 100) || '';
+      const parts = data.date.split(' ');
+      const date = parts.length >= 3 ? `${parts[0]} ${parts[1].charAt(0).toUpperCase() + parts[1].slice(1)} ${parts[2]}` : data.date;
+      const entry = `{ "tag": "${data.tag}", "date": "${date}", "title": "${data.title.replace(/"/g, '\\"')}", "excerpt": "${excerpt.replace(/"/g, '\\"')}", "year": ${year}, "slug": "${data.slug}" },`;
+      document.getElementById('entryCode').textContent = entry;
+    } else {
+      const excerpt = data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '';
+      const slugKey = data.slug;
+      const entry = `{ "category": "${data.category.toLowerCase()}", "tag": "${data.category}", "slug": "${slugKey}", "img": "${data.thumb.replace(/"/g, '\\"')}", "title": "${data.title.replace(/"/g, '\\"')}", "desc": "${excerpt.replace(/"/g, '\\"')}" },`;
+      document.getElementById('entryCode').textContent = entry;
+    }
+    document.getElementById('entryOutput').classList.add('show');
+  }
+
   // Event listeners
-  document.getElementById('btnNew').addEventListener('click', newArticle);
+  document.getElementById('btnNew').addEventListener('click', newEntry);
   document.getElementById('fieldTitle').addEventListener('input', () => {
     if (isNew) {
       const slug = slugify(document.getElementById('fieldTitle').value);
@@ -502,6 +635,8 @@
   });
   document.getElementById('fieldTag').addEventListener('change', updatePreview);
   document.getElementById('fieldDate').addEventListener('input', updatePreview);
+  document.getElementById('fieldCategory').addEventListener('change', updatePreview);
+  document.getElementById('fieldThumb').addEventListener('input', updatePreview);
   document.getElementById('fieldBody').addEventListener('input', updatePreview);
 
   document.getElementById('btnDownload').addEventListener('click', () => {
@@ -536,20 +671,6 @@
     document.getElementById('btnCopyEntry').click();
   });
 
-  function capDate(d) {
-    const p = d.split(' ');
-    return p.length >= 3 ? `${p[0]} ${p[1].charAt(0).toUpperCase() + p[1].slice(1)} ${p[2]}` : d;
-  }
-
-  function showEntry(data) {
-    const year = data.date.split(' ')[2] || '2026';
-    const excerpt = data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '';
-    const date = capDate(data.date);
-    const entry = `{ "tag": "${data.tag}", "date": "${date}", "title": "${data.title.replace(/"/g, '\\"')}", "excerpt": "${excerpt.replace(/"/g, '\\"')}", "year": ${year}, "slug": "${data.slug}" },`;
-    document.getElementById('entryCode').textContent = entry;
-    document.getElementById('entryOutput').classList.add('show');
-  }
-
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
     const panel = document.getElementById('previewPanel');
     const btn = document.getElementById('btnPreviewToggle');
@@ -569,10 +690,6 @@
     if (e.target === e.currentTarget) document.getElementById('helpOverlay').classList.remove('open');
   });
 
-  // Auto-unlock for demo (remove in prod)
-  // unlock();
-
-  // Init
   populateTags();
   updatePreview();
 

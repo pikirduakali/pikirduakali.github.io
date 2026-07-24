@@ -248,11 +248,11 @@
 
     <section id="about" class="reveal">
       <div class="section-label"><span class="num">01</span><span class="line"></span><span class="text">About Me</span></div>
-      <h2 class="display">I'm a craftsman who sometimes<br>takes things too seriously.</h2>
+      <h2 class="display">I make things. And I make<br>sure they work.</h2>
       <div class="about-grid">
         <div class="about-text">
-          <p>Barista by trade, designer by stubbornness. I've spent years brewing coffee and creating all sorta things that range from genuinely useful to "we thought this was a good idea."</p>
-          <p>I care about craft — not in a precious way, but in the "let's make this actually work" way. The function matters. The result matters more.</p>
+          <p>Barista by trade, designer by stubbornness. I've spent years brewing coffee, designing brand identities, building menus that balance cost with craveability, and training teams that actually stay. I don't just make things look good — I make the numbers make sense, too.</p>
+          <p>The function matters. The result matters more.</p>
         </div>
         <div class="photo-wrap">
           <img src="https://i.ibb.co.com/Lz6PTHGr/pram-pf.webp" alt="Profile photo" />
@@ -300,26 +300,7 @@
     <section id="showcase" class="reveal">
       <div class="section-label"><span class="num">05</span><span class="line"></span><span class="text">Showcase</span></div>
       <h2 class="display">All the projects<br>I've poured myself into.</h2>
-      <div class="showcase-grid">
-        <a href="project.html?slug=roastery-rebrand" class="showcase-card">
-          <div class="showcase-thumb"><img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&h=375&fit=crop&auto=format" alt="Brand Identity"></div>
-          <h3>Brand Identity</h3>
-          <p>Logo, packaging, and brand guidelines for a local coffee roastery.</p>
-          <span class="showcase-btn">View project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
-        </a>
-        <a href="project.html?slug=menu-system" class="showcase-card">
-          <div class="showcase-thumb"><img src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=500&h=375&fit=crop&auto=format" alt="Menu Design"></div>
-          <h3>Menu Design</h3>
-          <p>Food & beverage menu layout, photography direction, and print production.</p>
-          <span class="showcase-btn">View project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
-        </a>
-        <a href="project.html?slug=social-media-kit" class="showcase-card">
-          <div class="showcase-thumb"><img src="https://images.unsplash.com/photo-1613909207039-6b173b4c7c5e?w=500&h=375&fit=crop&auto=format" alt="Social Media Assets"></div>
-          <h3>Social Media Assets</h3>
-          <p>Campaign visuals, templates, and content strategy for F&B brands.</p>
-          <span class="showcase-btn">View project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>
-        </a>
-      </div>
+      <div class="showcase-grid" id="homeShowcaseGrid"></div>
       <div style="max-width:896px"><a href="showcase.html" class="btn-row">All projects <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
     </section>
 
@@ -400,6 +381,18 @@
       item.className = 'exp-item';
       item.innerHTML = `<div class="exp-row"><div class="exp-logo"><img src="logos/${e.logo}" alt="${e.company}"></div><div class="exp-content"><div class="exp-role">${e.role} <span class="exp-company">@ ${e.company}</span></div><div class="exp-note">${e.desc}</div></div></div><div class="exp-period">${e.period}</div>`;
       expList.appendChild(item);
+    });
+
+    fetch('projects.json').then(r => r.json()).then(projects => {
+      const grid = document.getElementById('homeShowcaseGrid');
+      if (!grid) return;
+      projects.slice(0, 3).forEach(p => {
+        const card = document.createElement('a');
+        card.className = 'showcase-card';
+        card.href = `project.html?slug=${p.slug}`;
+        card.innerHTML = `<div class="showcase-thumb"><img src="${p.img}" alt="${p.title}"></div><h3>${p.title}</h3><p>${p.desc}</p><span class="showcase-btn">View project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span>`;
+        grid.appendChild(card);
+      });
     });
 
     mobileMenu.querySelectorAll('a').forEach(link => {
