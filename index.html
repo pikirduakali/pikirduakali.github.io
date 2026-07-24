@@ -388,17 +388,17 @@
     });
 
     const homeExps = [
-      { role: 'Creative Lead', company: 'PT. Akhir Permainan Semesta (Tobarworld)', period: '2024 — 2026', desc: 'I make the face of the brand & the products. Still surprised it works.', logo: 'tobarworld' },
-      { role: 'Area Supervisor & Trainer', company: 'PT. Solomon Utama (Wake Cup Coffee & Roastery, Anak Bakmie, Pick Cup Indonesia)', period: '2021 — 2022', desc: 'I trained, I visited, I counted, I planned. Was I even operating the whole ops?', logo: 'wake-cup' },
-      { role: 'Area Supervisor', company: 'PT. Exquise Boga Mulia (Exquise Pattisserie)', period: '— 2021', desc: 'Learned what not to do. Invaluable.', logo: 'exquise' },
-      { role: 'Store Manager', company: 'PT. Aroma Parama Visesa (Caribou Coffee Indonesia)', period: '2017 — 2020', desc: 'This has been a \'build me\' episode from start to finish. I can almost see the whole thing now.', logo: 'caribou' },
-      { role: 'Audit Staff', company: 'PT. KAP Heliantono & Rekan (KAP Heliantono & Rekan)', period: '2015 — 2017', desc: 'Roamed across Indonesia, learned to count along the way. Neat.', logo: 'kap-heliantono' },
+      { role: 'Creative Lead', company: 'PT. Akhir Permainan Semesta (Tobarworld)', period: '2024 — 2026', desc: 'I make the face of the brand & the products. Still surprised it works.', logo: 'tobarworld.svg' },
+      { role: 'Area Supervisor & Trainer', company: 'PT. Solomon Utama (Wake Cup Coffee & Roastery, Anak Bakmie, Pick Cup Indonesia)', period: '2021 — 2022', desc: 'I trained, I visited, I counted, I planned. Was I even operating the whole ops?', logo: 'wake-cup.svg' },
+      { role: 'Area Supervisor', company: 'PT. Exquise Boga Mulia (Exquise Pattisserie)', period: '— 2021', desc: 'Learned what not to do. Invaluable.', logo: 'exquise.svg' },
+      { role: 'Store Manager', company: 'PT. Aroma Parama Visesa (Caribou Coffee Indonesia)', period: '2017 — 2020', desc: 'This has been a \'build me\' episode from start to finish. I can almost see the whole thing now.', logo: 'caribou.webp' },
+      { role: 'Audit Staff', company: 'PT. KAP Heliantono & Rekan (KAP Heliantono & Rekan)', period: '2015 — 2017', desc: 'Roamed across Indonesia, learned to count along the way. Neat.', logo: 'kap-heliantono.svg' },
     ];
     const expList = document.getElementById('homeExpList');
     homeExps.forEach(e => {
       const item = document.createElement('div');
       item.className = 'exp-item';
-      item.innerHTML = `<div class="exp-row"><div class="exp-logo"><img src="logos/${e.logo}.svg" alt="${e.company}"></div><div class="exp-content"><div class="exp-role">${e.role} <span class="exp-company">@ ${e.company}</span></div><div class="exp-note">${e.desc}</div></div></div><div class="exp-period">${e.period}</div>`;
+      item.innerHTML = `<div class="exp-row"><div class="exp-logo"><img src="logos/${e.logo}" alt="${e.company}"></div><div class="exp-content"><div class="exp-role">${e.role} <span class="exp-company">@ ${e.company}</span></div><div class="exp-note">${e.desc}</div></div></div><div class="exp-period">${e.period}</div>`;
       expList.appendChild(item);
     });
 
