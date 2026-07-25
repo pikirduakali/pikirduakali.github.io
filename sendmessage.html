@@ -127,37 +127,36 @@
     .editor-panel { flex: 1; min-width: 0; overflow-y: auto; }
     .preview-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
 
-    .field { margin-bottom: 20px; }
-    .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-foreground); margin-bottom: 6px; }
-    .field input, .field select, .field textarea {
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-foreground); margin-bottom: 4px; }
+    .field input, .field select {
       width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--foreground);
-      padding: 10px 14px; font-size: 14px; font-family: var(--font-body); outline: none;
+      padding: 7px 12px; font-size: 13px; font-family: var(--font-body); outline: none;
       transition: border-color 0.2s;
     }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
-    .field textarea { min-height: 320px; resize: vertical; font-size: 14px; line-height: 1.7; }
+    .field input:focus, .field select:focus { border-color: var(--accent); }
+    .field textarea {
+      width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--foreground);
+      padding: 10px 14px; font-size: 14px; font-family: var(--font-body); outline: none;
+      transition: border-color 0.2s; min-height: 320px; resize: vertical; line-height: 1.7;
+    }
+    .field textarea:focus { border-color: var(--accent); }
     .fmt-bar { display: flex; align-items: center; gap: 2px; padding: 6px 8px; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 4px 4px 0 0; }
     .fmt-btn { background: none; border: none; color: var(--muted-foreground); cursor: pointer; padding: 4px 8px; font-size: 14px; font-family: var(--font-body); border-radius: 3px; line-height: 1; }
     .fmt-btn:hover { background: var(--border); color: var(--foreground); }
     .fmt-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; display: inline-block; }
-    .field-row { display: flex; gap: 16px; }
+    .field-row { display: flex; gap: 12px; }
     .field-row .field { flex: 1; }
 
     .field select { cursor: pointer; }
     .field select option { background: var(--card); color: var(--foreground); }
 
     .tag-row { display: flex; gap: 0; }
-    .tag-row select { flex: 1; border-radius: 0; font-size: 13px; padding: 9px 10px; background: var(--card); border: 1px solid var(--border); color: var(--foreground); font-family: var(--font-body); outline: none; }
+    .tag-row select { flex: 1; border-radius: 0; font-size: 13px; padding: 6px 10px; background: var(--card); border: 1px solid var(--border); color: var(--foreground); font-family: var(--font-body); outline: none; }
     .tag-row select:focus { border-color: var(--accent); }
-    .tag-row input {
-      width: 48px; background: var(--card); border: 1px solid var(--border); border-left: none;
-      color: var(--foreground); padding: 10px 6px; font-size: 11px; font-family: var(--font-body);
-      outline: none; text-align: center;
-    }
-    .tag-row input:focus { border-color: var(--accent); }
     .tag-row button {
       background: var(--card); border: 1px solid var(--border); border-left: none;
-      color: var(--muted-foreground); padding: 7px 12px; cursor: pointer; font-size: 16px;
+      color: var(--muted-foreground); padding: 5px 10px; cursor: pointer; font-size: 15px;
       font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; line-height: 1;
     }
     .tag-row button:hover { border-color: var(--accent); color: var(--accent); }
