@@ -314,6 +314,14 @@
               <button id="addCategoryBtn">+</button>
             </div>
           </div>
+          <div class="field mode-project" style="display:none;max-width:100px">
+            <label>Year</label>
+            <input type="text" id="fieldYear" placeholder="2025" />
+          </div>
+          <div class="field mode-project" style="display:none;flex:1">
+            <label>Client</label>
+            <input type="text" id="fieldClient" placeholder="Client name" />
+          </div>
         </div>
         <div class="field">
           <label>Thumbnail URL <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(optional — will appear as hero image at the top)</span></label>
@@ -629,6 +637,8 @@ Ini paragraf setelah gambar.</pre>
     document.getElementById('fieldTag').value = 'Essay';
     document.getElementById('fieldDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('fieldCategory').value = 'Branding';
+    document.getElementById('fieldYear').value = '';
+    document.getElementById('fieldClient').value = '';
     document.getElementById('fieldThumb').value = '';
     document.getElementById('slugHint').textContent = 'slug: —';
     document.getElementById('entryOutput').classList.remove('show');
@@ -668,7 +678,7 @@ Ini paragraf setelah gambar.</pre>
             const body = lines.slice(bodyStart).filter(l => l !== '').join('\n\n');
             document.getElementById('fieldBody').value = body;
           } else {
-          const [category] = parts;
+          const [category, year, client] = parts;
           const catSel = document.getElementById('fieldCategory');
           if (category && ![...catSel.options].some(o => o.value === category)) {
             const opt = document.createElement('option');
@@ -676,6 +686,8 @@ Ini paragraf setelah gambar.</pre>
             catSel.appendChild(opt);
           }
           catSel.value = category || 'Branding';
+          document.getElementById('fieldYear').value = year || '';
+          document.getElementById('fieldClient').value = client || '';
           const imgLine = lines[2] || '';
           const thumb = imgLine.startsWith('img:') ? imgLine.slice(4) : '';
           document.getElementById('fieldThumb').value = thumb;
@@ -720,8 +732,10 @@ Ini paragraf setelah gambar.</pre>
       return { title, tag, date: dateStr, body, slug, thumb, mode: 'article' };
     } else {
       const category = document.getElementById('fieldCategory').value;
+      const year = document.getElementById('fieldYear').value.trim();
+      const client = document.getElementById('fieldClient').value.trim();
       const thumb = document.getElementById('fieldThumb').value.trim();
-      return { title, category, thumb, body, slug, mode: 'project' };
+      return { title, category, year, client, thumb, body, slug, mode: 'project' };
     }
   }
 
@@ -736,8 +750,9 @@ Ini paragraf setelah gambar.</pre>
       return txt;
     } else {
       const bodyLines = data.body.split('\n').filter(l => l.trim() !== '');
-      const year = new Date().getFullYear();
-      let txt = `${data.title}\n${data.category} | ${year}\n`;
+      const y = data.year || String(new Date().getFullYear());
+      const c = data.client ? ' | ' + data.client : '';
+      let txt = `${data.title}\n${data.category} | ${y}${c}\n`;
       if (data.thumb) txt += `img:${data.thumb}\n`;
       txt += `\n${bodyLines.join('\n\n')}`;
       return txt;
@@ -762,9 +777,11 @@ Ini paragraf setelah gambar.</pre>
       `;
     } else {
       const bodyHtml = data.body.split('\n\n').filter(l => l.trim()).map(l => l.startsWith('img:') ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:24px 0;overflow:hidden"><img src="${l.slice(4)}" style="width:100%;height:100%;object-fit:cover"></div>` : `<p>${l}</p>`).join('');
+      const meta = data.year ? `${data.year}${data.client ? ' &middot; ' + data.client : ''}` : (data.client || '');
       pane.innerHTML = `
         <div class="preview-tag">${data.category}</div>
         <div class="preview-title">${data.title}</div>
+        ${meta ? `<div class="preview-date">${meta}</div>` : ''}
         ${data.thumb ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:16px 0 24px;overflow:hidden"><img src="${data.thumb}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1);opacity:0.8"></div>` : ''}
         <div class="preview-body">${bodyHtml}</div>
       `;
@@ -807,6 +824,8 @@ Ini paragraf setelah gambar.</pre>
   document.getElementById('fieldTag').addEventListener('change', updatePreview);
   document.getElementById('fieldDate').addEventListener('input', updatePreview);
   document.getElementById('fieldCategory').addEventListener('change', updatePreview);
+  document.getElementById('fieldYear').addEventListener('input', updatePreview);
+  document.getElementById('fieldClient').addEventListener('input', updatePreview);
   document.getElementById('fieldThumb').addEventListener('input', updatePreview);
   document.getElementById('fieldBody').addEventListener('input', updatePreview);
 
