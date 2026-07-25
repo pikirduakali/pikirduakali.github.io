@@ -332,11 +332,32 @@
     <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Site Content</h2>
     <ol>
       <li><strong>Switch ke Content tab</strong> — Klik "Content" di sidebar buat edit teks homepage.</li>
-      <li><strong>Edit</strong> — Semua teks dikelompokin per section (Hero, About, Services, dll). Tinggal klik &amp; ubah aja.</li>
-      <li><strong>Copy full JSON</strong> — Klik "Copy full JSON" di toolbar, otomatis ke-clipboard seluruh <code>site-content.json</code>.</li>
-      <li><strong>Buka site-content.json</strong> — Paste isinya di file <code>site-content.json</code>.</li>
-      <li><strong>Push</strong> — <code>git add . && git commit -m "update konten" && git push</code></li>
+      <li><strong>Pilih section</strong> — Klik Hero / About / Services dll di sidebar kiri.</li>
+      <li><strong>Edit</strong> — Ubah teks di kolom yang tersedia.</li>
+      <li><strong>Simpan</strong> — Klik "Copy JSON" di toolbar → download file <code>site-content.json</code>.</li>
+      <li><strong>Replace file</strong> — Timpa file lama di folder project lo dengan yang baru didownload.</li>
+      <li><strong>Push</strong> — Jalankan <code>gitpush.bat</code> atau <code>git add . && git commit -m "update konten" && git push</code></li>
     </ol>
+    <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">Text Modifiers — Site Content</h2>
+    <p style="font-size:14px;color:var(--muted-foreground);margin-bottom:12px;line-height:1.7">Karena pake <code>innerHTML</code>, lo bisa pake HTML langsung di kolom Content biar teksnya lebih hidup:</p>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px">
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)"><strong>Bold</strong></td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;strong&gt;teks&lt;/strong&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)"><em>Italic</em></td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;em&gt;teks&lt;/em&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)">~~Strikethrough~~</td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;span style="text-decoration:line-through"&gt;teks&lt;/span&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)"><span class="accent">Teks merah</span></td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;span class="accent"&gt;teks&lt;/span&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)">Teks abu</td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;span style="color:var(--muted-foreground)"&gt;teks&lt;/span&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)">Baris baru</td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;br&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)">Teks kecil</td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;small&gt;teks&lt;/small&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)">UPPERCASE</td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;span style="text-transform:uppercase"&gt;teks&lt;/span&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)">Font display</td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;span style="font-family:var(--font-display)"&gt;teks&lt;/span&gt;</code></td></tr>
+      <tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--accent)">Monospace</td><td style="padding:6px 8px;border:1px solid var(--border);color:var(--muted-foreground)"><code>&lt;span style="font-family:monospace"&gt;teks&lt;/span&gt;</code></td></tr>
+    </table>
+    <div class="help-note">
+      <strong>Contoh implementasi di JSON:</strong>
+      <pre style="background:#111;border:1px solid var(--border);padding:12px;margin-top:8px;font-size:13px;color:var(--muted-foreground);line-height:1.7;white-space:pre-wrap">"hero-title": "Not trying to impress.&lt;br&gt;&lt;span class=\"accent\"&gt;Just trying to make it work.&lt;/span&gt;"
+"about-text-1": "9+ years in &lt;strong&gt;F&amp;B operations&lt;/strong&gt; and &lt;em&gt;digital creative&lt;/em&gt; since &lt;span class=\"accent\"&gt;2010&lt;/span&gt;."</pre>
+      <strong style="margin-top:12px;display:block">Catatan:</strong> HTML cuma jalan di field Content. Di body article/project (file .txt), HTML gak akan ke-render.
+    </div>
     <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to Add Images</h2>
     <p style="font-size:14px;color:var(--muted-foreground);margin-bottom:16px;line-height:1.7">Supported in both Articles and Projects. Caranya:</p>
     <ol>
