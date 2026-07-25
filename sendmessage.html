@@ -256,7 +256,7 @@
     </div>
 
     <div class="dash-body">
-      <div class="editor-panel">
+      <div class="editor-panel" id="editorPanel">
         <div class="field-row">
           <div class="field" style="flex:2">
             <label>Title</label>
@@ -431,8 +431,11 @@ Ini paragraf setelah gambar.</pre>
 
       if (isContent) {
         document.getElementById('entryOutput').classList.remove('show');
+        document.getElementById('editorPanel').style.display = 'none';
+        document.getElementById('previewPanel').style.display = 'none';
         renderContentForm();
       } else {
+        document.getElementById('editorPanel').style.display = 'block';
         document.getElementById('previewPanel').style.display = 'block';
         document.getElementById('btnPreviewToggle').style.color = '';
         document.getElementById('btnPreviewToggle').style.borderColor = '';
