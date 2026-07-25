@@ -813,11 +813,17 @@ Ini paragraf setelah gambar.</pre>
       return;
     }
     const json = JSON.stringify(contentData, null, 2);
-    navigator.clipboard.writeText(json).then(() => {
-      toast('full site-content copied to clipboard');
-    }).catch(() => {
-      toast('could not copy — select manually');
-    });
+    const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'site-content.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    navigator.clipboard.writeText(json).catch(() => {});
+    toast('site-content.json downloaded!');
   });
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
