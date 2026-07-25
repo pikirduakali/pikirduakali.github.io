@@ -253,6 +253,7 @@
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
+        <button id="btnCopyContentJson" class="btn-download" style="display:none">Copy JSON</button>
       </div>
     </div>
 
@@ -434,10 +435,18 @@ Ini paragraf setelah gambar.</pre>
         document.getElementById('previewPanel').style.display = 'none';
         document.getElementById('entryList').style.display = 'none';
         document.getElementById('sectionList').style.display = '';
+        document.getElementById('btnPreviewToggle').style.display = 'none';
+        document.getElementById('btnDownload').style.display = 'none';
+        document.getElementById('btnCopyEntry').style.display = 'none';
+        document.getElementById('btnCopyContentJson').style.display = '';
         currentContentSection = contentGroups[0].name;
         renderContentSectionList();
         renderContentSection(currentContentSection);
       } else {
+        document.getElementById('btnCopyContentJson').style.display = 'none';
+        document.getElementById('btnPreviewToggle').style.display = '';
+        document.getElementById('btnDownload').style.display = '';
+        document.getElementById('btnCopyEntry').style.display = '';
         document.getElementById('sectionList').style.display = 'none';
         document.getElementById('entryList').style.display = '';
         document.getElementById('editorPanel').style.display = 'block';
@@ -796,6 +805,19 @@ Ini paragraf setelah gambar.</pre>
 
   document.getElementById('copyEntryHint').addEventListener('click', () => {
     document.getElementById('btnCopyEntry').click();
+  });
+
+  document.getElementById('btnCopyContentJson').addEventListener('click', () => {
+    if (!contentData || !Object.keys(contentData).length) {
+      toast('content not loaded yet — please wait');
+      return;
+    }
+    const json = JSON.stringify(contentData, null, 2);
+    navigator.clipboard.writeText(json).then(() => {
+      toast('full site-content copied to clipboard');
+    }).catch(() => {
+      toast('could not copy — select manually');
+    });
   });
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
