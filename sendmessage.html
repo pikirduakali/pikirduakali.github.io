@@ -181,6 +181,33 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
+    /* Prompt modal */
+    .prompt-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 400; align-items: center; justify-content: center;
+    }
+    .prompt-overlay.open { display: flex; }
+    .prompt-box {
+      background: var(--card); border: 1px solid var(--border); padding: 32px;
+      width: 90%; max-width: 440px;
+    }
+    .prompt-box p { font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px; }
+    .prompt-box input {
+      width: 100%; background: var(--background); border: 1px solid var(--border);
+      color: var(--foreground); padding: 10px 14px; font-size: 14px;
+      font-family: var(--font-body); outline: none;
+    }
+    .prompt-box input:focus { border-color: var(--accent); }
+    .prompt-btns { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+    .prompt-btns button {
+      background: none; border: 1px solid var(--border); color: var(--muted-foreground);
+      padding: 8px 20px; font-size: 13px; cursor: pointer; font-family: var(--font-body);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .prompt-btns button:hover { border-color: var(--accent); color: var(--foreground); }
+    .prompt-btns button.prompt-ok { border-color: var(--accent); color: var(--accent); }
+    .prompt-btns button.prompt-ok:hover { background: var(--accent); color: var(--foreground); }
+
     /* Help modal */
     .help-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -390,7 +417,16 @@ Ini paragraf setelah gambar.</pre>
   </div>
 </div>
 
-
+<div class="prompt-overlay" id="promptOverlay">
+  <div class="prompt-box">
+    <p id="promptLabel">Enter URL:</p>
+    <input type="text" id="promptInput" placeholder="https://..." />
+    <div class="prompt-btns">
+      <button id="promptCancel">Cancel</button>
+      <button class="prompt-ok" id="promptOk">OK</button>
+    </div>
+  </div>
+</div>
 
 <script>
   const PASSKEY = 'qqqq';
@@ -770,34 +806,62 @@ Ini paragraf setelah gambar.</pre>
   document.getElementById('fieldThumb').addEventListener('input', updatePreview);
   document.getElementById('fieldBody').addEventListener('input', updatePreview);
 
+  let pendingFormat = null, pendingSel = null, pendingStart = null, pendingEnd = null;
+
+  function showPrompt(label, placeholder, callback) {
+    document.getElementById('promptLabel').textContent = label;
+    document.getElementById('promptInput').value = placeholder;
+    document.getElementById('promptInput').placeholder = placeholder;
+    document.getElementById('promptOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('promptInput').focus(), 100);
+    document.getElementById('promptOk').onclick = () => {
+      const val = document.getElementById('promptInput').value;
+      if (!val) return;
+      document.getElementById('promptOverlay').classList.remove('open');
+      callback(val);
+    };
+    document.getElementById('promptCancel').onclick = () => {
+      document.getElementById('promptOverlay').classList.remove('open');
+    };
+    document.getElementById('promptInput').onkeydown = e => {
+      if (e.key === 'Enter') document.getElementById('promptOk').click();
+      if (e.key === 'Escape') document.getElementById('promptCancel').click();
+    };
+  }
+
   document.querySelectorAll('.fmt-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const ta = document.getElementById('fieldBody');
-      const start = ta.selectionStart, end = ta.selectionEnd;
-      const text = ta.value, sel = text.substring(start, end);
+      pendingStart = ta.selectionStart; pendingEnd = ta.selectionEnd;
+      const text = ta.value, sel = text.substring(pendingStart, pendingEnd);
       const tag = btn.dataset.tag;
+
       if (tag === 'img') {
-        const url = prompt('Enter image URL:', 'https://');
-        if (!url) return;
-        const left = text.substring(0, start), right = text.substring(end);
-        const nlBefore = left && !left.endsWith('\n') ? '\n\n' : '';
-        const nlAfter = right && !right.startsWith('\n') ? '\n\n' : '';
-        const img = 'img:' + url;
-        ta.value = left + nlBefore + img + nlAfter;
-        ta.selectionStart = ta.selectionEnd = (left + nlBefore + img).length;
+        showPrompt('Enter image URL:', 'https://', url => {
+          const left = text.substring(0, pendingStart), right = text.substring(pendingEnd);
+          const nlBefore = left && !left.endsWith('\n') ? '\n\n' : '';
+          const nlAfter = right && !right.startsWith('\n') ? '\n\n' : '';
+          const img = 'img:' + url;
+          ta.value = left + nlBefore + img + nlAfter;
+          ta.selectionStart = ta.selectionEnd = (left + nlBefore + img).length;
+          ta.focus();
+          updatePreview();
+        });
       } else if (tag === 'link') {
-        const url = prompt('Enter URL:', 'https://');
-        if (!url) return;
-        const link = sel ? `<a href="${url}">${sel}</a>` : `<a href="${url}">link</a>`;
-        ta.value = text.substring(0, start) + link + text.substring(end);
-        ta.selectionStart = ta.selectionEnd = start + link.length;
+        showPrompt('Enter URL:', 'https://', url => {
+          const link = sel ? `<a href="${url}">${sel}</a>` : `<a href="${url}">link</a>`;
+          ta.value = text.substring(0, pendingStart) + link + text.substring(pendingEnd);
+          ta.selectionStart = ta.selectionEnd = pendingStart + link.length;
+          ta.focus();
+          updatePreview();
+        });
       } else {
         const wrapped = sel ? `<${tag}>${sel}</${tag}>` : `<${tag}></${tag}>`;
-        ta.value = text.substring(0, start) + wrapped + text.substring(end);
-        ta.selectionStart = ta.selectionEnd = start + (sel ? wrapped.length : wrapped.length - (`</${tag}>`).length);
+        ta.value = text.substring(0, pendingStart) + wrapped + text.substring(pendingEnd);
+        ta.selectionStart = ta.selectionEnd = pendingStart + (sel ? wrapped.length : wrapped.length - (`</${tag}>`).length);
+        ta.focus();
+        updatePreview();
       }
-      ta.focus();
-      updatePreview();
     });
   });
 
