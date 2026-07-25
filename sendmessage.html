@@ -296,7 +296,7 @@
         </div>
         <div class="field">
           <label>Body</label>
-          <div class="fmt-bar"><button class="fmt-btn" data-tag="strong" title="Bold"><strong>B</strong></button><button class="fmt-btn" data-tag="em" title="Italic"><em>I</em></button><button class="fmt-btn" data-tag="s" title="Strikethrough"><span style="text-decoration:line-through">S</span></button><span class="fmt-sep"></span><button class="fmt-btn" data-tag="link" title="Insert Link">🔗</button><button class="fmt-btn" data-tag="img" title="Insert Image">🖼</button></div>
+          <div class="fmt-bar"><button class="fmt-btn" data-tag="strong" title="Bold"><strong>B</strong></button><button class="fmt-btn" data-tag="em" title="Italic"><em>I</em></button><button class="fmt-btn" data-tag="u" title="Underline"><span style="text-decoration:underline">U</span></button><button class="fmt-btn" data-tag="s" title="Strikethrough"><span style="text-decoration:line-through">S</span></button><span class="fmt-sep"></span><button class="fmt-btn" data-tag="link" title="Insert Link">🔗</button><button class="fmt-btn" data-tag="img" title="Insert Image">🖼</button></div>
           <textarea id="fieldBody" placeholder="Write your content here...&#10;&#10;Each paragraph separated by a blank line.&#10;Add inline images with img:https://... on its own line.&#10;Select text and use toolbar above to format (Bold, Italic, etc.)."></textarea>
         </div>
         <div class="entry-output" id="entryOutput">
@@ -777,9 +777,12 @@ Ini paragraf setelah gambar.</pre>
       const text = ta.value, sel = text.substring(start, end);
       const tag = btn.dataset.tag;
       if (tag === 'img') {
+        const left = text.substring(0, start), right = text.substring(end);
+        const nlBefore = left && !left.endsWith('\n') ? '\n\n' : '';
+        const nlAfter = right && !right.startsWith('\n') ? '\n\n' : '';
         const img = 'img:https://';
-        ta.value = text.substring(0, start) + img + text.substring(end);
-        ta.selectionStart = ta.selectionEnd = start + img.length;
+        ta.value = left + nlBefore + img + nlAfter;
+        ta.selectionStart = ta.selectionEnd = (left + nlBefore + img).length;
       } else if (tag === 'link') {
         const url = prompt('Enter URL:', 'https://');
         if (!url) return;
