@@ -241,6 +241,7 @@
       <button class="btn-new" id="btnNew">+ New</button>
     </div>
     <div class="article-list" id="entryList"></div>
+    <div class="article-list" id="sectionList" style="display:none"></div>
   </div>
 
   <div class="dash-main">
@@ -303,9 +304,7 @@
           <div class="preview-empty">Preview will appear here</div>
         </div>
       </div>
-      <div class="content-panel mode-content" id="contentPanel" style="display:none;flex:1;overflow-y:auto">
-        <p style="color:var(--muted-foreground);font-size:14px">Loading content...</p>
-      </div>
+      <div class="content-panel mode-content" id="contentPanel" style="display:none;flex:1;overflow-y:auto;padding:32px"></div>
     </div>
   </div>
 </div>
@@ -433,8 +432,14 @@ Ini paragraf setelah gambar.</pre>
         document.getElementById('entryOutput').classList.remove('show');
         document.getElementById('editorPanel').style.display = 'none';
         document.getElementById('previewPanel').style.display = 'none';
-        renderContentForm();
+        document.getElementById('entryList').style.display = 'none';
+        document.getElementById('sectionList').style.display = '';
+        currentContentSection = contentGroups[0].name;
+        renderContentSectionList();
+        renderContentSection(currentContentSection);
       } else {
+        document.getElementById('sectionList').style.display = 'none';
+        document.getElementById('entryList').style.display = '';
         document.getElementById('editorPanel').style.display = 'block';
         document.getElementById('previewPanel').style.display = 'block';
         document.getElementById('btnPreviewToggle').style.color = '';
@@ -457,6 +462,9 @@ Ini paragraf setelah gambar.</pre>
     { name: 'Footer', keys: ['footer-text'] },
   ];
 
+  let currentContentSection = 'Hero';
+  let contentData = {};
+
   function keyLabel(key) {
     return key.split('-').slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   }
@@ -465,29 +473,37 @@ Ini paragraf setelah gambar.</pre>
     return ['hero-body', 'about-text-1', 'about-text-2', 'service-1-desc', 'service-2-desc', 'service-3-desc', 'footer-text'].includes(key);
   }
 
-  let contentData = {};
+  function renderContentSectionList() {
+    const el = document.getElementById('sectionList');
+    el.innerHTML = contentGroups.map(g =>
+      `<button class="article-list-item${g.name === currentContentSection ? ' active' : ''}" data-section="${g.name}">${g.name}</button>`
+    ).join('');
+    el.querySelectorAll('.article-list-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentContentSection = btn.dataset.section;
+        renderContentSectionList();
+        renderContentSection(currentContentSection);
+      });
+    });
+  }
 
-  function renderContentForm() {
+  function renderContentSection(sectionName) {
+    const group = contentGroups.find(g => g.name === sectionName);
+    if (!group) return;
     fetch('site-content.json').then(r => r.json()).then(data => {
       contentData = data;
       const panel = document.getElementById('contentPanel');
-      let html = '<div style="padding:4px 0 32px">';
-      contentGroups.forEach(g => {
-        html += `<div style="margin-bottom:28px"><h3 style="font-family:var(--font-display);font-size:14px;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em">${g.name}</h3>`;
-        g.keys.forEach(k => {
-          const val = data[k] || '';
-          const label = keyLabel(k);
-          if (isLongText(k)) {
-            html += `<div class="field"><label>${label}</label><textarea class="content-field" data-key="${k}" style="min-height:80px">${val.replace(/</g, '&lt;')}</textarea></div>`;
-          } else {
-            html += `<div class="field"><label>${label}</label><input type="text" class="content-field" data-key="${k}" value="${val.replace(/"/g, '&quot;').replace(/</g, '&lt;')}" /></div>`;
-          }
-        });
-        html += '</div>';
+      let html = '';
+      group.keys.forEach(k => {
+        const val = data[k] || '';
+        const label = keyLabel(k);
+        if (isLongText(k)) {
+          html += `<div class="field"><label>${label}</label><textarea class="content-field" data-key="${k}" style="min-height:80px">${val.replace(/</g, '&lt;')}</textarea></div>`;
+        } else {
+          html += `<div class="field"><label>${label}</label><input type="text" class="content-field" data-key="${k}" value="${val.replace(/"/g, '&quot;').replace(/</g, '&lt;')}" /></div>`;
+        }
       });
-      html += '</div>';
       panel.innerHTML = html;
-
       document.querySelectorAll('.content-field').forEach(el => {
         el.addEventListener('input', () => {
           contentData[el.dataset.key] = el.value;
