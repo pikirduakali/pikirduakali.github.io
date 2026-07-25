@@ -147,7 +147,8 @@
     .field select option { background: var(--card); color: var(--foreground); }
 
     .tag-row { display: flex; gap: 0; }
-    .tag-row select { flex: 1; border-radius: 0; }
+    .tag-row select { flex: 1; border-radius: 0; font-size: 13px; padding: 9px 10px; background: var(--card); border: 1px solid var(--border); color: var(--foreground); font-family: var(--font-body); outline: none; }
+    .tag-row select:focus { border-color: var(--accent); }
     .tag-row input {
       width: 48px; background: var(--card); border: 1px solid var(--border); border-left: none;
       color: var(--foreground); padding: 10px 6px; font-size: 11px; font-family: var(--font-body);
@@ -156,7 +157,7 @@
     .tag-row input:focus { border-color: var(--accent); }
     .tag-row button {
       background: var(--card); border: 1px solid var(--border); border-left: none;
-      color: var(--muted-foreground); padding: 8px 10px; cursor: pointer; font-size: 15px;
+      color: var(--muted-foreground); padding: 7px 12px; cursor: pointer; font-size: 16px;
       font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; line-height: 1;
     }
     .tag-row button:hover { border-color: var(--accent); color: var(--accent); }
@@ -309,12 +310,10 @@
           </div>
           <div class="field mode-project" style="display:none;max-width:170px">
             <label>Category</label>
-            <select id="fieldCategory">
-              <option value="Branding">Branding</option>
-              <option value="Print">Print</option>
-              <option value="Digital">Digital</option>
-              <option value="Packaging">Packaging</option>
-            </select>
+            <div class="tag-row">
+              <select id="fieldCategory"></select>
+              <button id="addCategoryBtn">+</button>
+            </div>
           </div>
         </div>
         <div class="field">
@@ -671,7 +670,13 @@ Ini paragraf setelah gambar.</pre>
             document.getElementById('fieldBody').value = body;
           } else {
           const [category] = parts;
-          document.getElementById('fieldCategory').value = category || 'Branding';
+          const catSel = document.getElementById('fieldCategory');
+          if (category && ![...catSel.options].some(o => o.value === category)) {
+            const opt = document.createElement('option');
+            opt.value = category; opt.textContent = category;
+            catSel.appendChild(opt);
+          }
+          catSel.value = category || 'Branding';
           const imgLine = lines[2] || '';
           const thumb = imgLine.startsWith('img:') ? imgLine.slice(4) : '';
           document.getElementById('fieldThumb').value = thumb;
@@ -968,12 +973,20 @@ Ini paragraf setelah gambar.</pre>
   });
 
   populateTags();
+  populateCategories();
   updatePreview();
 
   function populateTags() {
     const sel = document.getElementById('fieldTag');
     const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
     const all = ['Essay', 'Tech', 'Design', ...custom];
+    sel.innerHTML = all.map(t => `<option value="${t}">${t}</option>`).join('');
+  }
+
+  function populateCategories() {
+    const sel = document.getElementById('fieldCategory');
+    const custom = JSON.parse(localStorage.getItem('p2x_custom_categories') || '[]');
+    const all = ['Branding', 'Print', 'Digital', 'Packaging', ...custom];
     sel.innerHTML = all.map(t => `<option value="${t}">${t}</option>`).join('');
   }
 
@@ -996,6 +1009,23 @@ Ini paragraf setelah gambar.</pre>
   });
   document.getElementById('newTagInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('addTagBtn').click();
+  });
+
+  document.getElementById('addCategoryBtn').addEventListener('click', () => {
+    showPrompt('Enter new category name:', 'Category name', name => {
+      if (!name.trim()) return;
+      const custom = JSON.parse(localStorage.getItem('p2x_custom_categories') || '[]');
+      if (custom.includes(name) || ['Branding','Print','Digital','Packaging'].includes(name)) {
+        toast('category already exists');
+        return;
+      }
+      custom.push(name);
+      localStorage.setItem('p2x_custom_categories', JSON.stringify(custom));
+      populateCategories();
+      document.getElementById('fieldCategory').value = name;
+      updatePreview();
+      toast(`category "${name}" added`);
+    });
   });
 </script>
 </body>
