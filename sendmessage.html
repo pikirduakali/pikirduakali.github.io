@@ -300,7 +300,6 @@
             <label>Tag</label>
             <div class="tag-row">
               <select id="fieldTag"></select>
-              <input type="text" id="newTagInput" placeholder="New" />
               <button id="addTagBtn">+</button>
             </div>
           </div>
@@ -991,24 +990,20 @@ Ini paragraf setelah gambar.</pre>
   }
 
   document.getElementById('addTagBtn').addEventListener('click', () => {
-    const input = document.getElementById('newTagInput');
-    const name = input.value.trim();
-    if (!name) return;
-    const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
-    if (custom.includes(name) || ['Essay','Tech','Design'].includes(name)) {
-      toast('tag already exists');
-      return;
-    }
-    custom.push(name);
-    localStorage.setItem('p2x_custom_tags', JSON.stringify(custom));
-    populateTags();
-    document.getElementById('fieldTag').value = name;
-    input.value = '';
-    updatePreview();
-    toast(`tag "${name}" added`);
-  });
-  document.getElementById('newTagInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('addTagBtn').click();
+    showPrompt('Enter new tag name:', 'Tag name', name => {
+      if (!name.trim()) return;
+      const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
+      if (custom.includes(name) || ['Essay','Tech','Design'].includes(name)) {
+        toast('tag already exists');
+        return;
+      }
+      custom.push(name);
+      localStorage.setItem('p2x_custom_tags', JSON.stringify(custom));
+      populateTags();
+      document.getElementById('fieldTag').value = name;
+      updatePreview();
+      toast(`tag "${name}" added`);
+    });
   });
 
   document.getElementById('addCategoryBtn').addEventListener('click', () => {
