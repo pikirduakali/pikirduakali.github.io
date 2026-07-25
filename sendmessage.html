@@ -136,6 +136,10 @@
     }
     .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
     .field textarea { min-height: 320px; resize: vertical; font-size: 14px; line-height: 1.7; }
+    .fmt-bar { display: flex; align-items: center; gap: 2px; padding: 6px 8px; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 4px 4px 0 0; }
+    .fmt-btn { background: none; border: none; color: var(--muted-foreground); cursor: pointer; padding: 4px 8px; font-size: 14px; font-family: var(--font-body); border-radius: 3px; line-height: 1; }
+    .fmt-btn:hover { background: var(--border); color: var(--foreground); }
+    .fmt-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; display: inline-block; }
     .field-row { display: flex; gap: 16px; }
     .field-row .field { flex: 1; }
 
@@ -292,7 +296,8 @@
         </div>
         <div class="field">
           <label>Body</label>
-          <textarea id="fieldBody" placeholder="Write your content here...&#10;&#10;Each paragraph separated by a blank line.&#10;Add inline images with img:https://... on its own line."></textarea>
+          <div class="fmt-bar"><button class="fmt-btn" data-tag="strong" title="Bold"><strong>B</strong></button><button class="fmt-btn" data-tag="em" title="Italic"><em>I</em></button><button class="fmt-btn" data-tag="s" title="Strikethrough"><span style="text-decoration:line-through">S</span></button><span class="fmt-sep"></span><button class="fmt-btn" data-tag="link" title="Insert Link">🔗</button><button class="fmt-btn" data-tag="img" title="Insert Image">🖼</button></div>
+          <textarea id="fieldBody" placeholder="Write your content here...&#10;&#10;Each paragraph separated by a blank line.&#10;Add inline images with img:https://... on its own line.&#10;Select text and use toolbar above to format (Bold, Italic, etc.)."></textarea>
         </div>
         <div class="entry-output" id="entryOutput">
           <span class="copy-hint" id="copyEntryHint">click to copy</span>
@@ -764,6 +769,32 @@ Ini paragraf setelah gambar.</pre>
   document.getElementById('fieldCategory').addEventListener('change', updatePreview);
   document.getElementById('fieldThumb').addEventListener('input', updatePreview);
   document.getElementById('fieldBody').addEventListener('input', updatePreview);
+
+  document.querySelectorAll('.fmt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ta = document.getElementById('fieldBody');
+      const start = ta.selectionStart, end = ta.selectionEnd;
+      const text = ta.value, sel = text.substring(start, end);
+      const tag = btn.dataset.tag;
+      if (tag === 'img') {
+        const img = 'img:https://';
+        ta.value = text.substring(0, start) + img + text.substring(end);
+        ta.selectionStart = ta.selectionEnd = start + img.length;
+      } else if (tag === 'link') {
+        const url = prompt('Enter URL:', 'https://');
+        if (!url) return;
+        const link = sel ? `<a href="${url}">${sel}</a>` : `<a href="${url}">link</a>`;
+        ta.value = text.substring(0, start) + link + text.substring(end);
+        ta.selectionStart = ta.selectionEnd = start + link.length;
+      } else {
+        const wrapped = sel ? `<${tag}>${sel}</${tag}>` : `<${tag}></${tag}>`;
+        ta.value = text.substring(0, start) + wrapped + text.substring(end);
+        ta.selectionStart = ta.selectionEnd = start + (sel ? wrapped.length : wrapped.length - (`</${tag}>`).length);
+      }
+      ta.focus();
+      updatePreview();
+    });
+  });
 
   document.getElementById('btnDownload').addEventListener('click', () => {
     if (currentMode === 'content') {
