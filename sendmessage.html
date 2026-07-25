@@ -777,10 +777,12 @@ Ini paragraf setelah gambar.</pre>
       const text = ta.value, sel = text.substring(start, end);
       const tag = btn.dataset.tag;
       if (tag === 'img') {
+        const url = prompt('Enter image URL:', 'https://');
+        if (!url) return;
         const left = text.substring(0, start), right = text.substring(end);
         const nlBefore = left && !left.endsWith('\n') ? '\n\n' : '';
         const nlAfter = right && !right.startsWith('\n') ? '\n\n' : '';
-        const img = 'img:https://';
+        const img = 'img:' + url;
         ta.value = left + nlBefore + img + nlAfter;
         ta.selectionStart = ta.selectionEnd = (left + nlBefore + img).length;
       } else if (tag === 'link') {
