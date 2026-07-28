@@ -93,7 +93,7 @@
 
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; max-width: 896px; }
     .about-text p { color: var(--muted-foreground); line-height: 1.8; margin-bottom: 16px; }
-    .photo-wrap { position: relative; aspect-ratio: 4/5; background: var(--card); overflow: hidden; }
+    .photo-wrap { position: relative; aspect-ratio: 4/5; background: var(--card); overflow: hidden; border-radius: var(--radius); }
     .photo-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); opacity: 0.8; transition: filter 0.5s, opacity 0.5s; }
     .photo-wrap:hover img { filter: grayscale(0); opacity: 1; }
     .photo-badge { position: absolute; bottom: -16px; right: -16px; background: var(--accent); color: var(--foreground); font-size: 11px; padding: 8px 12px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
@@ -112,7 +112,7 @@
     .exp-item:hover { padding-left: 8px; }
     .exp-row { display: flex; gap: 16px; align-items: flex-start; flex: 1; }
     .exp-logo { width: 32px; height: 32px; flex-shrink: 0; }
-    .exp-logo img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); opacity: 0.7; transition: filter 0.4s, opacity 0.4s; }
+    .exp-logo img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); opacity: 0.7; transition: filter 0.4s, opacity 0.4s; border-radius: var(--radius); }
     .exp-item:hover .exp-logo img { filter: grayscale(0); opacity: 1; }
     .exp-content { flex: 1; min-width: 0; }
     .exp-role { font-weight: 500; margin-bottom: 4px; }
