@@ -956,6 +956,19 @@ Ini paragraf setelah gambar.</pre>
       });
       return;
     }
+    if (currentMode === 'project') {
+      const data = getFormData();
+      const idx = projects.findIndex(p => p.slug === data.slug);
+      const entry = { category: data.category.toLowerCase(), tag: data.category, slug: data.slug, img: data.thumb, title: data.title, desc: data.headline || (data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '') };
+      if (idx >= 0) projects[idx] = entry; else projects.push(entry);
+      const json = JSON.stringify(projects, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        toast('full projects.json copied to clipboard');
+      }).catch(() => {
+        toast('could not copy — select manually');
+      });
+      return;
+    }
     const data = getFormData();
     showEntry(data);
     const code = document.getElementById('entryCode');
