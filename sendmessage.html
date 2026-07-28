@@ -467,7 +467,7 @@ Ini paragraf setelah gambar.</pre>
     if (val === PASSKEY) {
       document.getElementById('lockscreen').style.display = 'none';
       document.getElementById('dashboard').classList.add('open');
-      fetch('projects.json').then(r => r.json()).then(p => { projects = p; }).catch(() => {});
+      fetch('projects.json').then(r => r.json()).then(p => { projects = p; if (currentMode === 'project') renderList(); }).catch(() => {});
       renderList();
       if (articles.length) loadEntry(articles[0].slug);
     } else {
