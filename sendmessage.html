@@ -109,6 +109,8 @@
     .btn-help:hover, .btn-preview:hover, .btn-home:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
     .btn-download, .btn-copy { border-color: var(--accent) !important; color: var(--accent) !important; }
     .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
+    .btn-delete { border-color: #c0392b !important; color: #c0392b !important; }
+    .btn-delete:hover { background: #c0392b !important; color: var(--foreground) !important; }
 
     .entry-output {
       display: none; margin-top: 20px; padding: 16px; background: #111;
@@ -285,6 +287,7 @@
         <button id="btnHelp" class="btn-help">How to</button>
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
+        <button id="btnDeleteEntry" class="btn-delete mode-project" style="display:none">Delete</button>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
         <button id="btnCopyContentJson" class="btn-download" style="display:none">Copy JSON</button>
       </div>
@@ -524,6 +527,7 @@ Ini paragraf setelah gambar.</pre>
         document.getElementById('btnPreviewToggle').style.color = '';
         document.getElementById('btnPreviewToggle').style.borderColor = '';
         clearForm();
+        document.getElementById('btnDeleteEntry').style.display = 'none';
         renderList();
         updatePreview();
       }
@@ -653,6 +657,7 @@ Ini paragraf setelah gambar.</pre>
   function loadEntry(slug) {
     currentSlug = slug;
     isNew = false;
+    document.getElementById('btnDeleteEntry').style.display = currentMode === 'project' ? '' : 'none';
     renderList();
     document.getElementById('slugHint').textContent = `slug: ${slug}`;
 
@@ -722,6 +727,7 @@ Ini paragraf setelah gambar.</pre>
   function newEntry() {
     isNew = true;
     currentSlug = null;
+    document.getElementById('btnDeleteEntry').style.display = 'none';
     renderList();
     clearForm();
     updatePreview();
@@ -1000,6 +1006,15 @@ Ini paragraf setelah gambar.</pre>
     URL.revokeObjectURL(url);
     navigator.clipboard.writeText(json).catch(() => {});
     toast('site-content.json downloaded!');
+  });
+
+  document.getElementById('btnDeleteEntry').addEventListener('click', () => {
+    if (currentMode !== 'project' || !currentSlug) return;
+    const idx = projects.findIndex(p => p.slug === currentSlug);
+    if (idx === -1) { toast('entry not found in memory'); return; }
+    projects.splice(idx, 1);
+    newEntry();
+    toast('entry deleted — copy full projects.json to save');
   });
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
