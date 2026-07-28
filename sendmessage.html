@@ -111,6 +111,9 @@
     .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
     .btn-delete { border-color: #c0392b !important; color: #c0392b !important; }
     .btn-delete:hover { background: #c0392b !important; color: var(--foreground) !important; }
+    .list-del-btn { background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;opacity:0.7;transition:opacity 0.2s;flex-shrink:0 }
+    .list-del-btn:hover { opacity:1 }
+    .list-del-hidden { visibility:hidden;pointer-events:none }
 
     .entry-output {
       display: none; margin-top: 20px; padding: 16px; background: #111;
@@ -287,7 +290,6 @@
         <button id="btnHelp" class="btn-help">How to</button>
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
-        <button id="btnDeleteEntry" class="btn-delete mode-project" style="display:none">Delete</button>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
         <button id="btnCopyContentJson" class="btn-download" style="display:none">Copy JSON</button>
       </div>
@@ -442,6 +444,16 @@ Ini paragraf setelah gambar.</pre>
   </div>
 </div>
 
+<div class="prompt-overlay" id="confirmOverlay">
+  <div class="prompt-box">
+    <p id="confirmLabel">Are you sure you want to delete this?</p>
+    <div class="prompt-btns">
+      <button id="confirmCancel">Cancel</button>
+      <button class="prompt-ok" id="confirmOk" style="background:#c0392b">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const PASSKEY = 'qqqq';
   let currentMode = 'article';
@@ -527,7 +539,6 @@ Ini paragraf setelah gambar.</pre>
         document.getElementById('btnPreviewToggle').style.color = '';
         document.getElementById('btnPreviewToggle').style.borderColor = '';
         clearForm();
-        document.getElementById('btnDeleteEntry').style.display = 'none';
         renderList();
         updatePreview();
       }
@@ -610,10 +621,14 @@ Ini paragraf setelah gambar.</pre>
         </button>`;
       } else {
         const p = i;
-        return `<button class="article-list-item${p.slug === currentSlug ? ' active' : ''}" data-slug="${p.slug}">
-          <div><span class="list-tag">${p.tag}</span></div>
-          <div style="margin-top:2px">${p.title}</div>
-        </button>`;
+        const isActive = p.slug === currentSlug;
+        return `<div style="display:flex;align-items:center;gap:6px">
+          <button class="list-del-btn${isActive ? '' : ' list-del-hidden'}" data-slug="${p.slug}" title="Delete">×</button>
+          <button class="article-list-item${isActive ? ' active' : ''}" data-slug="${p.slug}" style="flex:1;min-width:0">
+            <div><span class="list-tag">${p.tag}</span></div>
+            <div style="margin-top:2px">${p.title}</div>
+          </button>
+        </div>`;
       }
     }).join('');
     el.querySelectorAll('.article-list-item').forEach(btn => {
@@ -657,7 +672,6 @@ Ini paragraf setelah gambar.</pre>
   function loadEntry(slug) {
     currentSlug = slug;
     isNew = false;
-    document.getElementById('btnDeleteEntry').style.display = currentMode === 'project' ? '' : 'none';
     renderList();
     document.getElementById('slugHint').textContent = `slug: ${slug}`;
 
@@ -727,7 +741,6 @@ Ini paragraf setelah gambar.</pre>
   function newEntry() {
     isNew = true;
     currentSlug = null;
-    document.getElementById('btnDeleteEntry').style.display = 'none';
     renderList();
     clearForm();
     updatePreview();
@@ -1008,13 +1021,39 @@ Ini paragraf setelah gambar.</pre>
     toast('site-content.json downloaded!');
   });
 
-  document.getElementById('btnDeleteEntry').addEventListener('click', () => {
-    if (currentMode !== 'project' || !currentSlug) return;
-    const idx = projects.findIndex(p => p.slug === currentSlug);
-    if (idx === -1) { toast('entry not found in memory'); return; }
-    projects.splice(idx, 1);
-    newEntry();
-    toast('entry deleted — copy full projects.json to save');
+  let confirmAction = null;
+
+  function showConfirm(msg, cb) {
+    document.getElementById('confirmLabel').textContent = msg;
+    confirmAction = cb;
+    document.getElementById('confirmOverlay').classList.add('open');
+  }
+
+  document.getElementById('confirmCancel').addEventListener('click', () => {
+    document.getElementById('confirmOverlay').classList.remove('open');
+    confirmAction = null;
+  });
+
+  document.getElementById('confirmOk').addEventListener('click', () => {
+    document.getElementById('confirmOverlay').classList.remove('open');
+    if (confirmAction) { confirmAction(); confirmAction = null; }
+  });
+  document.getElementById('confirmOverlay').addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('confirmCancel').click();
+  });
+
+  document.getElementById('entryList').addEventListener('click', e => {
+    const delBtn = e.target.closest('.list-del-btn');
+    if (!delBtn) return;
+    const slug = delBtn.dataset.slug;
+    if (!slug) return;
+    showConfirm('Are you sure want to delete this?', () => {
+      const idx = projects.findIndex(p => p.slug === slug);
+      if (idx === -1) return;
+      projects.splice(idx, 1);
+      newEntry();
+      toast('entry deleted — copy full projects.json to save');
+    });
   });
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
