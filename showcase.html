@@ -91,7 +91,7 @@
         card.className = 'showcase-card';
         card.href = p.slug ? 'project.html?slug=' + p.slug : '#';
         card.innerHTML = `
-          <div class="showcase-thumb"><img src="${p.img}" alt="${p.title}"></div>
+          ${p.img ? `<div class="showcase-thumb"><img src="${p.img}" alt="${p.title}"></div>` : ''}
           <div class="showcase-tag">${p.tag}</div>
           <h3>${p.title}</h3>
           <p>${p.desc}</p>
