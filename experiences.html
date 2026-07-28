@@ -23,6 +23,7 @@
       --border: rgba(240, 237, 232, 0.1);
       --font-body: 'DM Sans', sans-serif;
       --font-display: 'Bricolage Grotesque', sans-serif;
+      --radius: 4px;
     }
     html { scroll-behavior: smooth; font-size: 16px; }
     body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; }
@@ -37,7 +38,7 @@
     h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; margin-bottom: 8px; }
     .subtitle { font-size: 15px; color: var(--muted-foreground); margin-bottom: 64px; }
 
-    .exp-item { padding: 32px 0; border-bottom: 1px solid var(--border); transition: padding-left 0.2s; }
+    .exp-item { padding: 32px 0; border-bottom: 1px solid var(--border); transition: padding-left 0.2s; border-radius: var(--radius); }
     .exp-item:hover { padding-left: 8px; }
     .exp-row { display: flex; gap: 16px; align-items: flex-start; }
     .exp-logo { width: 32px; height: 32px; flex-shrink: 0; }
@@ -50,7 +51,7 @@
     .exp-period { font-size: 11px; font-family: monospace; color: var(--muted-foreground); white-space: nowrap; padding-top: 4px; }
     .exp-desc { font-size: 14px; color: var(--muted-foreground); line-height: 1.7; max-width: 640px; }
     .exp-highlights { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-    .exp-highlight { font-size: 11px; padding: 4px 10px; border: 1px solid var(--border); color: var(--muted-foreground); }
+    .exp-highlight { font-size: 11px; padding: 4px 10px; border: 1px solid var(--border); color: var(--muted-foreground); border-radius: var(--radius); }
 
     @media (max-width: 768px) { .page { padding: 48px 24px; } .exp-header { flex-direction: column; gap: 4px; } .exp-period { white-space: normal; } }
   </style>
