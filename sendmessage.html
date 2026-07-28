@@ -615,25 +615,19 @@ Ini paragraf setelah gambar.</pre>
     const el = document.getElementById('entryList');
     const items = currentMode === 'article' ? articles : projects;
     if (!items.length) { el.innerHTML = ''; return; }
+    const trashIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     el.innerHTML = items.map(i => {
-      if (currentMode === 'article') {
-        const a = i;
-        return `<button class="article-list-item${a.slug === currentSlug ? ' active' : ''}" data-slug="${a.slug}">
-          <div><span class="list-tag">${a.tag}</span><span class="list-date">${fmtDate(a.date)}</span></div>
-          <div style="margin-top:2px">${a.title}</div>
-        </button>`;
-      } else {
-        const p = i;
-        const isActive = p.slug === currentSlug;
-        const trashIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
-        return `<div class="list-item-wrap" draggable="true" data-slug="${p.slug}">
-          <button class="article-list-item${isActive ? ' active' : ''}" data-slug="${p.slug}" style="flex:1;min-width:0">
-            <div><span class="list-tag">${p.tag}</span></div>
-            <div style="margin-top:2px">${p.title}</div>
-          </button>
-          <button class="list-del-btn${isActive ? '' : ' list-del-hidden'}" data-slug="${p.slug}" title="Delete">${trashIcon}</button>
-        </div>`;
-      }
+      const slug = i.slug;
+      const isActive = slug === currentSlug;
+      const tag = i.tag || '';
+      const date = i.date ? fmtDate(i.date) : '';
+      return `<div class="list-item-wrap" draggable="true" data-slug="${slug}">
+        <button class="article-list-item${isActive ? ' active' : ''}" data-slug="${slug}" style="flex:1;min-width:0">
+          <div>${date ? `<span class="list-tag">${tag}</span><span class="list-date">${date}</span>` : `<span class="list-tag">${tag}</span>`}</div>
+          <div style="margin-top:2px">${i.title}</div>
+        </button>
+        <button class="list-del-btn${isActive ? '' : ' list-del-hidden'}" data-slug="${slug}" title="Delete">${trashIcon}</button>
+      </div>`;
     }).join('');
     el.querySelectorAll('.article-list-item').forEach(btn => {
       btn.addEventListener('click', () => loadEntry(btn.dataset.slug));
@@ -1046,15 +1040,18 @@ Ini paragraf setelah gambar.</pre>
     if (e.key === 'Escape') document.getElementById('confirmCancel').click();
   });
 
+  function getItems() { return currentMode === 'article' ? articles : projects; }
+
   document.getElementById('entryList').addEventListener('click', e => {
     const delBtn = e.target.closest('.list-del-btn');
     if (!delBtn) return;
     const slug = delBtn.dataset.slug;
     if (!slug) return;
     showConfirm('Are you sure want to delete this?', () => {
-      const idx = projects.findIndex(p => p.slug === slug);
+      const items = getItems();
+      const idx = items.findIndex(p => p.slug === slug);
       if (idx === -1) return;
-      projects.splice(idx, 1);
+      items.splice(idx, 1);
       newEntry();
       toast('entry deleted — copy full projects.json to save');
     });
@@ -1089,15 +1086,16 @@ Ini paragraf setelah gambar.</pre>
     e.preventDefault();
     const target = e.target.closest('.list-item-wrap');
     if (!target || !dragSlug || target.dataset.slug === dragSlug) return;
-    const fromIdx = projects.findIndex(p => p.slug === dragSlug);
-    const toIdx = projects.findIndex(p => p.slug === target.dataset.slug);
+    const items = getItems();
+    const fromIdx = items.findIndex(p => p.slug === dragSlug);
+    const toIdx = items.findIndex(p => p.slug === target.dataset.slug);
     if (fromIdx === -1 || toIdx === -1) return;
-    const [moved] = projects.splice(fromIdx, 1);
-    projects.splice(toIdx, 0, moved);
+    const [moved] = items.splice(fromIdx, 1);
+    items.splice(toIdx, 0, moved);
     dragSlug = null;
     document.querySelectorAll('.list-item-wrap.drag-over').forEach(el => el.classList.remove('drag-over'));
     renderList();
-    toast('reordered — copy full projects.json to save');
+    toast('reordered — copy full ' + (currentMode === 'article' ? 'articles.json' : 'projects.json') + ' to save');
   });
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
