@@ -111,9 +111,12 @@
     .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
     .btn-delete { border-color: #c0392b !important; color: #c0392b !important; }
     .btn-delete:hover { background: #c0392b !important; color: var(--foreground) !important; }
-    .list-del-btn { background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;opacity:0.7;transition:opacity 0.2s;flex-shrink:0 }
+    .list-del-btn { background:none;border:none;color:#c0392b;cursor:pointer;padding:4px 6px;opacity:0.7;transition:opacity 0.2s;flex-shrink:0;display:flex;align-items:center }
     .list-del-btn:hover { opacity:1 }
     .list-del-hidden { visibility:hidden;pointer-events:none }
+    .list-item-wrap { display:flex;align-items:center;gap:4px }
+    .list-item-wrap.dragging { opacity:0.4 }
+    .list-item-wrap.drag-over { border-top: 2px solid var(--accent) }
 
     .entry-output {
       display: none; margin-top: 20px; padding: 16px; background: #111;
@@ -622,12 +625,13 @@ Ini paragraf setelah gambar.</pre>
       } else {
         const p = i;
         const isActive = p.slug === currentSlug;
-        return `<div style="display:flex;align-items:center;gap:6px">
-          <button class="list-del-btn${isActive ? '' : ' list-del-hidden'}" data-slug="${p.slug}" title="Delete">×</button>
+        const trashIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+        return `<div class="list-item-wrap" draggable="true" data-slug="${p.slug}">
           <button class="article-list-item${isActive ? ' active' : ''}" data-slug="${p.slug}" style="flex:1;min-width:0">
             <div><span class="list-tag">${p.tag}</span></div>
             <div style="margin-top:2px">${p.title}</div>
           </button>
+          <button class="list-del-btn${isActive ? '' : ' list-del-hidden'}" data-slug="${p.slug}" title="Delete">${trashIcon}</button>
         </div>`;
       }
     }).join('');
@@ -1054,6 +1058,46 @@ Ini paragraf setelah gambar.</pre>
       newEntry();
       toast('entry deleted — copy full projects.json to save');
     });
+  });
+
+  let dragSlug = null;
+  document.getElementById('entryList').addEventListener('dragstart', e => {
+    const wrap = e.target.closest('.list-item-wrap');
+    if (!wrap) return;
+    dragSlug = wrap.dataset.slug;
+    wrap.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  document.getElementById('entryList').addEventListener('dragend', e => {
+    const wrap = e.target.closest('.list-item-wrap');
+    if (wrap) wrap.classList.remove('dragging');
+    document.querySelectorAll('.list-item-wrap.drag-over').forEach(el => el.classList.remove('drag-over'));
+  });
+  document.getElementById('entryList').addEventListener('dragover', e => {
+    const wrap = e.target.closest('.list-item-wrap');
+    if (!wrap || wrap.dataset.slug === dragSlug) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.list-item-wrap.drag-over').forEach(el => el.classList.remove('drag-over'));
+    wrap.classList.add('drag-over');
+  });
+  document.getElementById('entryList').addEventListener('dragleave', e => {
+    const wrap = e.target.closest('.list-item-wrap');
+    if (wrap) wrap.classList.remove('drag-over');
+  });
+  document.getElementById('entryList').addEventListener('drop', e => {
+    e.preventDefault();
+    const target = e.target.closest('.list-item-wrap');
+    if (!target || !dragSlug || target.dataset.slug === dragSlug) return;
+    const fromIdx = projects.findIndex(p => p.slug === dragSlug);
+    const toIdx = projects.findIndex(p => p.slug === target.dataset.slug);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const [moved] = projects.splice(fromIdx, 1);
+    projects.splice(toIdx, 0, moved);
+    dragSlug = null;
+    document.querySelectorAll('.list-item-wrap.drag-over').forEach(el => el.classList.remove('drag-over'));
+    renderList();
+    toast('reordered — copy full projects.json to save');
   });
 
   document.getElementById('btnPreviewToggle').addEventListener('click', () => {
