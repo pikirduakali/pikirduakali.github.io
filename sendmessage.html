@@ -986,6 +986,21 @@ Ini paragraf setelah gambar.</pre>
       });
       return;
     }
+    if (currentMode === 'article') {
+      const data = getFormData();
+      const excerpt = data.body.split('\n\n').filter(l => l.trim() && !l.startsWith('img:'))[0]?.slice(0, 100) || '';
+      const year = data.date.split(' ')[2] || '2026';
+      const entry = { tag: data.tag, date: data.date, title: data.title, excerpt, year: parseInt(year), slug: data.slug };
+      const idx = articles.findIndex(a => a.slug === data.slug);
+      if (idx >= 0) articles[idx] = entry; else articles.push(entry);
+      const json = JSON.stringify(articles, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        toast('full articles.json copied to clipboard');
+      }).catch(() => {
+        toast('could not copy — select manually');
+      });
+      return;
+    }
     const data = getFormData();
     showEntry(data);
     const code = document.getElementById('entryCode');
