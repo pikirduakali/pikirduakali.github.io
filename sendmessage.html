@@ -351,6 +351,10 @@
           <label>Thumbnail URL <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(optional — will appear as hero image at the top)</span></label>
           <input type="text" id="fieldThumb" placeholder="https://i.ibb.co.com/..." />
         </div>
+        <div class="field mode-article" style="display:none">
+          <label>Excerpt <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(short hook shown on article listing)</span></label>
+          <input type="text" id="fieldExcerpt" placeholder="Short hook for the article list..." />
+        </div>
         <div class="field mode-project" style="display:none">
           <label>Headline <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(shown on showcase card only)</span></label>
           <input type="text" id="fieldHeadline" placeholder="Short hook for the showcase card..." />
@@ -702,6 +706,7 @@ Ini paragraf setelah gambar.</pre>
     document.getElementById('fieldYear').value = '';
     document.getElementById('fieldClient').value = '';
     document.getElementById('fieldHeadline').value = '';
+    document.getElementById('fieldExcerpt').value = '';
     document.getElementById('fieldThumb').value = '';
     document.getElementById('slugHint').textContent = 'slug: —';
     document.getElementById('entryOutput').classList.remove('show');
@@ -734,10 +739,14 @@ Ini paragraf setelah gambar.</pre>
             }
             tagSel.value = tag || 'Essay';
             if (date) document.getElementById('fieldDate').value = toRawDate(date);
-            const imgLine = lines[2] || '';
-            const thumb = imgLine.startsWith('img:') ? imgLine.slice(4) : '';
+            let excerpt = '', thumb = '', bodyStart = 2;
+            for (let i = 2; i < lines.length; i++) {
+              if (lines[i].startsWith('excerpt:')) { excerpt = lines[i].slice(8); bodyStart = i + 1; }
+              else if (lines[i].startsWith('img:')) { thumb = lines[i].slice(4); bodyStart = i + 1; }
+              else break;
+            }
+            document.getElementById('fieldExcerpt').value = excerpt;
             document.getElementById('fieldThumb').value = thumb;
-            const bodyStart = thumb ? 3 : 2;
             const body = lines.slice(bodyStart).filter(l => l !== '').join('\n\n');
             document.getElementById('fieldBody').value = body;
           } else {
@@ -793,6 +802,7 @@ Ini paragraf setelah gambar.</pre>
       const tag = document.getElementById('fieldTag').value;
       const rawDate = document.getElementById('fieldDate').value;
       const thumb = document.getElementById('fieldThumb').value.trim();
+      const excerpt = document.getElementById('fieldExcerpt').value.trim();
       const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
       let dateStr;
       if (rawDate) {
@@ -804,7 +814,7 @@ Ini paragraf setelah gambar.</pre>
         const now = new Date();
         dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
       }
-      return { title, tag, date: dateStr, body, slug, thumb, mode: 'article' };
+      return { title, tag, excerpt, date: dateStr, body, slug, thumb, mode: 'article' };
     } else {
       const category = document.getElementById('fieldCategory').value;
       const year = document.getElementById('fieldYear').value.trim();
@@ -821,6 +831,7 @@ Ini paragraf setelah gambar.</pre>
       const parts = data.date.split(' ');
       const date = parts.length >= 3 ? `${parts[0]} ${parts[1].charAt(0).toUpperCase() + parts[1].slice(1)} ${parts[2]}` : data.date;
       let txt = `${data.title}\n${data.tag} | ${date}\n`;
+      if (data.excerpt) txt += `excerpt:${data.excerpt}\n`;
       if (data.thumb) txt += `img:${data.thumb}\n`;
       txt += `\n${bodyLines.join('\n\n')}`;
       return txt;
@@ -876,7 +887,7 @@ Ini paragraf setelah gambar.</pre>
   function showEntry(data) {
     if (data.mode === 'article') {
       const year = data.date.split(' ')[2] || '2026';
-      const excerpt = data.body.split('\n\n').filter(l => l.trim() && !l.startsWith('img:'))[0]?.slice(0, 100) || '';
+      const excerpt = data.excerpt || data.body.split('\n\n').filter(l => l.trim() && !l.startsWith('img:'))[0]?.slice(0, 100) || '';
       const parts = data.date.split(' ');
       const date = parts.length >= 3 ? `${parts[0]} ${parts[1].charAt(0).toUpperCase() + parts[1].slice(1)} ${parts[2]}` : data.date;
       const entry = `{ "tag": "${data.tag}", "date": "${date}", "title": "${data.title.replace(/"/g, '\\"')}", "excerpt": "${excerpt.replace(/"/g, '\\"')}", "year": ${year}, "slug": "${data.slug}" },`;
@@ -900,8 +911,8 @@ Ini paragraf setelah gambar.</pre>
     updatePreview();
   });
   document.getElementById('fieldTag').addEventListener('change', updatePreview);
-  document.getElementById('fieldDate').addEventListener('input', updatePreview);
   document.getElementById('fieldCategory').addEventListener('change', updatePreview);
+  document.getElementById('fieldExcerpt').addEventListener('input', updatePreview);
   document.getElementById('fieldYear').addEventListener('input', updatePreview);
   document.getElementById('fieldClient').addEventListener('input', updatePreview);
   document.getElementById('fieldHeadline').addEventListener('input', updatePreview);
@@ -1029,7 +1040,7 @@ Ini paragraf setelah gambar.</pre>
     }
     if (currentMode === 'article') {
       const data = getFormData();
-      const excerpt = data.body.split('\n\n').filter(l => l.trim() && !l.startsWith('img:'))[0]?.slice(0, 100) || '';
+      const excerpt = data.excerpt || data.body.split('\n\n').filter(l => l.trim() && !l.startsWith('img:'))[0]?.slice(0, 100) || '';
       const year = data.date.split(' ')[2] || '2026';
       const entry = { tag: data.tag, date: data.date, title: data.title, excerpt, year: parseInt(year), slug: data.slug };
       const idx = articles.findIndex(a => a.slug === data.slug);
@@ -1093,8 +1104,28 @@ Ini paragraf setelah gambar.</pre>
       .catch(() => {});
   }
 
+  function syncFormToArray() {
+    if (currentMode === 'article' || currentMode === 'project') {
+      const data = getFormData();
+      if (currentMode === 'article') {
+        const excerpt = data.excerpt || data.body.split('\n\n').filter(l => l.trim() && !l.startsWith('img:'))[0]?.slice(0, 100) || '';
+        const year = data.date.split(' ')[2] || '2026';
+        const entry = { tag: data.tag, date: data.date, title: data.title, excerpt, year: parseInt(year), slug: data.slug };
+        const idx = articles.findIndex(a => a.slug === data.slug);
+        const existing = idx >= 0 ? articles[idx] : null;
+        if (existing) { entry.hidden = existing.hidden; articles[idx] = entry; } else articles.push(entry);
+      } else {
+        const entry = { category: data.category.toLowerCase(), tag: data.category, slug: data.slug, img: data.thumb, title: data.title, desc: data.headline || (data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '') };
+        const idx = projects.findIndex(p => p.slug === data.slug);
+        const existing = idx >= 0 ? projects[idx] : null;
+        if (existing) { entry.hidden = existing.hidden; projects[idx] = entry; } else projects.push(entry);
+      }
+    }
+  }
+
   document.getElementById('btnPublish').addEventListener('click', () => {
     if (!serverOnline) { toast('server not detected — start server.ps1 first'); return; }
+    syncFormToArray();
     const data = getFormData();
     const items = getItems();
     const txt = generateTxt(data);
