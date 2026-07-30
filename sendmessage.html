@@ -229,6 +229,46 @@
     .prompt-btns button.prompt-ok { border-color: var(--accent); color: var(--accent); }
     .prompt-btns button.prompt-ok:hover { background: var(--accent); color: var(--foreground); }
 
+    /* Publish success popup */
+    .publish-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 500; align-items: center; justify-content: center;
+    }
+    .publish-overlay.open { display: flex; }
+    .publish-box {
+      background: var(--card); border: 1px solid var(--border); padding: 40px;
+      width: 90%; max-width: 480px; border-radius: var(--radius); text-align: center;
+    }
+    .publish-box .pub-title {
+      font-family: var(--font-display); font-size: 2rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .publish-box .pub-info {
+      font-size: 13px; color: var(--muted-foreground); font-style: italic;
+      margin-bottom: 8px; line-height: 1.5;
+    }
+    .publish-box .pub-more {
+      font-size: 12px; color: var(--muted-foreground); cursor: pointer;
+      text-decoration: underline; text-underline-offset: 3px;
+    }
+    .publish-box .pub-more:hover { color: var(--accent); }
+    .publish-box .pub-detail {
+      font-size: 12px; color: var(--muted-foreground); margin: 8px 0 12px;
+      display: none; white-space: pre-wrap; text-align: left;
+      font-family: monospace; max-height: 120px; overflow-y: auto;
+    }
+    .publish-box .pub-detail.open { display: block; }
+    .publish-box .pub-timer {
+      font-size: 12px; color: var(--muted-foreground); margin: 16px 0 20px;
+      font-family: monospace;
+    }
+    .publish-box .pub-ok {
+      background: none; border: 1px solid var(--accent); color: var(--accent);
+      padding: 10px 32px; font-size: 14px; cursor: pointer; font-family: var(--font-body);
+      border-radius: var(--radius); transition: background 0.2s, color 0.2s;
+    }
+    .publish-box .pub-ok:hover { background: var(--accent); color: var(--foreground); }
+
     /* Help modal */
     .help-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -485,6 +525,17 @@ Ini paragraf setelah gambar.</pre>
       <button id="confirmCancel">Cancel</button>
       <button class="prompt-ok" id="confirmOk" style="background:#c0392b">Delete</button>
     </div>
+  </div>
+</div>
+
+<div class="publish-overlay" id="publishOverlay">
+  <div class="publish-box">
+    <div class="pub-title">PUBLISHED!</div>
+    <div class="pub-info" id="pubInfo">Changes pushed to GitHub.</div>
+    <span class="pub-more" id="pubMore">(more)</span>
+    <div class="pub-detail" id="pubDetail"></div>
+    <div class="pub-timer" id="pubTimer">Auto-close in 5s</div>
+    <button class="pub-ok" id="pubOk">Okay</button>
   </div>
 </div>
 
@@ -1138,7 +1189,7 @@ Ini paragraf setelah gambar.</pre>
       body: JSON.stringify({ slug: data.slug, txt, json })
     }).then(r => r.json()).then(d => {
       if (!d.ok) { toast('save failed: ' + d.msg); return; }
-      toast('files saved! Run gitpush.bat to publish.');
+      toast('files saved!');
       showPrompt('Push to GitHub?', 'update', msg => {
         if (!msg) return;
         fetch(SERVER + '/push', {
@@ -1146,10 +1197,47 @@ Ini paragraf setelah gambar.</pre>
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: msg })
         }).then(r => r.json()).then(p => {
-          toast('Published! ' + p.msg);
+          if (p.ok) showPublishSuccess(p.msg);
+          else toast('push failed: ' + p.msg);
         }).catch(() => toast('push request failed — run gitpush.bat manually'));
       });
     }).catch(() => toast('server not reachable'));
+  });
+
+  let pubTimerInterval = null;
+
+  function showPublishSuccess(msg) {
+    const overlay = document.getElementById('publishOverlay');
+    const infoEl = document.getElementById('pubInfo');
+    const detailEl = document.getElementById('pubDetail');
+    const timerEl = document.getElementById('pubTimer');
+
+    const firstLine = msg.split('|')[0]?.trim() || msg.split('\n')[0]?.trim() || msg;
+    detailEl.textContent = msg;
+    infoEl.textContent = firstLine.length > 80 ? firstLine.slice(0, 80) + '...' : firstLine;
+
+    overlay.classList.add('open');
+
+    let countdown = 5;
+    timerEl.textContent = `Auto-close in ${countdown}s`;
+    if (pubTimerInterval) clearInterval(pubTimerInterval);
+    pubTimerInterval = setInterval(() => {
+      countdown--;
+      timerEl.textContent = `Auto-close in ${countdown}s`;
+      if (countdown <= 0) closePublishSuccess();
+    }, 1000);
+  }
+
+  function closePublishSuccess() {
+    document.getElementById('publishOverlay').classList.remove('open');
+    document.getElementById('pubDetail').classList.remove('open');
+    if (pubTimerInterval) { clearInterval(pubTimerInterval); pubTimerInterval = null; }
+  }
+
+  document.getElementById('pubOk').addEventListener('click', closePublishSuccess);
+
+  document.getElementById('pubMore').addEventListener('click', () => {
+    document.getElementById('pubDetail').classList.toggle('open');
   });
 
   let confirmAction = null;
