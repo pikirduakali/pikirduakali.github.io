@@ -1067,11 +1067,11 @@ Ini paragraf setelah gambar.</pre>
     toast('site-content.json downloaded!');
   });
 
-  const SERVER = 'http://localhost:3456';
+  const SERVER = 'http://localhost:3457';
   let serverOnline = false;
 
   function checkServer() {
-    fetch('/ping', { method: 'POST' }).catch(() => fetch('http://localhost:3456/ping', { method: 'POST' }))
+    fetch('/ping', { method: 'POST' }).catch(() => fetch(SERVER + '/ping', { method: 'POST' }))
       .then(r => { if (!r.ok) throw Error(); return r.json(); })
       .then(d => {
         if (d.ok) {
