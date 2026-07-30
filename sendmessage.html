@@ -534,6 +534,40 @@ Ini paragraf setelah gambar.</pre>
   let currentMode = 'article';
   let currentSlug = null;
   let isNew = false;
+  let drafts = {};
+
+  function clearDraft(slug) { delete drafts[slug || '__new__']; }
+
+  function saveDraft() {
+    const slug = currentSlug || '__new__';
+    drafts[slug] = {
+      title: document.getElementById('fieldTitle').value,
+      tag: document.getElementById('fieldTag').value,
+      date: document.getElementById('fieldDate').value,
+      excerpt: document.getElementById('fieldExcerpt').value,
+      thumb: document.getElementById('fieldThumb').value,
+      body: document.getElementById('fieldBody').value
+    };
+  }
+
+  function loadDraft(slug) {
+    const d = drafts[slug || '__new__'];
+    if (!d) return false;
+    document.getElementById('fieldTitle').value = d.title || '';
+    const tagSel = document.getElementById('fieldTag');
+    if (d.tag && ![...tagSel.options].some(o => o.value === d.tag)) {
+      const opt = document.createElement('option');
+      opt.value = d.tag; opt.textContent = d.tag;
+      tagSel.appendChild(opt);
+    }
+    if (d.tag) tagSel.value = d.tag;
+    if (d.date) document.getElementById('fieldDate').value = d.date;
+    document.getElementById('fieldExcerpt').value = d.excerpt || '';
+    document.getElementById('fieldThumb').value = d.thumb || '';
+    document.getElementById('fieldBody').value = d.body || '';
+    updatePreview();
+    return true;
+  }
 
   let articles = [
     { tag: 'Essay', date: '23 jul 2026', title: 'Artikel terbaru nih bos senggol dong', excerpt: 'Oke ini adalah contoh artikel terbaru', year: 2026, slug: 'artikel-terbaru-nih-bos-senggol-dong' },
@@ -589,6 +623,7 @@ Ini paragraf setelah gambar.</pre>
     tab.addEventListener('click', () => {
       const mode = tab.dataset.mode;
       if (mode === currentMode) return;
+      saveDraft();
       currentMode = mode;
       currentSlug = null;
       isNew = false;
@@ -759,10 +794,13 @@ Ini paragraf setelah gambar.</pre>
   }
 
   function loadEntry(slug) {
+    saveDraft();
     currentSlug = slug;
     isNew = false;
     renderList();
     document.getElementById('slugHint').textContent = `slug: ${slug}`;
+
+    if (loadDraft(slug)) { updatePreview(); return; }
 
     const items = currentMode === 'article' ? articles : projects;
     const entry = items.find(i => i.slug === slug);
@@ -837,6 +875,13 @@ Ini paragraf setelah gambar.</pre>
   }
 
   function newEntry() {
+    saveDraft();
+    if (drafts['__new__']) {
+      isNew = true; currentSlug = null;
+      loadDraft('__new__');
+      renderList();
+      return;
+    }
     isNew = true;
     currentSlug = null;
     renderList();
@@ -1189,6 +1234,7 @@ Ini paragraf setelah gambar.</pre>
       body: JSON.stringify({ slug: data.slug, txt, json })
     }).then(r => r.json()).then(d => {
       if (!d.ok) { toast('save failed: ' + d.msg); return; }
+      clearDraft(data.slug); clearDraft('__new__');
       toast('files saved!');
       showPrompt('Push to GitHub?', 'update', msg => {
         if (!msg) return;
