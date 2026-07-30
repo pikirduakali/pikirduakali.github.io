@@ -180,17 +180,7 @@
     }
     .tag-row button:hover { border-color: var(--accent); color: var(--accent); }
     .tag-row button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
-    .custom-tag-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-    .custom-tag-list .tag-chip {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: var(--card); border: 1px solid var(--border);
-      padding: 2px 8px; font-size: 11px; border-radius: 3px;
-      color: var(--muted-foreground);
-    }
-    .custom-tag-list .tag-chip .del-chip {
-      cursor: pointer; color: var(--muted-foreground); font-size: 14px; line-height: 1;
-    }
-    .custom-tag-list .tag-chip .del-chip:hover { color: var(--accent); }
+
 
     /* Preview */
     .preview-pane {
@@ -333,8 +323,8 @@
             <div class="tag-row">
               <select id="fieldTag"></select>
               <button id="addTagBtn">+</button>
+              <button id="delTagBtn">−</button>
             </div>
-            <div id="customTagList" class="custom-tag-list"></div>
           </div>
           <div class="field mode-article" style="max-width:160px">
             <label>Date</label>
@@ -345,8 +335,8 @@
             <div class="tag-row">
               <select id="fieldCategory"></select>
               <button id="addCategoryBtn">+</button>
+              <button id="delCategoryBtn">−</button>
             </div>
-            <div id="customCategoryList" class="custom-tag-list"></div>
           </div>
           <div class="field mode-project" style="display:none;max-width:100px">
             <label>Year</label>
@@ -1265,36 +1255,11 @@ Ini paragraf setelah gambar.</pre>
   populateCategories();
   updatePreview();
 
-  function renderCustomChips(containerId, storageKey, populateFn) {
-    const custom = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    const container = document.getElementById(containerId);
-    container.innerHTML = custom.map(t =>
-      `<span class="tag-chip">${t}<span class="del-chip" data-tag="${t}" data-storage="${storageKey}" data-populate="${populateFn}">✕</span></span>`
-    ).join('');
-    container.querySelectorAll('.del-chip').forEach(el => {
-      el.addEventListener('click', () => {
-        const tag = el.dataset.tag;
-        showConfirm(`Delete custom tag "${tag}"?`, () => {
-          const key = el.dataset.storage;
-          const arr = JSON.parse(localStorage.getItem(key) || '[]');
-          const idx = arr.indexOf(tag);
-          if (idx === -1) return;
-          arr.splice(idx, 1);
-          localStorage.setItem(key, JSON.stringify(arr));
-          const fnName = el.dataset.populate;
-          window[fnName]();
-          toast(`"${tag}" deleted`);
-        });
-      });
-    });
-  }
-
   function populateTags() {
     const sel = document.getElementById('fieldTag');
     const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
     const all = ['Essay', 'Tech', 'Design', ...custom];
     sel.innerHTML = all.map(t => `<option value="${t}">${t}</option>`).join('');
-    renderCustomChips('customTagList', 'p2x_custom_tags', 'populateTags');
   }
 
   function populateCategories() {
@@ -1302,7 +1267,6 @@ Ini paragraf setelah gambar.</pre>
     const custom = JSON.parse(localStorage.getItem('p2x_custom_categories') || '[]');
     const all = ['Branding', 'Print', 'Digital', 'Packaging', ...custom];
     sel.innerHTML = all.map(t => `<option value="${t}">${t}</option>`).join('');
-    renderCustomChips('customCategoryList', 'p2x_custom_categories', 'populateCategories');
   }
 
   document.getElementById('addTagBtn').addEventListener('click', () => {
@@ -1319,6 +1283,23 @@ Ini paragraf setelah gambar.</pre>
       document.getElementById('fieldTag').value = name;
       updatePreview();
       toast(`tag "${name}" added`);
+    });
+  });
+
+  document.getElementById('delTagBtn').addEventListener('click', () => {
+    const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
+    if (!custom.length) { toast('no custom tags to delete'); return; }
+    const list = custom.map((t,i) => `${i+1}. ${t}`).join('\n');
+    showPrompt('Type the name of the custom tag to delete:\n\n' + list, 'Tag name', name => {
+      if (!name.trim()) return;
+      const idx = custom.indexOf(name);
+      if (idx === -1) { toast('tag not found'); return; }
+      showConfirm(`Delete custom tag "${name}"?`, () => {
+        custom.splice(idx, 1);
+        localStorage.setItem('p2x_custom_tags', JSON.stringify(custom));
+        populateTags();
+        toast(`tag "${name}" deleted`);
+      });
     });
   });
 
@@ -1339,6 +1320,22 @@ Ini paragraf setelah gambar.</pre>
     });
   });
 
+  document.getElementById('delCategoryBtn').addEventListener('click', () => {
+    const custom = JSON.parse(localStorage.getItem('p2x_custom_categories') || '[]');
+    if (!custom.length) { toast('no custom categories to delete'); return; }
+    const list = custom.map((t,i) => `${i+1}. ${t}`).join('\n');
+    showPrompt('Type the name of the custom category to delete:\n\n' + list, 'Category name', name => {
+      if (!name.trim()) return;
+      const idx = custom.indexOf(name);
+      if (idx === -1) { toast('category not found'); return; }
+      showConfirm(`Delete custom category "${name}"?`, () => {
+        custom.splice(idx, 1);
+        localStorage.setItem('p2x_custom_categories', JSON.stringify(custom));
+        populateCategories();
+        toast(`category "${name}" deleted`);
+      });
+    });
+  });
 </script>
 </body>
 </html>
