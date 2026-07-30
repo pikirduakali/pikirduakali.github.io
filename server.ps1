@@ -73,7 +73,7 @@ while ($listener.IsListening) {
       $commitOut = git commit -m "$($d.message)" 2>&1
       $pushJob = Start-Job -ScriptBlock { param($d) Set-Location $d; git push 2>&1 } -ArgumentList $scriptDir
       $pushResult = Wait-Job $pushJob -Timeout 30
-      if (!$pushResult) { Stop-Job $pushJob; $pushOut = "TIMEOUT — git push stuck (credentials?)" }
+      if (!$pushResult) { Stop-Job $pushJob; $pushOut = "TIMEOUT - git push stuck (credentials?)" }
       else { $pushOut = Receive-Job $pushJob }
       Remove-Job $pushJob -Force
       $msg = "$($commitOut -join '; ') | $($pushOut -join '; ')"
