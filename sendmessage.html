@@ -577,6 +577,14 @@ Ini paragraf setelah gambar.</pre>
   }
 
   // Tab switching
+  function applyMode(mode) {
+    document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+    document.querySelectorAll('.mode-article').forEach(el => el.style.display = mode === 'article' ? '' : 'none');
+    document.querySelectorAll('.mode-project').forEach(el => el.style.display = mode === 'project' ? '' : 'none');
+    document.querySelectorAll('.mode-content').forEach(el => el.style.display = mode === 'content' ? '' : 'none');
+  }
+  applyMode('article');
+
   document.querySelectorAll('.dash-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       const mode = tab.dataset.mode;
@@ -584,10 +592,7 @@ Ini paragraf setelah gambar.</pre>
       currentMode = mode;
       currentSlug = null;
       isNew = false;
-      document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-      document.querySelectorAll('.mode-article').forEach(el => el.style.display = mode === 'article' ? '' : 'none');
-      document.querySelectorAll('.mode-project').forEach(el => el.style.display = mode === 'project' ? '' : 'none');
-      document.querySelectorAll('.mode-content').forEach(el => el.style.display = mode === 'content' ? '' : 'none');
+      applyMode(mode);
 
       const isContent = mode === 'content';
       document.getElementById('entryList').style.display = isContent ? 'none' : '';
