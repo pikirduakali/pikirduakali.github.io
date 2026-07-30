@@ -176,9 +176,10 @@
     .tag-row button {
       background: var(--card); border: 1px solid var(--border); border-left: none;
       color: var(--muted-foreground); padding: 5px 10px; cursor: pointer; font-size: 15px;
-      font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; line-height: 1; border-radius: 0 var(--radius) var(--radius) 0;
+      font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; line-height: 1; border-radius: 0;
     }
     .tag-row button:hover { border-color: var(--accent); color: var(--accent); }
+    .tag-row button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
 
     /* Preview */
     .preview-pane {
@@ -303,10 +304,9 @@
         <button id="btnHelp" class="btn-help">How to</button>
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
-        <button id="btnPublish" class="btn-publish" style="display:none">Publish</button>
-        <span id="serverIndicator" style="display:none;width:8px;height:8px;border-radius:50%;background:#555;flex-shrink:0" title="Server offline"></span>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
         <button id="btnCopyContentJson" class="btn-download" style="display:none">Copy JSON</button>
+        <button id="btnPublish" class="btn-publish" style="display:none"><span id="serverIndicator" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#555;margin-right:6px;vertical-align:middle"></span>Publish</button>
       </div>
     </div>
 
@@ -322,6 +322,7 @@
             <div class="tag-row">
               <select id="fieldTag"></select>
               <button id="addTagBtn">+</button>
+              <button id="delTagBtn" title="Delete custom tag">−</button>
             </div>
           </div>
           <div class="field mode-article" style="max-width:160px">
@@ -333,6 +334,7 @@
             <div class="tag-row">
               <select id="fieldCategory"></select>
               <button id="addCategoryBtn">+</button>
+              <button id="delCategoryBtn" title="Delete custom category">−</button>
             </div>
           </div>
           <div class="field mode-project" style="display:none;max-width:100px">
@@ -1067,7 +1069,7 @@ Ini paragraf setelah gambar.</pre>
       .then(d => {
         if (d.ok) {
           serverOnline = true;
-          document.getElementById('serverIndicator').style.cssText = 'width:8px;height:8px;border-radius:50%;background:#27ae60;flex-shrink:0';
+          document.getElementById('serverIndicator').style.background = '#27ae60';
           document.getElementById('serverIndicator').title = 'Server online';
           document.getElementById('btnPublish').style.display = '';
         }
@@ -1268,6 +1270,21 @@ Ini paragraf setelah gambar.</pre>
     });
   });
 
+  document.getElementById('delTagBtn').addEventListener('click', () => {
+    const custom = JSON.parse(localStorage.getItem('p2x_custom_tags') || '[]');
+    if (!custom.length) { toast('no custom tags to delete'); return; }
+    const list = custom.map((t,i) => `${i+1}. ${t}`).join('\n');
+    showPrompt('Type the name of the custom tag to delete:\n\n' + list, 'Tag name', name => {
+      if (!name.trim()) return;
+      const idx = custom.indexOf(name);
+      if (idx === -1) { toast('tag not found'); return; }
+      custom.splice(idx, 1);
+      localStorage.setItem('p2x_custom_tags', JSON.stringify(custom));
+      populateTags();
+      toast(`tag "${name}" deleted`);
+    });
+  });
+
   document.getElementById('addCategoryBtn').addEventListener('click', () => {
     showPrompt('Enter new category name:', 'Category name', name => {
       if (!name.trim()) return;
@@ -1282,6 +1299,21 @@ Ini paragraf setelah gambar.</pre>
       document.getElementById('fieldCategory').value = name;
       updatePreview();
       toast(`category "${name}" added`);
+    });
+  });
+
+  document.getElementById('delCategoryBtn').addEventListener('click', () => {
+    const custom = JSON.parse(localStorage.getItem('p2x_custom_categories') || '[]');
+    if (!custom.length) { toast('no custom categories to delete'); return; }
+    const list = custom.map((t,i) => `${i+1}. ${t}`).join('\n');
+    showPrompt('Type the name of the custom category to delete:\n\n' + list, 'Category name', name => {
+      if (!name.trim()) return;
+      const idx = custom.indexOf(name);
+      if (idx === -1) { toast('category not found'); return; }
+      custom.splice(idx, 1);
+      localStorage.setItem('p2x_custom_categories', JSON.stringify(custom));
+      populateCategories();
+      toast(`category "${name}" deleted`);
     });
   });
 </script>
