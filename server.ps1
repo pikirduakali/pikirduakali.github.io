@@ -32,7 +32,7 @@ while ($listener.IsListening) {
         $slug = $d.slug
         $txt = $d.txt
         $json = $d.json
-        $null = New-Item -Force -Path "articles" -Name "$slug.txt" -Value $txt -ItemType File
+        [System.IO.File]::WriteAllText("$scriptDir\articles\$slug.txt", $txt)
         [System.IO.File]::WriteAllText("$scriptDir\articles.json", $json)
         $msg = "article saved"
       }
@@ -42,7 +42,7 @@ while ($listener.IsListening) {
         $slug = $d.slug
         $txt = $d.txt
         $json = $d.json
-        $null = New-Item -Force -Path "projects" -Name "$slug.txt" -Value $txt -ItemType File
+        [System.IO.File]::WriteAllText("$scriptDir\projects\$slug.txt", $txt)
         [System.IO.File]::WriteAllText("$scriptDir\projects.json", $json)
         $msg = "project saved"
       }
@@ -57,9 +57,9 @@ while ($listener.IsListening) {
         $d = $body | ConvertFrom-Json
         $m = $d.message
         & "git" add -A
-        & "git" commit -m $m
-        $out = & "git" push 2>&1
-        $msg = "pushed: $($out -join '; ')"
+        $commitOut = & "git" commit -m $m 2>&1
+        $pushOut = & "git" push 2>&1
+        $msg = "done: $($commitOut -join '; ') | $($pushOut -join '; ')"
       }
 
       default { $ok = $false; $msg = "unknown route" }
