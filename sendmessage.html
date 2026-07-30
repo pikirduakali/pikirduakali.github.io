@@ -111,12 +111,20 @@
     .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
     .btn-delete { border-color: #c0392b !important; color: #c0392b !important; }
     .btn-delete:hover { background: #c0392b !important; color: var(--foreground) !important; }
-    .list-del-btn { background:none;border:none;color:#c0392b;cursor:pointer;padding:4px 6px;opacity:0.7;transition:opacity 0.2s;flex-shrink:0;display:flex;align-items:center }
-    .list-del-btn:hover { opacity:1 }
-    .list-del-hidden { visibility:hidden;pointer-events:none }
-    .list-item-wrap { display:flex;align-items:center;gap:4px }
+    .list-opt-btn { background:none;border:none;color:var(--muted-foreground);cursor:pointer;padding:4px 6px;opacity:0.5;transition:opacity 0.2s;flex-shrink:0;display:flex;align-items:center;font-size:16px;line-height:1 }
+    .list-opt-btn:hover { opacity:1 }
+    .list-opt-hidden { visibility:hidden;pointer-events:none }
+    .list-item-wrap { display:flex;align-items:center;gap:4px;position:relative }
     .list-item-wrap.dragging { opacity:0.4 }
     .list-item-wrap.drag-over { border-top: 2px solid var(--accent) }
+    .list-item-wrap.hidden-item .article-list-item { opacity:0.35;text-decoration:line-through }
+
+    .opt-dropdown { position:absolute;right:0;top:100%;background:#1a1a1a;border:1px solid var(--border);z-index:50;min-width:130px;display:none;border-radius:var(--radius);overflow:hidden }
+    .opt-dropdown.open { display:block }
+    .opt-dropdown button { display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:var(--muted-foreground);padding:8px 12px;font-size:12px;cursor:pointer;font-family:var(--font-body);text-align:left;transition:background 0.15s }
+    .opt-dropdown button:hover { background:var(--card);color:var(--foreground) }
+    .opt-dropdown button.danger { color:#c0392b }
+    .opt-dropdown button.danger:hover { background:#2a1515 }
 
     .entry-output {
       display: none; margin-top: 20px; padding: 16px; background: #111;
@@ -615,18 +623,24 @@ Ini paragraf setelah gambar.</pre>
     const el = document.getElementById('entryList');
     const items = currentMode === 'article' ? articles : projects;
     if (!items.length) { el.innerHTML = ''; return; }
+    const eyeIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
     const trashIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     el.innerHTML = items.map(i => {
       const slug = i.slug;
       const isActive = slug === currentSlug;
+      const isHidden = i.hidden;
       const tag = i.tag || '';
       const date = i.date ? fmtDate(i.date) : '';
-      return `<div class="list-item-wrap" draggable="true" data-slug="${slug}">
+      return `<div class="list-item-wrap${isHidden ? ' hidden-item' : ''}" draggable="true" data-slug="${slug}">
         <button class="article-list-item${isActive ? ' active' : ''}" data-slug="${slug}" style="flex:1;min-width:0">
           <div>${date ? `<span class="list-tag">${tag}</span><span class="list-date">${date}</span>` : `<span class="list-tag">${tag}</span>`}</div>
           <div style="margin-top:2px">${i.title}</div>
         </button>
-        <button class="list-del-btn${isActive ? '' : ' list-del-hidden'}" data-slug="${slug}" title="Delete">${trashIcon}</button>
+        <button class="list-opt-btn${isActive ? '' : ' list-opt-hidden'}" data-slug="${slug}" title="Options">&vellip;</button>
+        <div class="opt-dropdown" data-slug="${slug}">
+          <button class="opt-hide" data-slug="${slug}">${eyeIcon} ${isHidden ? 'Show' : 'Hide'}</button>
+          <button class="opt-delete danger" data-slug="${slug}">${trashIcon} Delete</button>
+        </div>
       </div>`;
     }).join('');
     el.querySelectorAll('.article-list-item').forEach(btn => {
@@ -976,8 +990,9 @@ Ini paragraf setelah gambar.</pre>
     if (currentMode === 'project') {
       const data = getFormData();
       const idx = projects.findIndex(p => p.slug === data.slug);
+      const existing = idx >= 0 ? projects[idx] : null;
       const entry = { category: data.category.toLowerCase(), tag: data.category, slug: data.slug, img: data.thumb, title: data.title, desc: data.headline || (data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '') };
-      if (idx >= 0) projects[idx] = entry; else projects.push(entry);
+      if (existing) { entry.hidden = existing.hidden; projects[idx] = entry; } else projects.push(entry);
       const json = JSON.stringify(projects, null, 2);
       navigator.clipboard.writeText(json).then(() => {
         toast('full projects.json copied to clipboard');
@@ -992,7 +1007,8 @@ Ini paragraf setelah gambar.</pre>
       const year = data.date.split(' ')[2] || '2026';
       const entry = { tag: data.tag, date: data.date, title: data.title, excerpt, year: parseInt(year), slug: data.slug };
       const idx = articles.findIndex(a => a.slug === data.slug);
-      if (idx >= 0) articles[idx] = entry; else articles.push(entry);
+      const existing = idx >= 0 ? articles[idx] : null;
+      if (existing) { entry.hidden = existing.hidden; articles[idx] = entry; } else articles.push(entry);
       const json = JSON.stringify(articles, null, 2);
       navigator.clipboard.writeText(json).then(() => {
         toast('full articles.json copied to clipboard');
@@ -1057,19 +1073,47 @@ Ini paragraf setelah gambar.</pre>
 
   function getItems() { return currentMode === 'article' ? articles : projects; }
 
+  function closeAllDropdowns() {
+    document.querySelectorAll('.opt-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.list-opt-btn')) closeAllDropdowns();
+  });
+
   document.getElementById('entryList').addEventListener('click', e => {
-    const delBtn = e.target.closest('.list-del-btn');
-    if (!delBtn) return;
-    const slug = delBtn.dataset.slug;
-    if (!slug) return;
-    showConfirm('Are you sure want to delete this?', () => {
+    const optBtn = e.target.closest('.list-opt-btn');
+    if (optBtn) {
+      e.stopPropagation();
+      closeAllDropdowns();
+      const dd = optBtn.parentElement.querySelector('.opt-dropdown');
+      if (dd) dd.classList.toggle('open');
+      return;
+    }
+    const hideBtn = e.target.closest('.opt-hide');
+    if (hideBtn) {
+      const slug = hideBtn.dataset.slug;
       const items = getItems();
-      const idx = items.findIndex(p => p.slug === slug);
-      if (idx === -1) return;
-      items.splice(idx, 1);
-      newEntry();
-      toast('entry deleted — copy full projects.json to save');
-    });
+      const item = items.find(p => p.slug === slug);
+      if (item) { item.hidden = !item.hidden; renderList(); }
+      closeAllDropdowns();
+      toast(item && item.hidden ? 'hidden — copy full JSON to save' : 'visible — copy full JSON to save');
+      return;
+    }
+    const delBtn = e.target.closest('.opt-delete');
+    if (delBtn) {
+      const slug = delBtn.dataset.slug;
+      closeAllDropdowns();
+      showConfirm('Are you sure want to delete this?', () => {
+        const items = getItems();
+        const idx = items.findIndex(p => p.slug === slug);
+        if (idx === -1) return;
+        items.splice(idx, 1);
+        newEntry();
+        toast('entry deleted — copy full JSON to save');
+      });
+      return;
+    }
   });
 
   let dragSlug = null;

@@ -358,6 +358,7 @@
 
     fetch('articles.json').then(r => r.json()).then(articles => {
       const list = document.getElementById('homeArticleList');
+      articles = articles.filter(a => !a.hidden);
       articles.sort((a, b) => new Date(b.date.split(' ').reverse().join('-')) - new Date(a.date.split(' ').reverse().join('-')));
       articles.slice(0, 3).forEach(a => {
         const el = document.createElement('a');
@@ -384,6 +385,7 @@
     });
 
     fetch('projects.json').then(r => r.json()).then(projects => {
+      projects = projects.filter(p => !p.hidden);
       const grid = document.getElementById('homeShowcaseGrid');
       if (!grid) return;
       projects.slice(0, 3).forEach(p => {

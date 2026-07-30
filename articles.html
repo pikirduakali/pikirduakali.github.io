@@ -182,7 +182,7 @@
     };
 
     fetch('articles.json').then(r => r.json()).then(data => {
-      articles = data;
+      articles = data.filter(a => !a.hidden);
       populateSelects();
       render();
     });

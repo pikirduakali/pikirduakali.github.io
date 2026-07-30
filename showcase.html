@@ -78,7 +78,7 @@
     const catSelect = document.getElementById('catSelect');
 
     fetch('projects.json').then(r => r.json()).then(data => {
-      projects = data;
+      projects = data.filter(p => !p.hidden);
       render();
     }).catch(() => {});
 
