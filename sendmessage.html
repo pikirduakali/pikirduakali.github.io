@@ -191,12 +191,12 @@
     .preview-empty { color: var(--muted-foreground); text-align: center; padding: 60px 0; font-size: 14px; }
 
     .toast {
-      position: fixed; bottom: 32px; right: 32px; background: var(--card); border: 1px solid var(--border);
+      position: fixed; top: 50%; left: 50%; background: var(--card); border: 1px solid var(--border);
       padding: 12px 20px; font-size: 13px; color: var(--foreground); z-index: 200;
-      opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s;
+      opacity: 0; transform: translate(-50%,-50%) translateY(8px); transition: opacity 0.3s, transform 0.3s;
       pointer-events: none; border-radius: var(--radius);
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.show { opacity: 1; transform: translate(-50%,-50%) translateY(0); }
 
     /* Prompt modal */
     .prompt-overlay {
