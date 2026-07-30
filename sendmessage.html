@@ -73,6 +73,13 @@
       transition: background 0.2s; border-radius: var(--radius);
     }
     .btn-new:hover { background: var(--accent); color: var(--foreground); }
+    .dash-sidebar-filters { display:flex; gap:6px; padding:8px 20px; border-bottom:1px solid var(--border); align-items:center; }
+    .search-input { flex:1; background:transparent; border:1px solid var(--border); color:var(--foreground); padding:5px 10px; font-size:12px; font-family:var(--font-body); border-radius:var(--radius); outline:none }
+    .search-input:focus { border-color:var(--accent) }
+    .search-input::placeholder { color:var(--muted-foreground); opacity:0.6 }
+    .sort-select { background:transparent; border:1px solid var(--border); color:var(--muted-foreground); padding:4px 6px; font-size:11px; font-family:var(--font-body); border-radius:var(--radius); cursor:pointer; outline:none; max-width:110px }
+    .sort-select:hover, .sort-select:focus { border-color:var(--accent); color:var(--foreground) }
+    .sort-select option { background:#1a1a1a; color:var(--foreground) }
     .article-list { flex: 1; overflow-y: auto; padding: 12px 0; }
     .article-list-item {
       display: block; width: 100%; text-align: left; padding: 10px 20px;
@@ -83,6 +90,7 @@
     .article-list-item:hover { color: var(--foreground); background: var(--card); }
     .article-list-item.active { color: var(--accent); border-bottom-color: var(--border); }
     .article-list-item .list-tag { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+    .draft-badge { font-size:9px; color:#f39c12; background:rgba(243,156,18,0.15); padding:1px 6px; border-radius:3px; margin-left:6px; text-transform:uppercase; letter-spacing:0.05em; }
     .article-list-item .list-date { font-size: 10px; color: var(--muted-foreground); margin-left: 8px; }
 
     /* Main editor */
@@ -323,6 +331,16 @@
       <h2 id="dashHeaderLabel">Articles</h2>
       <button class="btn-new" id="btnNew">+ New</button>
     </div>
+    <div class="dash-sidebar-filters mode-list">
+      <input type="text" id="searchEntry" placeholder="Search by keyword..." class="search-input">
+      <select id="sortEntry" class="sort-select">
+        <option value="">Sort: Default</option>
+        <option value="year-desc">Year &#8595;</option>
+        <option value="year-asc">Year &#8593;</option>
+        <option value="tag">Tag A-Z</option>
+        <option value="tag-desc">Tag Z-A</option>
+      </select>
+    </div>
     <div class="article-list" id="entryList"></div>
     <div class="article-list" id="sectionList" style="display:none"></div>
   </div>
@@ -337,6 +355,7 @@
         <button id="btnDownload" class="btn-download">Download .txt</button>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
         <button id="btnCopyContentJson" class="btn-download" style="display:none">Copy JSON</button>
+        <button id="btnSaveDraft" class="btn-download" title="Save draft to browser">Save Draft</button>
         <button id="btnPublish" class="btn-publish" style="display:none"><span id="serverIndicator" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#555;margin-right:6px;vertical-align:middle"></span>Publish</button>
       </div>
     </div>
@@ -535,12 +554,18 @@ Ini paragraf setelah gambar.</pre>
   let currentSlug = null;
   let isNew = false;
   let drafts = {};
+  let sortBy = '';
+  let searchQuery = '';
 
-  function clearDraft(slug) { delete drafts[slug || '__new__']; }
+  function clearDraft(slug) {
+    delete drafts[slug || '__new__'];
+    localStorage.removeItem('p2x_draft_' + (slug || '__new__'));
+  }
 
   function saveDraft() {
+    if (currentMode === 'content') return;
     const slug = currentSlug || '__new__';
-    drafts[slug] = {
+    const data = {
       title: document.getElementById('fieldTitle').value,
       tag: document.getElementById('fieldTag').value,
       date: document.getElementById('fieldDate').value,
@@ -548,10 +573,19 @@ Ini paragraf setelah gambar.</pre>
       thumb: document.getElementById('fieldThumb').value,
       body: document.getElementById('fieldBody').value
     };
+    drafts[slug] = data;
+    localStorage.setItem('p2x_draft_' + slug, JSON.stringify(data));
   }
 
   function loadDraft(slug) {
-    const d = drafts[slug || '__new__'];
+    const key = slug || '__new__';
+    let d = drafts[key];
+    if (!d) {
+      const stored = localStorage.getItem('p2x_draft_' + key);
+      if (stored) {
+        try { d = JSON.parse(stored); drafts[key] = d; } catch(e) {}
+      }
+    }
     if (!d) return false;
     document.getElementById('fieldTitle').value = d.title || '';
     const tagSel = document.getElementById('fieldTag');
@@ -567,6 +601,60 @@ Ini paragraf setelah gambar.</pre>
     document.getElementById('fieldBody').value = d.body || '';
     updatePreview();
     return true;
+  }
+
+  function getDraftList() {
+    try { return JSON.parse(localStorage.getItem('p2x_drafts_list') || '[]'); } catch(e) { return []; }
+  }
+  function saveDraftList(list) {
+    localStorage.setItem('p2x_drafts_list', JSON.stringify(list));
+  }
+  function addDraft(data) {
+    const list = getDraftList();
+    const id = 'draft_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+    const draftSlug = data.slug || slugify(data.title || 'untitled') + '-' + Date.now().toString(36);
+    const isProject = (data.mode || currentMode) === 'project';
+    list.unshift({ id, title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, body: data.body, mode: data.mode || currentMode, slug: draftSlug, createdAt: Date.now(), year: isProject ? data.year : '', client: isProject ? data.client : '' });
+    saveDraftList(list);
+    return id;
+  }
+  function updateDraft(id, data) {
+    const list = getDraftList();
+    const idx = list.findIndex(d => d.id === id);
+    if (idx < 0) return;
+    const isProject = (data.mode || currentMode) === 'project';
+    list[idx] = { ...list[idx], title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, body: data.body, mode: data.mode || currentMode, year: isProject ? data.year : '' };
+    saveDraftList(list);
+  }
+  function removeDraft(id) {
+    const list = getDraftList().filter(d => d.id !== id);
+    saveDraftList(list);
+    renderList();
+  }
+  function findDraftBySlug(slug) {
+    return getDraftList().find(d => d.slug === slug) || null;
+  }
+  function loadDraftEntry(draft) {
+    saveDraft();
+    isNew = false;
+    currentSlug = draft.slug;
+    document.getElementById('fieldTitle').value = draft.title || '';
+    document.getElementById('fieldBody').value = draft.body || '';
+    document.getElementById('fieldThumb').value = draft.thumb || '';
+    document.getElementById('slugHint').textContent = 'slug: ' + draft.slug;
+    if (draft.mode === 'project') {
+      document.getElementById('fieldCategory').value = draft.tag || 'Branding';
+      document.getElementById('fieldYear').value = '';
+      document.getElementById('fieldClient').value = '';
+      document.getElementById('fieldHeadline').value = draft.excerpt || '';
+    } else {
+      document.getElementById('fieldTag').value = draft.tag || 'Essay';
+      document.getElementById('fieldDate').value = draft.date || new Date().toISOString().split('T')[0];
+      document.getElementById('fieldExcerpt').value = draft.excerpt || '';
+    }
+    updatePreview();
+    renderList();
+    toast('Draft loaded');
   }
 
   let articles = [
@@ -616,6 +704,7 @@ Ini paragraf setelah gambar.</pre>
     document.querySelectorAll('.mode-article').forEach(el => el.style.display = mode === 'article' ? '' : 'none');
     document.querySelectorAll('.mode-project').forEach(el => el.style.display = mode === 'project' ? '' : 'none');
     document.querySelectorAll('.mode-content').forEach(el => el.style.display = mode === 'content' ? '' : 'none');
+    document.querySelectorAll('.mode-list').forEach(el => el.style.display = (mode === 'article' || mode === 'project') ? '' : 'none');
   }
   applyMode('article');
 
@@ -627,6 +716,10 @@ Ini paragraf setelah gambar.</pre>
       currentMode = mode;
       currentSlug = null;
       isNew = false;
+      sortBy = '';
+      searchQuery = '';
+      document.getElementById('searchEntry').value = '';
+      document.getElementById('sortEntry').value = '';
       applyMode(mode);
 
       const isContent = mode === 'content';
@@ -732,30 +825,46 @@ Ini paragraf setelah gambar.</pre>
 
   function renderList() {
     const el = document.getElementById('entryList');
-    const items = currentMode === 'article' ? articles : projects;
+    let items = [...(currentMode === 'article' ? articles : projects)];
+    const draftItems = getDraftList().filter(d => d.mode === currentMode).map(d => ({ _draft: true, _draftId: d.id, title: d.title, tag: d.tag, date: d.date, excerpt: d.excerpt, slug: d.slug }));
+    if (draftItems.length) items = [...draftItems, ...items];
     if (!items.length) { el.innerHTML = ''; return; }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      items = items.filter(i => (i.title || '').toLowerCase().includes(q) || (i.tag || '').toLowerCase().includes(q) || (i.excerpt || '').toLowerCase().includes(q));
+    }
+    if (sortBy === 'year-desc') items.sort((a,b) => (b.year||0) - (a.year||0));
+    else if (sortBy === 'year-asc') items.sort((a,b) => (a.year||0) - (b.year||0));
+    else if (sortBy === 'tag') items.sort((a,b) => (a.tag||'').localeCompare(b.tag||'') || (b.year||0)-(a.year||0));
+    else if (sortBy === 'tag-desc') items.sort((a,b) => (b.tag||'').localeCompare(a.tag||'') || (b.year||0)-(a.year||0));
     const eyeIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
     const trashIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
     el.innerHTML = items.map(i => {
       const slug = i.slug;
       const isActive = slug === currentSlug;
       const isHidden = i.hidden;
+      const isDraft = i._draft;
       const tag = i.tag || '';
       const date = i.date ? fmtDate(i.date) : '';
       return `<div class="list-item-wrap${isHidden ? ' hidden-item' : ''}" draggable="true" data-slug="${slug}">
         <button class="article-list-item${isActive ? ' active' : ''}" data-slug="${slug}" style="flex:1;min-width:0">
-          <div>${date ? `<span class="list-tag">${tag}</span><span class="list-date">${date}</span>` : `<span class="list-tag">${tag}</span>`}</div>
+          <div>${date ? `<span class="list-tag">${tag}</span><span class="list-date">${date}</span>` : `<span class="list-tag">${tag}</span>`}${isDraft ? ' <span class="draft-badge">Draft</span>' : ''}</div>
           <div style="margin-top:2px">${i.title}</div>
         </button>
         <button class="list-opt-btn${isActive ? '' : ' list-opt-hidden'}" data-slug="${slug}" title="Options">&vellip;</button>
         <div class="opt-dropdown" data-slug="${slug}">
-          <button class="opt-hide" data-slug="${slug}">${eyeIcon} ${isHidden ? 'Show' : 'Hide'}</button>
-          <button class="opt-delete danger" data-slug="${slug}">${trashIcon} Delete</button>
+          ${isDraft ? '' : `<button class="opt-hide" data-slug="${slug}">${eyeIcon} ${isHidden ? 'Show' : 'Hide'}</button>`}
+          <button class="opt-delete danger" data-slug="${slug}">${trashIcon} Delete${isDraft ? ' draft' : ''}</button>
         </div>
       </div>`;
     }).join('');
     el.querySelectorAll('.article-list-item').forEach(btn => {
-      btn.addEventListener('click', () => loadEntry(btn.dataset.slug));
+      btn.addEventListener('click', () => {
+        const slug = btn.dataset.slug;
+        const draft = findDraftBySlug(slug);
+        if (draft) { loadDraftEntry(draft); return; }
+        loadEntry(slug);
+      });
     });
   }
 
@@ -876,17 +985,19 @@ Ini paragraf setelah gambar.</pre>
 
   function newEntry() {
     saveDraft();
-    if (drafts['__new__']) {
-      isNew = true; currentSlug = null;
-      loadDraft('__new__');
+    showPrompt('Enter title for new ' + currentMode + ':', '', title => {
+      if (!title) return;
+      isNew = true;
+      currentSlug = null;
+      clearForm();
+      document.getElementById('fieldTitle').value = title;
+      if (isNew) {
+        const slug = slugify(title);
+        document.getElementById('slugHint').textContent = 'slug: ' + slug;
+      }
       renderList();
-      return;
-    }
-    isNew = true;
-    currentSlug = null;
-    renderList();
-    clearForm();
-    updatePreview();
+      updatePreview();
+    });
   }
 
   function getFormData() {
@@ -999,6 +1110,16 @@ Ini paragraf setelah gambar.</pre>
 
   // Event listeners
   document.getElementById('btnNew').addEventListener('click', newEntry);
+
+  document.getElementById('searchEntry').addEventListener('input', e => {
+    searchQuery = e.target.value;
+    renderList();
+  });
+  document.getElementById('sortEntry').addEventListener('change', e => {
+    sortBy = e.target.value;
+    renderList();
+  });
+
   document.getElementById('fieldTitle').addEventListener('input', () => {
     if (isNew) {
       const slug = slugify(document.getElementById('fieldTitle').value);
@@ -1183,6 +1304,22 @@ Ini paragraf setelah gambar.</pre>
     toast('site-content.json downloaded!');
   });
 
+  document.getElementById('btnSaveDraft').addEventListener('click', () => {
+    if (currentMode === 'content') {
+      toast('Save Draft not available in Content mode');
+      return;
+    }
+    const title = document.getElementById('fieldTitle').value.trim();
+    if (!title) { toast('Enter a title first'); return; }
+    const data = getFormData();
+    const existing = findDraftBySlug(data.slug);
+    if (existing) updateDraft(existing.id, data);
+    else addDraft(data);
+    saveDraft();
+    renderList();
+    toast('Draft saved: ' + (title.slice(0, 40) + (title.length > 40 ? '...' : '')));
+  });
+
   const SERVER = 'http://localhost:3457';
   let serverOnline = false;
 
@@ -1235,6 +1372,8 @@ Ini paragraf setelah gambar.</pre>
     }).then(r => r.json()).then(d => {
       if (!d.ok) { toast('save failed: ' + d.msg); return; }
       clearDraft(data.slug); clearDraft('__new__');
+      const pubDraft = findDraftBySlug(data.slug);
+      if (pubDraft) removeDraft(pubDraft.id);
       toast('files saved!');
       showPrompt('Push to GitHub?', 'update', msg => {
         if (!msg) return;
@@ -1348,14 +1487,23 @@ Ini paragraf setelah gambar.</pre>
     if (delBtn) {
       const slug = delBtn.dataset.slug;
       closeAllDropdowns();
-      showConfirm('Are you sure want to delete this?', () => {
-        const items = getItems();
-        const idx = items.findIndex(p => p.slug === slug);
-        if (idx === -1) return;
-        items.splice(idx, 1);
-        newEntry();
-        toast('entry deleted — copy full JSON to save');
-      });
+      const draft = findDraftBySlug(slug);
+      if (draft) {
+        showConfirm('Delete this draft?', () => {
+          removeDraft(draft.id);
+          if (currentSlug === slug) newEntry();
+          toast('draft deleted');
+        });
+      } else {
+        showConfirm('Are you sure want to delete this?', () => {
+          const items = getItems();
+          const idx = items.findIndex(p => p.slug === slug);
+          if (idx === -1) return;
+          items.splice(idx, 1);
+          newEntry();
+          toast('entry deleted — copy full JSON to save');
+        });
+      }
       return;
     }
   });
@@ -1363,7 +1511,7 @@ Ini paragraf setelah gambar.</pre>
   let dragSlug = null;
   document.getElementById('entryList').addEventListener('dragstart', e => {
     const wrap = e.target.closest('.list-item-wrap');
-    if (!wrap) return;
+    if (!wrap || findDraftBySlug(wrap.dataset.slug)) return;
     dragSlug = wrap.dataset.slug;
     wrap.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
