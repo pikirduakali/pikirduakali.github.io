@@ -377,16 +377,18 @@
     <ol>
       <li><strong>Compose</strong> — Isi title, tag, date, hero image (opsional), dan body.</li>
       <li><strong>Download .txt</strong> → <code>articles/namafile.txt</code>.</li>
-      <li><strong>Copy entry</strong> → Paste ke <code>articles.json</code>.</li>
+      <li><strong>Copy entry</strong> — Copy <strong>full <code>articles.json</code></strong> (termasuk urutan & hidden state).</li>
+      <li><strong>Replace file</strong> — Timpa seluruh isi <code>articles.json</code> dengan hasil paste.</li>
       <li><strong>Push</strong> — Klik <code>gitpush.bat</code> di folder project, isi pesan updatenya.</li>
     </ol>
     <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Projects</h2>
     <ol>
       <li><strong>Switch tab</strong> — Klik "Projects" di sidebar buat mode project.</li>
-      <li><strong>Compose</strong> — Isi title, category, hero image (opsional), dan body.</li>
+      <li><strong>Compose</strong> — Isi title, category, year, client, headline, hero image, dan body.</li>
       <li><strong>Download .txt</strong> → <code>projects/namafile.txt</code>.</li>
-      <li><strong>Copy entry</strong> — Paste ke <code>projects.json</code>.</li>
-      <li><strong>Push</strong> — Sama kayak artikel.</li>
+      <li><strong>Copy entry</strong> — Copy <strong>full <code>projects.json</code></strong> (termasuk urutan & hidden state).</li>
+      <li><strong>Replace file</strong> — Timpa seluruh isi <code>projects.json</code> dengan hasil paste.</li>
+      <li><strong>Push</strong> — Klik <code>gitpush.bat</code>.</li>
     </ol>
     <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Site Content</h2>
     <ol>
@@ -433,12 +435,14 @@ Ini paragraf setelah gambar.</pre>
       <li><strong>Gambar inline</strong> — Akan tampil full-width dengan aspect ratio 16:9 di tengah konten. Bisa di artikel maupun project.</li>
       <li><strong>Tips:</strong> Pake hosting gambar yang support hotlinking (ImgBB, imgur, Unsplash direct link). Hindari Google Drive atau shared drive karena biasanya gak muncul.</li>
     </ol>
-    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to Delete</h2>
+    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to Delete / Hide</h2>
     <ol>
-      <li><strong>Download .txt dulu</strong> — Klik entry yang mau dihapus, catet slug-nya.</li>
-      <li><strong>Hapus file</strong> — Hapus file <code>articles/namafile.txt</code> atau <code>projects/namafile.txt</code>.</li>
-      <li><strong>Hapus entry</strong> — Buka <code>articles.json</code> atau <code>projects.json</code>, hapus baris entry itu.</li>
-      <li><strong>Push</strong> — Klik <code>gitpush.bat</code> di folder project, isi pesan updatenya.</li>
+      <li><strong>Pilih entry</strong> — Klik entry di sidebar.</li>
+      <li><strong>Klik ⋮</strong> — Tombol opsi di sebelah kanan entry.</li>
+      <li><strong>Hide</strong> — Sembunyikan dari halaman publik (bisa di-unhide nanti).</li>
+      <li><strong>Delete</strong> — Hapus permanen dari array (konfirmasi dulu).</li>
+      <li><strong>Copy full JSON</strong> — Klik "Copy entry" di toolbar, paste & replace file <code>.json</code>.</li>
+      <li><strong>Push</strong> — Klik <code>gitpush.bat</code>.</li>
     </ol>
     <button class="help-close" id="helpClose">Got it</button>
   </div>
