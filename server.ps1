@@ -68,10 +68,15 @@ while ($listener.IsListening) {
       $msg = "content saved"
     } elseif ($path -eq "/push") {
       $d = $body | ConvertFrom-Json
-      & "git" add -A
-      $co = & "git" commit -m $d.message 2>&1
-      $po = & "git" push 2>&1
-      $msg = "$($co -join '; ') | $($po -join '; ')"
+      Set-Location $scriptDir
+      git add -A 2>&1 | Out-Null
+      $commitOut = git commit -m "$($d.message)" 2>&1
+      $pushJob = Start-Job -ScriptBlock { param($d) Set-Location $d; git push 2>&1 } -ArgumentList $scriptDir
+      $pushResult = Wait-Job $pushJob -Timeout 30
+      if (!$pushResult) { Stop-Job $pushJob; $pushOut = "TIMEOUT — git push stuck (credentials?)" }
+      else { $pushOut = Receive-Job $pushJob }
+      Remove-Job $pushJob -Force
+      $msg = "$($commitOut -join '; ') | $($pushOut -join '; ')"
     } else {
       $ok = $false; $msg = "not found"
     }

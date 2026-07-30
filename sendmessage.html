@@ -1088,9 +1088,6 @@ Ini paragraf setelah gambar.</pre>
     if (!serverOnline) { toast('server not detected — start server.ps1 first'); return; }
     const data = getFormData();
     const items = getItems();
-    const folder = currentMode === 'article' ? 'articles' : 'projects';
-    const file = currentMode === 'article' ? 'articles.json' : 'projects.json';
-
     const txt = generateTxt(data);
     const json = JSON.stringify(items, null, 2);
     const route = currentMode === 'article' ? '/save-article' : '/save-project';
@@ -1101,17 +1098,16 @@ Ini paragraf setelah gambar.</pre>
       body: JSON.stringify({ slug: data.slug, txt, json })
     }).then(r => r.json()).then(d => {
       if (!d.ok) { toast('save failed: ' + d.msg); return; }
-      toast('files saved — pushing...');
-
-      showPrompt('Enter commit message:', 'update', msg => {
+      toast('files saved! Run gitpush.bat to publish.');
+      showPrompt('Push to GitHub?', 'update', msg => {
         if (!msg) return;
         fetch(SERVER + '/push', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: msg })
         }).then(r => r.json()).then(p => {
-          toast(p.ok ? 'Published!' : 'push failed: ' + p.msg);
-        }).catch(() => toast('push request failed'));
+          toast('Published! ' + p.msg);
+        }).catch(() => toast('push request failed — run gitpush.bat manually'));
       });
     }).catch(() => toast('server not reachable'));
   });
