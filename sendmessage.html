@@ -851,7 +851,7 @@ Ini paragraf setelah gambar.</pre>
           <div>${date ? `<span class="list-tag">${tag}</span><span class="list-date">${date}</span>` : `<span class="list-tag">${tag}</span>`}${isDraft ? ' <span class="draft-badge">Draft</span>' : ''}</div>
           <div style="margin-top:2px">${i.title}</div>
         </button>
-        <button class="list-opt-btn${isActive ? '' : ' list-opt-hidden'}" data-slug="${slug}" title="Options">&vellip;</button>
+        <button class="list-opt-btn${isActive ? '' : ' list-opt-hidden'}" data-slug="${slug}" title="Options"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
         <div class="opt-dropdown" data-slug="${slug}">
           ${isDraft ? '' : `<button class="opt-hide" data-slug="${slug}">${eyeIcon} ${isHidden ? 'Show' : 'Hide'}</button>`}
           <button class="opt-delete danger" data-slug="${slug}">${trashIcon} Delete${isDraft ? ' draft' : ''}</button>
@@ -1501,7 +1501,34 @@ Ini paragraf setelah gambar.</pre>
           if (idx === -1) return;
           items.splice(idx, 1);
           if (currentSlug === slug) { isNew = false; currentSlug = null; clearForm(); renderList(); updatePreview(); }
-          toast('entry deleted — copy full JSON to save');
+          if (serverOnline) {
+            const json = JSON.stringify(items, null, 2);
+            const route = currentMode === 'article' ? '/save-article' : '/save-project';
+            fetch(SERVER + route, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug: '', txt: 'deleted', json })
+            }).then(r => r.json()).then(d => {
+              if (!d.ok) { toast('save failed: ' + d.msg); return; }
+              clearDraft(slug); clearDraft('__new__');
+              const delDraft = findDraftBySlug(slug);
+              if (delDraft) removeDraft(delDraft.id);
+              toast('deleted & files saved!');
+              showPrompt('Push to GitHub?', 'update', msg => {
+                if (!msg) return;
+                fetch(SERVER + '/push', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ message: msg })
+                }).then(r => r.json()).then(p => {
+                  if (p.ok) toast('pushed to GitHub!');
+                  else toast('push failed: ' + p.msg);
+                }).catch(() => toast('push request failed — run gitpush.bat manually'));
+              });
+            }).catch(() => toast('save failed — copy full JSON to save manually'));
+          } else {
+            toast('entry deleted — copy full JSON to save');
+          }
         });
       }
       return;
