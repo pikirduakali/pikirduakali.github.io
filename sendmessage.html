@@ -243,10 +243,6 @@
       font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;
       color: var(--accent); margin-bottom: 8px;
     }
-    .publish-box .pub-info {
-      font-size: 12px; color: var(--muted-foreground); font-style: italic;
-      margin-bottom: 4px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
     .publish-box .pub-detail {
       font-size: 11px; color: var(--muted-foreground); margin: 6px 0 8px;
       display: none; white-space: pre-wrap; text-align: left;
@@ -525,7 +521,6 @@ Ini paragraf setelah gambar.</pre>
 <div class="publish-overlay" id="publishOverlay">
   <div class="publish-box">
     <div class="pub-title">&#9989; PUBLISHED!</div>
-    <div class="pub-info" id="pubInfo">Changes pushed to GitHub.</div>
     <div class="pub-detail" id="pubDetail"></div>
     <div class="pub-btns">
       <button id="pubMore">More Info</button>
@@ -1203,14 +1198,13 @@ Ini paragraf setelah gambar.</pre>
 
   function showPublishSuccess(msg) {
     const overlay = document.getElementById('publishOverlay');
-    const infoEl = document.getElementById('pubInfo');
     const detailEl = document.getElementById('pubDetail');
     const timerEl = document.getElementById('pubTimer');
     const moreBtn = document.getElementById('pubMore');
 
     const firstLine = msg.split('|')[0]?.trim() || msg.split('\n')[0]?.trim() || msg;
     detailEl.textContent = msg;
-    infoEl.textContent = firstLine;
+    moreBtn.textContent = firstLine.length > 40 ? 'More Info - ' + firstLine.slice(0, 40) + '...' : 'More Info - ' + firstLine;
 
     overlay.classList.add('open');
 
