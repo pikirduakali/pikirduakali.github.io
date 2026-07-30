@@ -487,21 +487,7 @@ Ini paragraf setelah gambar.</pre>
   let currentSlug = null;
   let isNew = false;
 
-  const articles = [
-    { tag: 'Essay', date: '26 jun 2026', title: 'This is an Example', slug: 'this-is-an-example' },
-    { tag: 'Essay', date: '13 jul 2026', title: 'On Building Things That Last', slug: 'on-building-things-that-last' },
-    { tag: 'Essay', date: '11 jun 2026', title: 'The Art of Doing Nothing', slug: 'the-art-of-doing-nothing' },
-    { tag: 'Tech', date: '28 jan 2026', title: 'The Quiet Power of Boring Infrastructure', slug: 'the-quiet-power-of-boring-infrastructure' },
-    { tag: 'Design', date: '5 nov 2025', title: 'Designing for Yourself First', slug: 'designing-for-yourself-first' },
-    { tag: 'Essay', date: '19 sep 2025', title: 'Why I Stopped Trying to Optimize Everything', slug: 'why-i-stopped-trying-to-optimize-everything' },
-    { tag: 'Tech', date: '2 aug 2025', title: 'Notes on Running a One-Person Tech Stack', slug: 'notes-on-running-a-one-person-tech-stack' },
-    { tag: 'Design', date: '14 apr 2025', title: 'Good Enough is Better Than Perfect', slug: 'good-enough-is-better-than-perfect' },
-    { tag: 'Essay', date: '21 feb 2025', title: 'What Working in F&B Taught Me About People', slug: 'what-working-in-fb-taught-me-about-people' },
-    { tag: 'Tech', date: '7 dec 2024', title: 'My Love-Hate Relationship with Automation', slug: 'my-love-hate-relationship-with-automation' },
-    { tag: 'Design', date: '15 oct 2024', title: 'Why Less is Still More', slug: 'why-less-is-still-more' },
-    { tag: 'Essay', date: '3 aug 2024', title: 'On Leaving and Starting Over', slug: 'on-leaving-and-starting-over' },
-    { tag: 'Essay', date: '22 jun 2024', title: 'The Coffee Shop as a Classroom', slug: 'the-coffee-shop-as-a-classroom' },
-  ];
+  let articles = [];
 
   let projects = [];
 
@@ -513,9 +499,14 @@ Ini paragraf setelah gambar.</pre>
     if (val === PASSKEY) {
       document.getElementById('lockscreen').style.display = 'none';
       document.getElementById('dashboard').classList.add('open');
-      fetch('projects.json').then(r => r.json()).then(p => { projects = p; renderList(); }).catch(() => {});
-      renderList();
-      if (articles.length) loadEntry(articles[0].slug);
+      Promise.all([
+        fetch('articles.json').then(r => r.json()).then(a => { articles = a; }).catch(() => {}),
+        fetch('projects.json').then(r => r.json()).then(p => { projects = p; }).catch(() => {})
+      ]).then(() => {
+        renderList();
+        const first = currentMode === 'article' ? articles[0] : projects[0];
+        if (first) loadEntry(first.slug);
+      });
       checkServer();
     } else {
       document.getElementById('lockError').textContent = 'Message sent';
