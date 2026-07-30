@@ -1491,7 +1491,7 @@ Ini paragraf setelah gambar.</pre>
       if (draft) {
         showConfirm('Delete this draft?', () => {
           removeDraft(draft.id);
-          if (currentSlug === slug) newEntry();
+          if (currentSlug === slug) { isNew = false; currentSlug = null; clearForm(); renderList(); updatePreview(); }
           toast('draft deleted');
         });
       } else {
@@ -1500,7 +1500,7 @@ Ini paragraf setelah gambar.</pre>
           const idx = items.findIndex(p => p.slug === slug);
           if (idx === -1) return;
           items.splice(idx, 1);
-          newEntry();
+          if (currentSlug === slug) { isNew = false; currentSlug = null; clearForm(); renderList(); updatePreview(); }
           toast('entry deleted — copy full JSON to save');
         });
       }
