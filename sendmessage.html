@@ -1204,7 +1204,7 @@ Ini paragraf setelah gambar.</pre>
 
     const firstLine = msg.split('|')[0]?.trim() || msg.split('\n')[0]?.trim() || msg;
     detailEl.textContent = msg;
-    moreBtn.textContent = firstLine.length > 40 ? 'More Info - ' + firstLine.slice(0, 40) + '...' : 'More Info - ' + firstLine;
+    moreBtn.textContent = 'More Info';
 
     overlay.classList.add('open');
 
