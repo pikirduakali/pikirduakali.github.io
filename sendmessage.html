@@ -109,6 +109,8 @@
     .btn-help:hover, .btn-preview:hover, .btn-home:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
     .btn-download, .btn-copy { border-color: var(--accent) !important; color: var(--accent) !important; }
     .btn-download:hover, .btn-copy:hover { background: var(--accent); color: var(--foreground) !important; }
+    .btn-publish { border-color: #27ae60 !important; color: #27ae60 !important; }
+    .btn-publish:hover { background: #27ae60 !important; color: var(--foreground) !important; }
     .btn-delete { border-color: #c0392b !important; color: #c0392b !important; }
     .btn-delete:hover { background: #c0392b !important; color: var(--foreground) !important; }
     .list-opt-btn { background:none;border:none;color:var(--muted-foreground);cursor:pointer;padding:4px 6px;opacity:0.5;transition:opacity 0.2s;flex-shrink:0;display:flex;align-items:center;font-size:16px;line-height:1 }
@@ -301,6 +303,8 @@
         <button id="btnHelp" class="btn-help">How to</button>
         <button id="btnPreviewToggle" class="btn-preview">Preview</button>
         <button id="btnDownload" class="btn-download">Download .txt</button>
+        <button id="btnPublish" class="btn-publish" style="display:none">Publish</button>
+        <span id="serverIndicator" style="display:none;width:8px;height:8px;border-radius:50%;background:#555;flex-shrink:0" title="Server offline"></span>
         <button id="btnCopyEntry" class="btn-copy">Copy entry</button>
         <button id="btnCopyContentJson" class="btn-download" style="display:none">Copy JSON</button>
       </div>
@@ -373,7 +377,15 @@
 
 <div class="help-overlay" id="helpOverlay">
   <div class="help-modal">
-    <h2>How to — Articles</h2>
+    <h2>How to — Quick Publish <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(server mode)</span></h2>
+    <ol>
+      <li><strong>Start server</strong> — Klik 2x <code>publish.bat</code> di folder project.</li>
+      <li><strong>Compose</strong> — Isi title, body, dll di dashboard.</li>
+      <li><strong>Klik "Publish"</strong> (tombol hijau di toolbar) → file otomatis tersimpan + push ke GitHub.</li>
+      <li><strong>Selesai</strong> — Tunggu GitHub Pages deploy.</li>
+    </ol>
+    <p style="font-size:13px;color:var(--muted-foreground);margin:8px 0 0">Dot hijau di toolbar = server nyala. Dot abu = server mati (pake cara manual di bawah).</p>
+    <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Articles <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(manual)</span></h2>
     <ol>
       <li><strong>Compose</strong> — Isi title, tag, date, hero image (opsional), dan body.</li>
       <li><strong>Download .txt</strong> → <code>articles/namafile.txt</code>.</li>
@@ -381,7 +393,7 @@
       <li><strong>Replace file</strong> — Timpa seluruh isi <code>articles.json</code> dengan hasil paste.</li>
       <li><strong>Push</strong> — Klik <code>gitpush.bat</code> di folder project, isi pesan updatenya.</li>
     </ol>
-    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Projects</h2>
+    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Projects <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(manual)</span></h2>
     <ol>
       <li><strong>Switch tab</strong> — Klik "Projects" di sidebar buat mode project.</li>
       <li><strong>Compose</strong> — Isi title, category, year, client, headline, hero image, dan body.</li>
@@ -504,6 +516,7 @@ Ini paragraf setelah gambar.</pre>
       fetch('projects.json').then(r => r.json()).then(p => { projects = p; renderList(); }).catch(() => {});
       renderList();
       if (articles.length) loadEntry(articles[0].slug);
+      checkServer();
     } else {
       document.getElementById('lockError').textContent = 'Message sent';
     }
@@ -1052,6 +1065,55 @@ Ini paragraf setelah gambar.</pre>
     URL.revokeObjectURL(url);
     navigator.clipboard.writeText(json).catch(() => {});
     toast('site-content.json downloaded!');
+  });
+
+  const SERVER = 'http://localhost:3456';
+  let serverOnline = false;
+
+  function checkServer() {
+    fetch(SERVER + '/ping', { method: 'POST' })
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          serverOnline = true;
+          document.getElementById('serverIndicator').style.cssText = 'width:8px;height:8px;border-radius:50%;background:#27ae60;flex-shrink:0';
+          document.getElementById('serverIndicator').title = 'Server online';
+          document.getElementById('btnPublish').style.display = '';
+        }
+      })
+      .catch(() => {});
+  }
+
+  document.getElementById('btnPublish').addEventListener('click', () => {
+    if (!serverOnline) { toast('server not detected — start server.ps1 first'); return; }
+    const data = getFormData();
+    const items = getItems();
+    const folder = currentMode === 'article' ? 'articles' : 'projects';
+    const file = currentMode === 'article' ? 'articles.json' : 'projects.json';
+
+    const txt = generateTxt(data);
+    const json = JSON.stringify(items, null, 2);
+    const route = currentMode === 'article' ? '/save-article' : '/save-project';
+
+    fetch(SERVER + route, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: data.slug, txt, json })
+    }).then(r => r.json()).then(d => {
+      if (!d.ok) { toast('save failed: ' + d.msg); return; }
+      toast('files saved — pushing...');
+
+      showPrompt('Enter commit message:', 'update', msg => {
+        if (!msg) return;
+        fetch(SERVER + '/push', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg })
+        }).then(r => r.json()).then(p => {
+          toast(p.ok ? 'Published!' : 'push failed: ' + p.msg);
+        }).catch(() => toast('push request failed'));
+      });
+    }).catch(() => toast('server not reachable'));
   });
 
   let confirmAction = null;
