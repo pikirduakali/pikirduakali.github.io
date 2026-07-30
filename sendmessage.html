@@ -1071,8 +1071,8 @@ Ini paragraf setelah gambar.</pre>
   let serverOnline = false;
 
   function checkServer() {
-    fetch(SERVER + '/ping', { method: 'POST' })
-      .then(r => r.json())
+    fetch('/ping', { method: 'POST' }).catch(() => fetch('http://localhost:3456/ping', { method: 'POST' }))
+      .then(r => { if (!r.ok) throw Error(); return r.json(); })
       .then(d => {
         if (d.ok) {
           serverOnline = true;
