@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P2X — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0e0e0e; --fg: #f0ede8; --card: #181818;
+      --muted: #7a7770; --accent: #e83d2a;
+      --border: rgba(240,237,232,0.1);
+      --font: 'DM Sans', sans-serif;
+      --display: 'Bricolage Grotesque', sans-serif;
+    }
+    html { font-size: 16px; }
+    body { background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.6; overflow: hidden; height: 100vh; }
+
+    /* Header */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 56px; height: 56px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    header a, header span { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    header a:hover { color: var(--fg); }
+
+    /* Layout */
+    .layout { display: flex; height: 100vh; padding-top: 56px; padding-bottom: 48px; }
+
+    /* Left panel */
+    .left {
+      width: 42%; min-width: 380px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 48px 56px;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .top-meta { display: flex; justify-content: space-between; align-items: center; }
+    .idx { font-size: 11px; font-family: monospace; color: var(--accent); }
+    .yr  { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+
+    .content { transition: opacity 0.28s, transform 0.28s; }
+    .content.hidden { opacity: 0; transform: translateY(16px); }
+
+    .cat { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+    h1 {
+      font-family: var(--display); font-weight: 800;
+      font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.95;
+      margin-bottom: 28px;
+    }
+    .desc { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 28px; max-width: 440px; }
+
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      padding: 20px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .meta-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .meta-value { font-size: 13px; font-weight: 500; }
+    .meta-value.accent { color: var(--accent); }
+
+    .stack { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .stack span {
+      font-size: 11px; padding: 4px 10px;
+      border: 1px solid var(--border); color: var(--muted);
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; border: 1px solid var(--border);
+      padding: 10px 20px; color: var(--muted);
+      background: none; cursor: pointer; font-family: var(--font);
+      transition: border-color 0.2s, color 0.2s; text-decoration: none;
+    }
+    .btn:hover { border-color: var(--fg); color: var(--fg); }
+
+    /* Nav controls */
+    .controls { display: flex; align-items: center; justify-content: space-between; }
+    .arrows { display: flex; gap: 10px; }
+    .arrow-btn {
+      width: 40px; height: 40px; border: 1px solid var(--border);
+      background: none; cursor: pointer; color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s; font-size: 16px;
+    }
+    .arrow-btn:hover { border-color: var(--fg); color: var(--fg); }
+    .arrow-btn:disabled { opacity: 0.3; cursor: default; }
+    .dots { display: flex; align-items: center; gap: 8px; }
+    .dot {
+      width: 24px; height: 3px; border: none; cursor: pointer;
+      background: var(--border); transition: all 0.3s;
+    }
+    .dot.active { background: var(--accent); }
+    .key-hint { font-size: 11px; color: var(--muted); }
+
+    /* Right panel */
+    .right { flex: 1; position: relative; overflow: hidden; }
+    .img-wrap {
+      position: absolute; inset: 0;
+      transition: opacity 0.35s;
+    }
+    .img-wrap.hidden { opacity: 0; }
+    .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.6) brightness(0.45); }
+    .img-grad {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, var(--bg) 0%, rgba(14,14,14,0.25) 55%, transparent 100%);
+    }
+    .watermark {
+      position: absolute; bottom: 32px; right: 32px;
+      font-family: var(--display); font-weight: 800;
+      font-size: clamp(6rem, 14vw, 11rem); line-height: 1;
+      color: rgba(232,61,42,0.1); pointer-events: none; user-select: none;
+      transition: opacity 0.28s;
+    }
+    .float-tags {
+      position: absolute; top: 32px; right: 32px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      transition: opacity 0.28s;
+    }
+    .float-tag {
+      font-size: 11px; padding: 6px 12px; color: var(--fg);
+      background: rgba(240,237,232,0.07);
+      border: 1px solid rgba(240,237,232,0.12);
+      backdrop-filter: blur(8px);
+    }
+
+    /* Bottom strip */
+    .strip {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+      display: flex; border-top: 1px solid var(--border);
+      background: rgba(14,14,14,0.92); backdrop-filter: blur(8px);
+    }
+    .strip-item {
+      flex: 1; padding: 10px 16px; text-align: left;
+      border: none; border-right: 1px solid var(--border);
+      background: none; cursor: pointer; font-family: var(--font);
+      transition: background 0.2s;
+    }
+    .strip-item:last-child { border-right: none; }
+    .strip-item:hover, .strip-item.active { background: var(--card); }
+    .strip-num { font-size: 10px; font-family: monospace; color: var(--accent); margin-bottom: 2px; }
+    .strip-title { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .strip-item.active .strip-title { color: var(--fg); }
+
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; overflow-y: auto; }
+      .left { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--border); overflow: visible; }
+      .right { flex: 0 0 40vh; order: -1; }
+      .img-wrap img { object-position: center; }
+      .content { max-width: 560px; }
+    }
+    @media (max-width: 640px) {
+      header { padding: 0 24px; }
+      .left { padding: 32px 24px; }
+      .controls { flex-wrap: wrap; gap: 16px; }
+      .watermark { font-size: 5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">P2X — Portfolio</a>
+    <nav>
+      <a href="showcase.html">Showcase</a>
+      <a href="articles.html">Articles</a>
+      <a href="index.html">Home</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <div class="left">
+      <div class="top-meta">
+        <span class="idx" id="idx">001</span>
+        <span class="yr" id="yr">—</span>
+      </div>
+
+      <div class="content" id="content">
+        <div class="cat" id="cat">Loading…</div>
+        <h1 id="title">—</h1>
+        <p class="desc" id="desc"></p>
+        <div class="meta-grid">
+          <div>
+            <div class="meta-label">Role</div>
+            <div class="meta-value" id="role">—</div>
+          </div>
+          <div>
+            <div class="meta-label">Outcome</div>
+            <div class="meta-value accent" id="outcome">—</div>
+          </div>
+        </div>
+        <div class="stack" id="stack"></div>
+        <a class="btn" href="mailto:hi@pikirduakali.com">Get in touch <span>→</span></a>
+      </div>
+
+      <div class="controls">
+        <div class="arrows">
+          <button class="arrow-btn" id="prevBtn" aria-label="Previous">&larr;</button>
+          <button class="arrow-btn" id="nextBtn" aria-label="Next">&rarr;</button>
+        </div>
+        <div class="dots" id="dots"></div>
+        <span class="key-hint">use &larr; &rarr; keys</span>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="img-wrap" id="imgWrap">
+        <img id="img" src="" alt="" />
+        <div class="img-grad"></div>
+      </div>
+      <div class="watermark" id="watermark">001</div>
+      <div class="float-tags" id="floatTags"></div>
+    </div>
+  </div>
+
+  <div class="strip" id="strip"></div>
+
+  <script>
+    let projects = [];
+    let i = 0;
+
+    const idxEl = document.getElementById('idx');
+    const yrEl = document.getElementById('yr');
+    const content = document.getElementById('content');
+    const catEl = document.getElementById('cat');
+    const titleEl = document.getElementById('title');
+    const descEl = document.getElementById('desc');
+    const roleEl = document.getElementById('role');
+    const outcomeEl = document.getElementById('outcome');
+    const stackEl = document.getElementById('stack');
+    const imgWrap = document.getElementById('imgWrap');
+    const imgEl = document.getElementById('img');
+    const watermarkEl = document.getElementById('watermark');
+    const floatTagsEl = document.getElementById('floatTags');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsEl = document.getElementById('dots');
+    const stripEl = document.getElementById('strip');
+
+    function imgUrl(id) {
+      return 'https://images.unsplash.com/photo-' + id + '?w=1600&h=1000&fit=crop&auto=format';
+    }
+
+    function render() {
+      const p = projects[i];
+
+      idxEl.textContent = p.index;
+      yrEl.textContent = p.year;
+      catEl.textContent = p.category;
+      titleEl.textContent = p.title;
+      descEl.textContent = p.description;
+      roleEl.textContent = p.role;
+      outcomeEl.textContent = p.outcome;
+      stackEl.innerHTML = p.stack.map(s => `<span>${s}</span>`).join('');
+
+      watermarkEl.textContent = p.index;
+      floatTagsEl.innerHTML = p.stack.slice(0, 3).map(s => `<div class="float-tag">${s}</div>`).join('');
+      imgEl.src = imgUrl(p.image);
+      imgEl.alt = p.title;
+
+      dotsEl.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i));
+      stripEl.querySelectorAll('.strip-item').forEach((s, j) => s.classList.toggle('active', j === i));
+      prevBtn.disabled = i === 0;
+      nextBtn.disabled = i === projects.length - 1;
+    }
+
+    function goTo(n) {
+      if (n < 0 || n >= projects.length) return;
+      content.classList.add('hidden');
+      imgWrap.classList.add('hidden');
+      setTimeout(() => {
+        i = n;
+        render();
+        content.classList.remove('hidden');
+        imgWrap.classList.remove('hidden');
+      }, 260);
+    }
+
+    fetch('showcase-prototype.json')
+      .then(r => r.json())
+      .then(data => {
+        projects = data;
+        dotsEl.innerHTML = projects.map((_, j) => `<button class="dot${j === 0 ? ' active' : ''}" data-i="${j}"></button>`).join('');
+        stripEl.innerHTML = projects.map((p, j) =>
+          `<button class="strip-item${j === 0 ? ' active' : ''}" data-i="${j}">
+            <div class="strip-num">${p.index}</div>
+            <div class="strip-title">${p.title}</div>
+          </button>`).join('');
+
+        dotsEl.addEventListener('click', e => {
+          const d = e.target.closest('.dot');
+          if (d) goTo(+d.dataset.i);
+        });
+        stripEl.addEventListener('click', e => {
+          const s = e.target.closest('.strip-item');
+          if (s) goTo(+s.dataset.i);
+        });
+        prevBtn.addEventListener('click', () => goTo(i - 1));
+        nextBtn.addEventListener('click', () => goTo(i + 1));
+        document.addEventListener('keydown', e => {
+          if (e.key === 'ArrowLeft') goTo(i - 1);
+          if (e.key === 'ArrowRight') goTo(i + 1);
+        });
+
+        render();
+      })
+      .catch(() => {
+        titleEl.textContent = 'data not found';
+        descEl.textContent = 'showcase-prototype.json tidak ketemu — deeym.';
+      });
+  </script>
+</body>
+</html>
