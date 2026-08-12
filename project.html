@@ -150,7 +150,7 @@
       transition: opacity 0.28s;
     }
     .img-wrap.hidden { opacity: 0; }
-    .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.5); transition: filter 0.5s; }
+    .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.5); transition: filter 0.5s; cursor: pointer; }
     .img-wrap:hover img { filter: grayscale(0) brightness(0.7); }
     .img-grad {
       position: absolute; inset: 0;
@@ -450,6 +450,7 @@
         });
         prevBtn.addEventListener('click', () => setPhoto(pi - 1, true));
         nextBtn.addEventListener('click', () => setPhoto(pi + 1, true));
+        imgEl.addEventListener('click', () => setPhoto(pi + 1, true));
         pagerTrack.addEventListener('click', e => {
           const seg = e.target.closest('.pager-seg');
           if (seg) setPhoto(+seg.dataset.p, true);
