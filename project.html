@@ -109,6 +109,9 @@
       font-size: 15px; color: var(--muted-foreground); line-height: 1.75;
       margin-bottom: 32px; max-width: 440px;
     }
+    .desc p + p { margin-top: 14px; }
+    .desc .content-img { margin: 18px 0; }
+    .desc .content-img img { width: 100%; border-radius: 8px; display: block; }
 
     .meta-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
@@ -345,6 +348,8 @@
       outcomeEl.textContent = p.outcome;
       stackEl.innerHTML = p.stack.map(s => `<span class="tag">${s}</span>`).join('');
 
+      loadBody(p.slug);
+
       watermarkEl.textContent = p.index;
       floatTagsEl.innerHTML = p.stack.slice(0, 3).map(s => `<div class="float-tag">${s}</div>`).join('');
 
@@ -369,6 +374,26 @@
       imgEl.alt = projects[i].title + ' photo ' + (pi + 1);
       renderPager();
       if (animate) setTimeout(() => imgWrap.classList.remove('hidden'), 260);
+    }
+
+    function loadBody(slug) {
+      if (!slug) return;
+      fetch(`projects/${slug}.txt`)
+        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+        .then(text => {
+          if (slug !== projects[i].slug) return;
+          const lines = text.split('\n').map(l => l.trim());
+          let start = 2;
+          for (let i = 2; i < lines.length; i++) {
+            if (lines[i].startsWith('headline:') || lines[i].startsWith('img:') || lines[i] === '') { start = i + 1; }
+            else break;
+          }
+          const paras = lines.slice(start).filter(l => l !== '').map(l =>
+            l.startsWith('img:') ? `<div class="content-img"><img src="${l.slice(4)}" alt=""></div>` : `<p>${l}</p>`
+          );
+          if (paras.length) descEl.innerHTML = paras.join('');
+        })
+        .catch(() => {});
     }
 
     function switchProject(n, fromMenu) {
