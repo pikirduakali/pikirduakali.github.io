@@ -450,7 +450,7 @@
         });
         prevBtn.addEventListener('click', () => setPhoto(pi - 1, true));
         nextBtn.addEventListener('click', () => setPhoto(pi + 1, true));
-        imgEl.addEventListener('click', () => setPhoto(pi + 1, true));
+        imgWrap.addEventListener('click', () => setPhoto(pi + 1, true));
         pagerTrack.addEventListener('click', e => {
           const seg = e.target.closest('.pager-seg');
           if (seg) setPhoto(+seg.dataset.p, true);
