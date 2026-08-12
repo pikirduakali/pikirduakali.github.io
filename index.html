@@ -39,7 +39,13 @@
 
     aside { position: fixed; top: 0; left: 0; height: 100%; width: 224px; border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 40px 32px; z-index: 30; }
     .logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 40px; display: block; text-decoration: none; transition: color 0.2s; }
+    .logo::before { content: attr(data-default); }
+    .logo:hover::before { content: attr(data-hover); }
     .logo:hover { color: var(--foreground); }
+    .m-logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    .m-logo::before { content: attr(data-default); }
+    .m-logo:hover::before { content: attr(data-hover); }
+    .m-logo:hover { color: var(--foreground); }
     nav { display: flex; flex-direction: column; gap: 4px; }
     nav a { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 14px; color: var(--muted-foreground); text-decoration: none; transition: color 0.2s; }
     nav a:hover, nav a.active { color: var(--foreground); }
@@ -200,7 +206,7 @@
 
   <aside>
     <div>
-      <a href="#home" class="logo">P2X</a>
+      <a href="#home" class="logo" data-default="P2X" data-hover="Pram Suwandi" onclick="location.reload();return false;"></a>
       <nav id="sidebar-nav">
         <a href="#home" class="active"><span class="indicator"></span>Home</a>
         <a href="#about"><span class="indicator"></span>About Me</a>
@@ -220,7 +226,7 @@
 
   <div class="mobile-nav">
     <div class="mobile-nav-bar">
-      <a href="#home" style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);text-decoration:none">P2X</a>
+      <a href="#home" class="m-logo" data-default="P2X" data-hover="Pram Suwandi" onclick="location.reload();return false;"></a>
       <button class="menu-toggle" id="menu-toggle">Menu</button>
     </div>
     <div class="mobile-menu" id="mobile-menu">

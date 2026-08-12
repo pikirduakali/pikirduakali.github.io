@@ -36,10 +36,14 @@
       background: var(--background);
     }
     .logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    .logo::before { content: attr(data-default); }
+    .logo:hover::before { content: attr(data-hover); }
     .logo:hover { color: var(--foreground); }
     header nav { display: flex; gap: 24px; }
     header nav a { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); text-decoration: none; transition: color 0.2s; }
     header nav a:hover, header nav a.active { color: var(--foreground); }
+    header nav a::before { content: attr(data-default); }
+    header nav a:hover::before { content: attr(data-hover); }
     .header-right { display: flex; align-items: center; gap: 20px; }
     .project-menu { position: relative; }
     .menu-btn {
@@ -50,6 +54,8 @@
       line-height: 1; height: 34px;
     }
     .menu-btn:hover, .menu-btn[aria-expanded="true"] { color: var(--foreground); }
+    .menu-btn .menu-label::before { content: attr(data-default); }
+    .menu-btn:hover .menu-label::before { content: attr(data-hover); }
     .menu-btn .caret { transition: transform 0.2s; }
     .menu-btn[aria-expanded="true"] .caret { transform: rotate(180deg); }
     .menu-btn .caret svg { display: block; }
@@ -82,13 +88,19 @@
       overflow-y: auto;
     }
     .top-meta { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
-    .idx { font-size: 11px; font-family: monospace; color: var(--muted-foreground); margin-bottom: 12px; }
+    .idx { font-size: 11px; font-family: monospace; color: var(--accent); }
+    .top-meta .meta-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .top-meta .meta-top .yr::before { content: '-'; margin-right: 10px; color: var(--border); }
     .top-meta h1 {
       font-family: var(--font-display); font-weight: 800;
-      font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.95;
+      font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.95;
       color: var(--accent); margin-bottom: 12px; overflow-wrap: break-word;
     }
-    .top-meta .yr  { font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted-foreground); }
+    .top-meta h1 .title-link { color: var(--accent); text-decoration: none; position: relative; transition: color 0.2s; }
+    .top-meta h1 .title-link::after { content: ' ↗'; font-size: 0.5em; vertical-align: super; opacity: 0; transition: opacity 0.2s; }
+    .top-meta h1 .title-link:hover { color: var(--foreground); }
+    .top-meta h1 .title-link:hover::after { opacity: 1; }
+    .top-meta .yr  { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); }
 
     .content { transition: opacity 0.28s, transform 0.28s; }
     .content.hidden { opacity: 0; transform: translateY(16px); }
@@ -192,15 +204,13 @@
 </head>
 <body>
   <header>
-    <a href="index.html" class="logo">P2X</a>
+    <a href="index.html" class="logo" data-default="P2X" data-hover="Back to Home"></a>
     <div class="header-right">
       <nav>
-        <a href="showcase.html">Showcase</a>
-        <a href="articles.html">Articles</a>
-        <a href="index.html">Home</a>
+        <a href="showcase.html" class="nav-link" data-default="Showcase" data-hover="Back to Showcase"></a>
       </nav>
       <div class="project-menu" id="projectMenu">
-        <button class="menu-btn" id="menuBtn" aria-label="Project list" aria-haspopup="true" aria-expanded="false"><span>projects</span><span class="caret"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+        <button class="menu-btn" id="menuBtn" aria-label="Project list" aria-haspopup="true" aria-expanded="false"><span class="menu-label" data-default="projects" data-hover="all projects"></span><span class="caret"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></button>
         <div class="menu-dropdown" id="menuDropdown"></div>
       </div>
     </div>
@@ -209,9 +219,12 @@
   <div class="layout">
     <div class="left">
       <div class="top-meta">
-        <span class="idx" id="idx">001</span>
+        <span class="meta-top">
+          <span class="idx" id="idx">001</span>
+          <span class="yr" id="yr" style="display:none">2025</span>
+        </span>
         <h1 id="title">—</h1>
-        <span class="yr" id="yr">2025</span>
+        <span class="yr" id="client" style="display:none">Client</span>
       </div>
 
       <div class="content" id="content" aria-live="polite">
@@ -261,6 +274,7 @@
     const descEl = document.getElementById('desc');
     const roleEl = document.getElementById('role');
     const outcomeEl = document.getElementById('outcome');
+    const clientEl = document.getElementById('client');
     const stackEl = document.getElementById('stack');
     const imgWrap = document.getElementById('imgWrap');
     const imgEl = document.getElementById('img');
@@ -274,6 +288,7 @@
 
     const roleWrap = document.querySelector('.meta-role');
     const outcomeWrap = document.querySelector('.meta-outcome');
+    const metaTop = document.querySelector('.meta-top');
 
     function imgUrl(id) {
       if (/^https?:/.test(id)) return id;
@@ -291,6 +306,8 @@
         slug: raw.slug || '',
         category: raw.category || raw.tag || '',
         year: raw.year || '',
+        client: raw.client || '',
+        link: raw.link || '',
         description: raw.description || raw.desc || '',
         role: raw.role || '',
         stack: raw.stack || [],
@@ -311,9 +328,12 @@
       const p = projects[i];
 
       idxEl.textContent = p.index;
-      titleEl.textContent = p.title;
+      titleEl.innerHTML = p.link ? `<a href="${p.link}" target="_blank" rel="noopener" class="title-link">${p.title}</a>` : p.title;
       yrEl.textContent = p.year;
       yrEl.style.display = p.year ? '' : 'none';
+      metaTop.style.display = p.year ? '' : 'none';
+      clientEl.textContent = p.client;
+      clientEl.style.display = p.client ? '' : 'none';
 
       descEl.textContent = p.description;
       roleEl.textContent = p.role;

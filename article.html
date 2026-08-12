@@ -72,9 +72,12 @@
           const title = lines[0] || 'untitled';
           const meta = lines[1] || '';
           const [tag, date] = meta.split('|').map(s => s.trim());
-          const imgLine = lines[2] || '';
-          const heroImg = imgLine.startsWith('img:') ? imgLine.slice(4) : '';
-          const bodyStart = heroImg ? 3 : 2;
+          let heroImg = '', bodyStart = 2;
+          for (let i = 2; i < lines.length; i++) {
+            if (lines[i].startsWith('img:')) { heroImg = lines[i].slice(4); bodyStart = i + 1; }
+            else if (lines[i].startsWith('excerpt:')) { bodyStart = i + 1; }
+            else break;
+          }
           const body = lines.slice(bodyStart).filter(l => l !== '').map(l => {
             if (l.startsWith('img:')) return `<div class="content-img"><img src="${l.slice(4)}" alt=""></div>`;
             return `<p>${l}</p>`;
