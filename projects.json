@@ -21,14 +21,13 @@
     "slug": "roastery-rebrand",
     "year": "2025",
     "client": "Coffee Craft Co.",
-    "img": "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&h=375&fit=crop&auto=format",
+    "link": "https://instagram.com/nasiudukraya.id",
+    "img": "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&h=600&fit=crop&auto=format",
     "photos": [
-      "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=1600&h=1000&fit=crop&auto=format",
-      "https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=1600&h=1000&fit=crop&auto=format",
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&h=1000&fit=crop&auto=format"
+      "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=900&h=600&fit=crop&auto=format"
     ],
     "title": "Roastery Rebrand",
-    "desc": "Full brand identity including logo, stationery, and brand guidelines for a local specialty coffee roaster."
+    "desc": "Full brand identity — logo, stationery, and guidelines for a local specialty coffee roaster."
   },
   {
     "category": "print",

@@ -175,6 +175,21 @@
     .field-row { display: flex; gap: 12px; }
     .field-row .field { flex: 1; }
 
+    .photo-row { display: flex; gap: 8px; margin-top: 8px; }
+    .photo-row input { flex: 1; }
+    .photo-del {
+      background: var(--card); border: 1px solid var(--border); color: var(--muted-foreground);
+      width: 34px; cursor: pointer; font-size: 16px; line-height: 1; border-radius: var(--radius);
+      transition: border-color 0.2s, color 0.2s; flex-shrink: 0;
+    }
+    .photo-del:hover { border-color: var(--accent); color: var(--accent); }
+    .photo-add {
+      margin-top: 8px; background: none; border: 1px dashed var(--border); color: var(--muted-foreground);
+      padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: var(--font-body);
+      border-radius: var(--radius); transition: border-color 0.2s, color 0.2s; width: 100%; text-align: center;
+    }
+    .photo-add:hover { border-color: var(--accent); color: var(--accent); }
+
     .field select { cursor: pointer; }
     .field select option { background: var(--card); color: var(--foreground); }
 
@@ -397,8 +412,10 @@
           </div>
         </div>
         <div class="field">
-          <label>Thumbnail URL <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(optional — will appear as hero image at the top)</span></label>
+          <label>Thumbnail URL <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(first photo — hero image)</span></label>
           <input type="text" id="fieldThumb" placeholder="https://i.ibb.co.com/..." />
+          <div id="photoList" class="mode-project" style="display:none"></div>
+          <button type="button" id="addPhotoBtn" class="photo-add mode-project" style="display:none">+ Add photo</button>
         </div>
         <div class="field mode-article" style="display:none">
           <label>Headline <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(short hook shown on article listing)</span></label>
@@ -580,6 +597,7 @@ Ini paragraf setelah gambar.</pre>
       headline: document.getElementById('fieldHeadline').value,
       excerpt: document.getElementById('fieldExcerpt').value,
       thumb: document.getElementById('fieldThumb').value,
+      photos: getPhotos(),
       body: document.getElementById('fieldBody').value
     };
     drafts[slug] = data;
@@ -612,6 +630,7 @@ Ini paragraf setelah gambar.</pre>
     if (d.headline) document.getElementById('fieldHeadline').value = d.headline;
     document.getElementById('fieldExcerpt').value = d.excerpt || '';
     document.getElementById('fieldThumb').value = d.thumb || '';
+    renderPhotos(Array.isArray(d.photos) ? d.photos : []);
     document.getElementById('fieldBody').value = d.body || '';
     updatePreview();
     return true;
@@ -628,7 +647,7 @@ Ini paragraf setelah gambar.</pre>
     const id = 'draft_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
     const draftSlug = data.slug || slugify(data.title || 'untitled') + '-' + Date.now().toString(36);
     const isProject = (data.mode || currentMode) === 'project';
-    list.unshift({ id, title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, body: data.body, mode: data.mode || currentMode, slug: draftSlug, createdAt: Date.now(), year: isProject ? data.year : '', client: isProject ? data.client : '', link: isProject ? data.link : '' });
+    list.unshift({ id, title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, photos: data.photos || [], body: data.body, mode: data.mode || currentMode, slug: draftSlug, createdAt: Date.now(), year: isProject ? data.year : '', client: isProject ? data.client : '', link: isProject ? data.link : '' });
     saveDraftList(list);
     return id;
   }
@@ -637,7 +656,7 @@ Ini paragraf setelah gambar.</pre>
     const idx = list.findIndex(d => d.id === id);
     if (idx < 0) return;
     const isProject = (data.mode || currentMode) === 'project';
-    list[idx] = { ...list[idx], title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, body: data.body, mode: data.mode || currentMode, year: isProject ? data.year : '', client: isProject ? data.client : '', link: isProject ? data.link : '' };
+    list[idx] = { ...list[idx], title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, photos: data.photos || [], body: data.body, mode: data.mode || currentMode, year: isProject ? data.year : '', client: isProject ? data.client : '', link: isProject ? data.link : '' };
     saveDraftList(list);
   }
   function removeDraft(id) {
@@ -655,6 +674,7 @@ Ini paragraf setelah gambar.</pre>
     document.getElementById('fieldTitle').value = draft.title || '';
     document.getElementById('fieldBody').value = draft.body || '';
     document.getElementById('fieldThumb').value = draft.thumb || '';
+    renderPhotos(Array.isArray(draft.photos) ? draft.photos : []);
     document.getElementById('slugHint').textContent = 'slug: ' + draft.slug;
     if (draft.mode === 'project') {
       document.getElementById('fieldCategory').value = draft.tag || 'Branding';
@@ -902,6 +922,28 @@ Ini paragraf setelah gambar.</pre>
     return `${parts[2]}-${m}-${parts[0].padStart(2, '0')}`;
   }
 
+  function getPhotos() {
+    const rows = [...document.querySelectorAll('#photoList .photo-row')];
+    return rows.map(r => r.querySelector('input').value.trim()).filter(Boolean);
+  }
+  function addPhotoRow(url) {
+    const wrap = document.getElementById('photoList');
+    const row = document.createElement('div');
+    row.className = 'photo-row';
+    row.innerHTML = `<input type="text" placeholder="https://i.ibb.co.com/..." value="${url.replace(/"/g, '&quot;')}" />
+      <button type="button" class="photo-del" title="Remove" aria-label="Remove photo">×</button>`;
+    row.querySelector('.photo-del').addEventListener('click', () => {
+      row.remove();
+      updatePreview();
+    });
+    wrap.appendChild(row);
+  }
+  function renderPhotos(urls) {
+    const wrap = document.getElementById('photoList');
+    wrap.innerHTML = '';
+    urls.filter(Boolean).forEach(addPhotoRow);
+  }
+
   function clearForm() {
     document.getElementById('fieldTitle').value = '';
     document.getElementById('fieldBody').value = '';
@@ -914,6 +956,7 @@ Ini paragraf setelah gambar.</pre>
     document.getElementById('fieldHeadline').value = '';
     document.getElementById('fieldExcerpt').value = '';
     document.getElementById('fieldThumb').value = '';
+    renderPhotos([]);
     document.getElementById('slugHint').textContent = 'slug: —';
     document.getElementById('entryOutput').classList.remove('show');
   }
@@ -955,6 +998,7 @@ Ini paragraf setelah gambar.</pre>
       document.getElementById('fieldLink').value = entry.link || '';
       document.getElementById('fieldHeadline').value = entry.desc || '';
       document.getElementById('fieldThumb').value = entry.img || '';
+      renderPhotos(Array.isArray(entry.photos) ? entry.photos.slice(1) : []);
     }
 
     const folder = currentMode === 'article' ? 'articles' : 'projects';
@@ -1046,8 +1090,9 @@ Ini paragraf setelah gambar.</pre>
       const link = document.getElementById('fieldLink').value.trim();
       const linkUrl = link && !/^https?:\/\//i.test(link) ? 'https://' + link : link;
       const headline = document.getElementById('fieldHeadline').value.trim();
-      const thumb = document.getElementById('fieldThumb').value.trim();
-      return { title, category, year, client, link: linkUrl, headline, thumb, body, slug, mode: 'project' };
+      const photos = [document.getElementById('fieldThumb').value.trim(), ...getPhotos()].filter(Boolean);
+      const thumb = photos[0] || '';
+      return { title, category, year, client, link: linkUrl, headline, thumb, photos, body, slug, mode: 'project' };
     }
   }
 
@@ -1084,8 +1129,8 @@ Ini paragraf setelah gambar.</pre>
       year: data.year || (existing && existing.year ? String(existing.year) : ''),
       client: data.client || ((existing && existing.client) || ''),
       link: data.link || ((existing && existing.link) || ''),
-      img: data.thumb || ((existing && existing.img) || ''),
-      photos: existing && existing.photos ? existing.photos : (data.thumb ? [data.thumb] : []),
+      img: (data.photos && data.photos[0]) || data.thumb || ((existing && existing.img) || ''),
+      photos: (data.photos && data.photos.length) ? data.photos : (existing && existing.photos ? existing.photos : (data.thumb ? [data.thumb] : [])),
       title: data.title,
       desc,
       ...(existing ? {
@@ -1117,12 +1162,14 @@ Ini paragraf setelah gambar.</pre>
       const bodyHtml = data.body.split('\n\n').filter(l => l.trim()).map(l => l.startsWith('img:') ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:24px 0;overflow:hidden"><img src="${l.slice(4)}" style="width:100%;height:100%;object-fit:cover"></div>` : `<p>${l}</p>`).join('');
       const meta = data.year ? `${data.year}${data.client ? ' &middot; ' + data.client : ''}` : (data.client || '');
       const titleHtml = data.link ? `<a href="${data.link}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">${data.title} ↗</a>` : data.title;
+      const allPhotos = (data.photos && data.photos.length) ? data.photos : [data.thumb].filter(Boolean);
+      const photosHtml = allPhotos.map((u, k) => `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:${k === 0 ? '16px 0 4px' : '4px 0'};overflow:hidden;position:relative"><img src="${u}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1);opacity:0.8"><span style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;font-size:10px;padding:2px 6px;border-radius:3px">${k + 1}</span></div>`).join('');
       pane.innerHTML = `
         <div class="preview-tag">${data.category}</div>
         <div class="preview-title">${titleHtml}</div>
         ${meta ? `<div class="preview-date">${meta}</div>` : ''}
         ${data.headline ? `<div style="font-size:13px;color:var(--muted-foreground);font-style:italic;margin: 4px 0 12px">${data.headline}</div>` : ''}
-        ${data.thumb ? `<div style="width:100%;aspect-ratio:16/9;background:var(--card);margin:16px 0 24px;overflow:hidden"><img src="${data.thumb}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1);opacity:0.8"></div>` : ''}
+        ${photosHtml}
         <div class="preview-body">${bodyHtml}</div>
       `;
     }
@@ -1150,7 +1197,9 @@ Ini paragraf setelah gambar.</pre>
       const year = data.year || (existing && existing.year) || '';
       const client = data.client || (existing && existing.client) || '';
       const link = data.link || (existing && existing.link) || '';
-      const entry = `{ "category": "${data.category.toLowerCase()}", "tag": "${data.category}", "slug": "${slugKey}", ${year ? `"year": "${year}", ` : ''}${client ? `"client": "${client}", ` : ''}${link ? `"link": "${link}", ` : ''}"img": "${data.thumb.replace(/"/g, '\\"')}", "title": "${data.title.replace(/"/g, '\\"')}", "desc": "${desc.replace(/"/g, '\\"')}" },`;
+      const photos = (data.photos && data.photos.length) ? data.photos : [data.thumb];
+      const photosJson = photos.map(u => `"${u.replace(/"/g, '\\"')}"`).join(', ');
+      const entry = `{ "category": "${data.category.toLowerCase()}", "tag": "${data.category}", "slug": "${slugKey}", ${year ? `"year": "${year}", ` : ''}${client ? `"client": "${client}", ` : ''}${link ? `"link": "${link}", ` : ''}"img": "${data.thumb.replace(/"/g, '\\"')}", "photos": [${photosJson}], "title": "${data.title.replace(/"/g, '\\"')}", "desc": "${desc.replace(/"/g, '\\"')}" },`;
       document.getElementById('entryCode').textContent = entry;
     }
     document.getElementById('entryOutput').classList.add('show');
@@ -1184,6 +1233,14 @@ Ini paragraf setelah gambar.</pre>
   document.getElementById('fieldHeadline').addEventListener('input', updatePreview);
   document.getElementById('fieldThumb').addEventListener('input', updatePreview);
   document.getElementById('fieldBody').addEventListener('input', updatePreview);
+
+  document.getElementById('addPhotoBtn').addEventListener('click', () => {
+    addPhotoRow('');
+    updatePreview();
+  });
+  document.getElementById('photoList').addEventListener('input', e => {
+    if (e.target.matches('input')) updatePreview();
+  });
 
   let pendingFormat = null, pendingSel = null, pendingStart = null, pendingEnd = null;
 
