@@ -433,39 +433,41 @@
 
 <div class="help-overlay" id="helpOverlay">
   <div class="help-modal">
-    <h2>How to — Quick Publish <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(server mode)</span></h2>
+    <h2>How to — Quick Publish <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(online / server mode)</span></h2>
     <ol>
-      <li><strong>Start server</strong> — Klik 2x <code>publish.bat</code> di folder project.</li>
+      <li><strong>Start server</strong> — Klik 2x <code>publish.bat</code> di folder project. Dashboard otomatis kebuka.</li>
       <li><strong>Compose</strong> — Isi title, body, dll di dashboard.</li>
-      <li><strong>Klik "Publish"</strong> (tombol hijau di toolbar) → file otomatis tersimpan + push ke GitHub.</li>
-      <li><strong>Selesai</strong> — Tunggu GitHub Pages deploy.</li>
+      <li><strong>Klik "Publish"</strong> (tombol hijau di toolbar, dot hijau = server nyala) → file .txt & .json tersimpan otomatis, lalu push ke GitHub.</li>
+      <li><strong>Delete</strong> — Klik gear ⚙️ di entry → Delete. Otomatis save JSON + push ke GitHub langsung.</li>
+      <li><strong>Selesai</strong> — Tunggu GitHub Pages deploy (1-2 menit).</li>
     </ol>
-    <p style="font-size:13px;color:var(--muted-foreground);margin:8px 0 0">Dot hijau di toolbar = server nyala. Dot abu = server mati (pake cara manual di bawah).</p>
-    <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Articles <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(manual)</span></h2>
+    <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Articles & Projects <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(offline / manual)</span></h2>
     <ol>
-      <li><strong>Compose</strong> — Isi title, tag, date, hero image (opsional), dan body.</li>
-      <li><strong>Download .txt</strong> → <code>articles/namafile.txt</code>.</li>
-      <li><strong>Copy entry</strong> — Copy <strong>full <code>articles.json</code></strong> (termasuk urutan & hidden state).</li>
-      <li><strong>Replace file</strong> — Timpa seluruh isi <code>articles.json</code> dengan hasil paste.</li>
-      <li><strong>Push</strong> — Klik <code>gitpush.bat</code> di folder project, isi pesan updatenya.</li>
+      <li><strong>Compose</strong> — Isi title, tag/category, date/year, client (project), headline, thumbnail, dan body.</li>
+      <li><strong>Download .txt</strong> — Klik "Download .txt" → simpan ke <code>articles/</code> atau <code>projects/</code>.</li>
+      <li><strong>Copy entry</strong> — Klik "Copy entry" → copy <strong>full JSON</strong> (termasuk urutan & hidden state).</li>
+      <li><strong>Replace file</strong> — Timpa seluruh isi <code>articles.json</code> / <code>projects.json</code> dengan hasil paste.</li>
+      <li><strong>Push</strong> — Klik 2x <code>gitpush.bat</code>, isi pesan commit.</li>
     </ol>
-    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Projects <span style="font-weight:400;color:var(--muted-foreground);text-transform:none;letter-spacing:0">(manual)</span></h2>
-    <ol>
-      <li><strong>Switch tab</strong> — Klik "Projects" di sidebar buat mode project.</li>
-      <li><strong>Compose</strong> — Isi title, category, year, client, headline, hero image, dan body.</li>
-      <li><strong>Download .txt</strong> → <code>projects/namafile.txt</code>.</li>
-      <li><strong>Copy entry</strong> — Copy <strong>full <code>projects.json</code></strong> (termasuk urutan & hidden state).</li>
-      <li><strong>Replace file</strong> — Timpa seluruh isi <code>projects.json</code> dengan hasil paste.</li>
-      <li><strong>Push</strong> — Klik <code>gitpush.bat</code>.</li>
-    </ol>
-    <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Site Content</h2>
+    <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">Fitur Baru</h2>
+    <ul style="font-size:14px;color:var(--muted-foreground);line-height:2;padding-left:20px">
+      <li><strong>+New</strong> — Klik <code>+New</code> → muncul prompt buat masukin judul dulu sebelum bikin entry baru.</li>
+      <li><strong>Save Draft</strong> — Simpan draft ke browser (localStorage). Muncul di sidebar list dengan badge <span style="color:#f39c12;background:rgba(243,156,18,0.15);padding:1px 6px;border-radius:3px;font-size:10px">Draft</span>. Klik draft buat load. Multiple drafts supported.</li>
+      <li><strong>Search</strong> — Kolom pencarian di sidebar buat filter entry by keyword (title, tag, excerpt).</li>
+      <li><strong>Sort</strong> — Dropdown sort by Year (desc/asc) atau Tag (A-Z / Z-A).</li>
+      <li><strong>Gear ⚙️</strong> — Tombol opsi di samping entry buat Hide & Delete.</li>
+      <li><strong>Drag & drop</strong> — Susun ulang urutan entry di sidebar. Copy full JSON buat nyimpen urutan baru.</li>
+      <li><strong>Formatting toolbar</strong> — Bold, Italic, Underline, Strikethrough, Link, Image di atas body editor.</li>
+      <li><strong>Auto-save draft</strong> — Form otomatis tersimpan di memori pas ganti entry atau tab. Balik lagi, draft langsung ke-restore.</li>
+    </ul>
+    <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to — Site Content</h2>
     <ol>
       <li><strong>Switch ke Content tab</strong> — Klik "Content" di sidebar buat edit teks homepage.</li>
       <li><strong>Pilih section</strong> — Klik Hero / About / Services dll di sidebar kiri.</li>
       <li><strong>Edit</strong> — Ubah teks di kolom yang tersedia.</li>
       <li><strong>Simpan</strong> — Klik "Copy JSON" di toolbar → download file <code>site-content.json</code>.</li>
       <li><strong>Replace file</strong> — Timpa file lama di folder project lo dengan yang baru didownload.</li>
-      <li><strong>Push</strong> — Klik <code>gitpush.bat</code> di folder project, isi pesan updatenya.</li>
+      <li><strong>Push</strong> — Klik <code>gitpush.bat</code>.</li>
     </ol>
     <h2 style="margin-top:24px;font-size:16px;color:var(--accent);font-family:var(--font-display)">Text Modifiers — Site Content</h2>
     <p style="font-size:14px;color:var(--muted-foreground);margin-bottom:12px;line-height:1.7">Karena pake <code>innerHTML</code>, lo bisa pake HTML langsung di kolom Content biar teksnya lebih hidup:</p>
@@ -500,17 +502,15 @@ img:https://i.ibb.co.com/gambar-saya.webp
 
 Ini paragraf setelah gambar.</pre>
       </li>
-      <li><strong>Gambar inline</strong> — Akan tampil full-width dengan aspect ratio 16:9 di tengah konten. Bisa di artikel maupun project.</li>
-      <li><strong>Tips:</strong> Pake hosting gambar yang support hotlinking (ImgBB, imgur, Unsplash direct link). Hindari Google Drive atau shared drive karena biasanya gak muncul.</li>
+      <li><strong>Gambar inline</strong> — Akan tampil full-width dengan aspect ratio 16:9 di tengah konten.</li>
+      <li><strong>Tips:</strong> Pake hosting gambar yang support hotlinking (ImgBB, imgur, Unsplash direct link).</li>
     </ol>
     <h2 style="margin-top:32px;font-size:16px;color:var(--accent);font-family:var(--font-display)">How to Delete / Hide</h2>
     <ol>
       <li><strong>Pilih entry</strong> — Klik entry di sidebar.</li>
-      <li><strong>Klik ⋮</strong> — Tombol opsi di sebelah kanan entry.</li>
+      <li><strong>Klik gear ⚙️</strong> — Tombol opsi di sebelah kanan entry.</li>
       <li><strong>Hide</strong> — Sembunyikan dari halaman publik (bisa di-unhide nanti).</li>
-      <li><strong>Delete</strong> — Hapus permanen dari array (konfirmasi dulu).</li>
-      <li><strong>Copy full JSON</strong> — Klik "Copy entry" di toolbar, paste & replace file <code>.json</code>.</li>
-      <li><strong>Push</strong> — Klik <code>gitpush.bat</code>.</li>
+      <li><strong>Delete</strong> — Hapus permanen. <strong>Online:</strong> otomatis save JSON + push ke GitHub. <strong>Offline:</strong> copy full JSON manual.</li>
     </ol>
     <button class="help-close" id="helpClose">Got it</button>
   </div>
@@ -623,7 +623,7 @@ Ini paragraf setelah gambar.</pre>
     const idx = list.findIndex(d => d.id === id);
     if (idx < 0) return;
     const isProject = (data.mode || currentMode) === 'project';
-    list[idx] = { ...list[idx], title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, body: data.body, mode: data.mode || currentMode, year: isProject ? data.year : '' };
+    list[idx] = { ...list[idx], title: data.title, tag: isProject ? data.category : data.tag, date: isProject ? '' : data.date, excerpt: isProject ? data.headline : data.excerpt, thumb: data.thumb, body: data.body, mode: data.mode || currentMode, year: isProject ? data.year : '', client: isProject ? data.client : '' };
     saveDraftList(list);
   }
   function removeDraft(id) {
@@ -644,8 +644,8 @@ Ini paragraf setelah gambar.</pre>
     document.getElementById('slugHint').textContent = 'slug: ' + draft.slug;
     if (draft.mode === 'project') {
       document.getElementById('fieldCategory').value = draft.tag || 'Branding';
-      document.getElementById('fieldYear').value = '';
-      document.getElementById('fieldClient').value = '';
+      document.getElementById('fieldYear').value = draft.year || '';
+      document.getElementById('fieldClient').value = draft.client || '';
       document.getElementById('fieldHeadline').value = draft.excerpt || '';
     } else {
       document.getElementById('fieldTag').value = draft.tag || 'Essay';
@@ -934,8 +934,8 @@ Ini paragraf setelah gambar.</pre>
       }
       catSel.value = entry.tag || 'Branding';
       document.getElementById('fieldTitle').value = entry.title || '';
-      document.getElementById('fieldYear').value = '';
-      document.getElementById('fieldClient').value = '';
+      document.getElementById('fieldYear').value = entry.year || '';
+      document.getElementById('fieldClient').value = entry.client || '';
       document.getElementById('fieldHeadline').value = entry.desc || '';
       document.getElementById('fieldThumb').value = entry.img || '';
     }
@@ -1054,6 +1054,28 @@ Ini paragraf setelah gambar.</pre>
     }
   }
 
+  function buildProjectEntry(data) {
+    const idx = projects.findIndex(p => p.slug === data.slug);
+    const existing = idx >= 0 ? projects[idx] : null;
+    const desc = data.headline || (data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '');
+    return {
+      category: data.category.toLowerCase(),
+      tag: data.category,
+      slug: data.slug,
+      year: data.year || (existing && existing.year ? String(existing.year) : ''),
+      img: data.thumb || ((existing && existing.img) || ''),
+      photos: existing && existing.photos ? existing.photos : (data.thumb ? [data.thumb] : []),
+      title: data.title,
+      desc,
+      ...(existing ? {
+        role: existing.role,
+        outcome: existing.outcome,
+        stack: existing.stack,
+        hidden: existing.hidden
+      } : {})
+    };
+  }
+
   function updatePreview() {
     const data = getFormData();
     const pane = document.getElementById('previewPane');
@@ -1102,7 +1124,9 @@ Ini paragraf setelah gambar.</pre>
     } else {
       const desc = data.headline || data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '';
       const slugKey = data.slug;
-      const entry = `{ "category": "${data.category.toLowerCase()}", "tag": "${data.category}", "slug": "${slugKey}", "img": "${data.thumb.replace(/"/g, '\\"')}", "title": "${data.title.replace(/"/g, '\\"')}", "desc": "${desc.replace(/"/g, '\\"')}" },`;
+      const existing = projects.find(p => p.slug === slugKey);
+      const year = data.year || (existing && existing.year) || '';
+      const entry = `{ "category": "${data.category.toLowerCase()}", "tag": "${data.category}", "slug": "${slugKey}", ${year ? `"year": "${year}", ` : ''}"img": "${data.thumb.replace(/"/g, '\\"')}", "title": "${data.title.replace(/"/g, '\\"')}", "desc": "${desc.replace(/"/g, '\\"')}" },`;
       document.getElementById('entryCode').textContent = entry;
     }
     document.getElementById('entryOutput').classList.add('show');
@@ -1243,10 +1267,9 @@ Ini paragraf setelah gambar.</pre>
     }
     if (currentMode === 'project') {
       const data = getFormData();
+      const entry = buildProjectEntry(data);
       const idx = projects.findIndex(p => p.slug === data.slug);
-      const existing = idx >= 0 ? projects[idx] : null;
-      const entry = { category: data.category.toLowerCase(), tag: data.category, slug: data.slug, img: data.thumb, title: data.title, desc: data.headline || (data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '') };
-      if (existing) { entry.hidden = existing.hidden; projects[idx] = entry; } else projects.push(entry);
+      if (idx >= 0) projects[idx] = entry; else projects.push(entry);
       const json = JSON.stringify(projects, null, 2);
       navigator.clipboard.writeText(json).then(() => {
         toast('full projects.json copied to clipboard');
@@ -1348,10 +1371,9 @@ Ini paragraf setelah gambar.</pre>
         const existing = idx >= 0 ? articles[idx] : null;
         if (existing) { entry.hidden = existing.hidden; articles[idx] = entry; } else articles.push(entry);
       } else {
-        const entry = { category: data.category.toLowerCase(), tag: data.category, slug: data.slug, img: data.thumb, title: data.title, desc: data.headline || (data.body.split('\n\n').filter(l => l.trim())[0]?.slice(0, 100) || '') };
+        const entry = buildProjectEntry(data);
         const idx = projects.findIndex(p => p.slug === data.slug);
-        const existing = idx >= 0 ? projects[idx] : null;
-        if (existing) { entry.hidden = existing.hidden; projects[idx] = entry; } else projects.push(entry);
+        if (idx >= 0) projects[idx] = entry; else projects.push(entry);
       }
     }
   }
@@ -1492,7 +1514,33 @@ Ini paragraf setelah gambar.</pre>
         showConfirm('Delete this draft?', () => {
           removeDraft(draft.id);
           if (currentSlug === slug) { isNew = false; currentSlug = null; clearForm(); renderList(); updatePreview(); }
-          toast('draft deleted');
+          if (serverOnline) {
+            const items = getItems();
+            const json = JSON.stringify(items, null, 2);
+            const route = currentMode === 'article' ? '/save-article' : '/save-project';
+            fetch(SERVER + route, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ slug: '', txt: 'deleted', json })
+            }).then(r => r.json()).then(d => {
+              if (!d.ok) { toast('save failed: ' + d.msg); return; }
+              clearDraft(slug); clearDraft('__new__');
+              toast('draft deleted & files saved!');
+              showPrompt('Push to GitHub?', 'update', msg => {
+                if (!msg) return;
+                fetch(SERVER + '/push', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ message: msg })
+                }).then(r => r.json()).then(p => {
+                  if (p.ok) toast('Deleted, and pushed to Github 👌');
+                  else toast('push failed: ' + p.msg);
+                }).catch(() => toast('push request failed — run gitpush.bat manually'));
+              });
+            }).catch(() => toast('save failed — copy full JSON to save manually'));
+          } else {
+            toast('draft deleted (no server)');
+          }
         });
       } else {
         showConfirm('Are you sure want to delete this?', () => {
@@ -1521,7 +1569,7 @@ Ini paragraf setelah gambar.</pre>
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ message: msg })
                 }).then(r => r.json()).then(p => {
-                  if (p.ok) toast('pushed to GitHub!');
+                  if (p.ok) toast('Deleted, and pushed to Github 👌');
                   else toast('push failed: ' + p.msg);
                 }).catch(() => toast('push request failed — run gitpush.bat manually'));
               });

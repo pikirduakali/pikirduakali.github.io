@@ -10,14 +10,17 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0e0e0e; --fg: #f0ede8; --card: #181818;
-      --muted: #7a7770; --accent: #e83d2a;
-      --border: rgba(240,237,232,0.1);
-      --font: 'DM Sans', sans-serif;
-      --display: 'Bricolage Grotesque', sans-serif;
+      --background: #0e0e0e;
+      --foreground: #f0ede8;
+      --card: #181818;
+      --muted-foreground: #7a7770;
+      --accent: #e83d2a;
+      --border: rgba(240, 237, 232, 0.1);
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Bricolage Grotesque', sans-serif;
     }
     html { font-size: 16px; }
-    body { background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.6; overflow: hidden; height: 100vh; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; overflow: hidden; height: 100vh; }
 
     /* Header */
     header {
@@ -25,95 +28,127 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 56px; height: 56px;
       border-bottom: 1px solid var(--border);
-      background: var(--bg);
+      background: var(--background);
     }
-    header a, header span { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-    header a:hover { color: var(--fg); }
+    .logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    .logo:hover { color: var(--foreground); }
+    header nav { display: flex; gap: 24px; }
+    header nav a { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); text-decoration: none; transition: color 0.2s; }
+    header nav a:hover { color: var(--foreground); }
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .project-menu { position: relative; }
+    .menu-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: none; background: none; padding: 0; cursor: pointer;
+      font-family: var(--font-body); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted-foreground); transition: color 0.2s;
+      line-height: 1; height: 34px;
+    }
+    .menu-btn:hover, .menu-btn[aria-expanded="true"] { color: var(--foreground); }
+    .menu-btn .caret { transition: transform 0.2s; }
+    .menu-btn[aria-expanded="true"] .caret { transform: rotate(180deg); }
+    .menu-btn .caret svg { display: block; }
+    .menu-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
+      min-width: 240px; background: var(--card); border: 1px solid var(--border);
+      opacity: 0; visibility: hidden; transform: translateY(-6px);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    }
+    .menu-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .menu-item {
+      display: flex; align-items: baseline; gap: 12px; width: 100%;
+      padding: 10px 16px; text-align: left; background: none; border: none; cursor: pointer;
+      font-family: var(--font-body); font-size: 13px; color: var(--muted-foreground);
+      transition: background 0.2s, color 0.2s;
+    }
+    .menu-item:hover, .menu-item.active { color: var(--foreground); background: var(--background); }
+    .menu-item.active { color: var(--accent); }
+    .menu-idx { font-family: monospace; font-size: 10px; color: var(--muted-foreground); flex-shrink: 0; }
+    .menu-item.active .menu-idx { color: var(--accent); }
 
     /* Layout */
-    .layout { display: flex; height: 100vh; padding-top: 56px; padding-bottom: 48px; }
+    .layout { display: flex; height: 100vh; padding-top: 56px; }
 
     /* Left panel */
     .left {
       width: 42%; min-width: 380px;
-      display: flex; flex-direction: column; justify-content: space-between;
+      display: flex; flex-direction: column; justify-content: flex-start;
       padding: 48px 56px;
-      border-right: 1px solid var(--border);
-      overflow: hidden;
+      overflow-y: auto;
     }
-    .top-meta { display: flex; justify-content: space-between; align-items: center; }
-    .idx { font-size: 11px; font-family: monospace; color: var(--accent); }
-    .yr  { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+    .top-meta { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .idx { font-size: 11px; font-family: monospace; color: var(--muted-foreground); margin-bottom: 12px; }
+    .top-meta h1 {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.95;
+      color: var(--accent); margin-bottom: 12px; overflow-wrap: break-word;
+    }
+    .top-meta .yr  { font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted-foreground); }
 
     .content { transition: opacity 0.28s, transform 0.28s; }
     .content.hidden { opacity: 0; transform: translateY(16px); }
 
-    .cat { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
-    h1 {
-      font-family: var(--display); font-weight: 800;
-      font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.95;
-      margin-bottom: 28px;
+    .desc {
+      font-size: 15px; color: var(--muted-foreground); line-height: 1.75;
+      margin-bottom: 32px; max-width: 440px;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .desc { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 28px; max-width: 440px; }
 
     .meta-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-      padding: 20px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      padding: 24px 0 0; border-top: 1px solid var(--border);
       margin-bottom: 24px;
     }
-    .meta-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .meta-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 4px; }
     .meta-value { font-size: 13px; font-weight: 500; }
     .meta-value.accent { color: var(--accent); }
+    .meta-grid .full { grid-column: 1 / -1; }
 
     .stack { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
-    .stack span {
-      font-size: 11px; padding: 4px 10px;
-      border: 1px solid var(--border); color: var(--muted);
-    }
+    .tag { font-size: 11px; padding: 4px 8px; border: 1px solid var(--border); color: var(--muted-foreground); transition: border-color 0.2s, color 0.2s; }
+    .tag:hover { border-color: var(--accent); color: var(--foreground); }
 
     .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 13px; border: 1px solid var(--border);
-      padding: 10px 20px; color: var(--muted);
-      background: none; cursor: pointer; font-family: var(--font);
-      transition: border-color 0.2s, color 0.2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 14px; color: var(--accent);
+      background: none; border: none; cursor: pointer; font-family: var(--font-body);
+      text-decoration: none; transition: opacity 0.2s; padding: 0;
     }
-    .btn:hover { border-color: var(--fg); color: var(--fg); }
+    .btn:hover { opacity: 0.7; }
+    .btn svg { transition: transform 0.2s; }
+    .btn:hover svg { transform: translateX(4px); }
+    /* Nav controls — pager: ←  ─ ─ ─  → navigasi foto dalam project */
+    .controls { display: flex; align-items: center; justify-content: center; margin-top: auto; }
+    .pager { display: flex; align-items: center; gap: 16px; }
+    .pager-arrow {
+      background: none; border: none; cursor: pointer; color: var(--muted-foreground);
+      padding: 0; font-size: 16px; font-family: var(--font-body); line-height: 1;
+      transition: color 0.2s;
+    }
+    .pager-arrow:hover { color: var(--accent); }
+    .pager-arrow:disabled { opacity: 0.3; cursor: default; }
+    .pager-track { display: flex; align-items: center; gap: 6px; }
+    .pager-seg { width: 18px; height: 3px; background: var(--border); transition: background 0.3s; }
+    .pager-seg.on { background: var(--accent); }
 
-    /* Nav controls */
-    .controls { display: flex; align-items: center; justify-content: space-between; }
-    .arrows { display: flex; gap: 10px; }
-    .arrow-btn {
-      width: 40px; height: 40px; border: 1px solid var(--border);
-      background: none; cursor: pointer; color: var(--muted);
-      display: flex; align-items: center; justify-content: center;
-      transition: border-color 0.2s, color 0.2s; font-size: 16px;
-    }
-    .arrow-btn:hover { border-color: var(--fg); color: var(--fg); }
-    .arrow-btn:disabled { opacity: 0.3; cursor: default; }
-    .dots { display: flex; align-items: center; gap: 8px; }
-    .dot {
-      width: 24px; height: 3px; border: none; cursor: pointer;
-      background: var(--border); transition: all 0.3s;
-    }
-    .dot.active { background: var(--accent); }
-    .key-hint { font-size: 11px; color: var(--muted); }
+    :is(.pager-arrow, .menu-item, .menu-btn):focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
 
     /* Right panel */
     .right { flex: 1; position: relative; overflow: hidden; }
     .img-wrap {
       position: absolute; inset: 0;
-      transition: opacity 0.35s;
+      transition: opacity 0.28s;
     }
     .img-wrap.hidden { opacity: 0; }
-    .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.6) brightness(0.45); }
+    .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.5); transition: filter 0.5s; }
+    .img-wrap:hover img { filter: grayscale(0) brightness(0.7); }
     .img-grad {
       position: absolute; inset: 0;
-      background: linear-gradient(to right, var(--bg) 0%, rgba(14,14,14,0.25) 55%, transparent 100%);
+      background: linear-gradient(to right, var(--background) 0%, rgba(14,14,14,0.25) 55%, transparent 100%);
     }
     .watermark {
       position: absolute; bottom: 32px; right: 32px;
-      font-family: var(--display); font-weight: 800;
+      font-family: var(--font-display); font-weight: 800;
       font-size: clamp(6rem, 14vw, 11rem); line-height: 1;
       color: rgba(232,61,42,0.1); pointer-events: none; user-select: none;
       transition: opacity 0.28s;
@@ -124,29 +159,24 @@
       transition: opacity 0.28s;
     }
     .float-tag {
-      font-size: 11px; padding: 6px 12px; color: var(--fg);
+      font-size: 11px; padding: 6px 12px; color: var(--foreground);
       background: rgba(240,237,232,0.07);
-      border: 1px solid rgba(240,237,232,0.12);
+      border: 1px solid rgba(240,237,232,0.12); letter-spacing: 0.05em;
       backdrop-filter: blur(8px);
     }
 
-    /* Bottom strip */
-    .strip {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
-      display: flex; border-top: 1px solid var(--border);
-      background: rgba(14,14,14,0.92); backdrop-filter: blur(8px);
+    /* Bottom strip removed — project selector now a dropdown in header */
+
+    /* Layout saat mobil */
+    @media (pointer: coarse) {
+      .pager-track { gap: 5px; }
     }
-    .strip-item {
-      flex: 1; padding: 10px 16px; text-align: left;
-      border: none; border-right: 1px solid var(--border);
-      background: none; cursor: pointer; font-family: var(--font);
-      transition: background 0.2s;
+
+    /* Reduced motion: matikan animasi */
+    @media (prefers-reduced-motion: reduce) {
+      .content, .img-wrap { transition: none; }
+      html { scroll-behavior: auto; }
     }
-    .strip-item:last-child { border-right: none; }
-    .strip-item:hover, .strip-item.active { background: var(--card); }
-    .strip-num { font-size: 10px; font-family: monospace; color: var(--accent); margin-bottom: 2px; }
-    .strip-title { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .strip-item.active .strip-title { color: var(--fg); }
 
     @media (max-width: 900px) {
       .layout { flex-direction: column; overflow-y: auto; }
@@ -165,46 +195,49 @@
 </head>
 <body>
   <header>
-    <a href="index.html">P2X — Portfolio</a>
-    <nav>
-      <a href="showcase.html">Showcase</a>
-      <a href="articles.html">Articles</a>
-      <a href="index.html">Home</a>
-    </nav>
+    <a href="index.html" class="logo">P2X</a>
+    <div class="header-right">
+      <nav>
+        <a href="showcase.html">Showcase</a>
+        <a href="articles.html">Articles</a>
+        <a href="index.html">Home</a>
+      </nav>
+      <div class="project-menu" id="projectMenu">
+        <button class="menu-btn" id="menuBtn" aria-label="Project list" aria-haspopup="true" aria-expanded="false"><span>projects</span><span class="caret"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+        <div class="menu-dropdown" id="menuDropdown"></div>
+      </div>
+    </div>
   </header>
 
   <div class="layout">
     <div class="left">
       <div class="top-meta">
         <span class="idx" id="idx">001</span>
-        <span class="yr" id="yr">—</span>
+        <h1 id="title">—</h1>
+        <span class="yr" id="yr">2025</span>
       </div>
 
-      <div class="content" id="content">
-        <div class="cat" id="cat">Loading…</div>
-        <h1 id="title">—</h1>
+      <div class="content" id="content" aria-live="polite">
         <p class="desc" id="desc"></p>
         <div class="meta-grid">
-          <div>
+          <div class="meta-role">
             <div class="meta-label">Role</div>
             <div class="meta-value" id="role">—</div>
           </div>
-          <div>
+          <div class="meta-outcome">
             <div class="meta-label">Outcome</div>
             <div class="meta-value accent" id="outcome">—</div>
           </div>
         </div>
         <div class="stack" id="stack"></div>
-        <a class="btn" href="mailto:hi@pikirduakali.com">Get in touch <span>→</span></a>
       </div>
 
       <div class="controls">
-        <div class="arrows">
-          <button class="arrow-btn" id="prevBtn" aria-label="Previous">&larr;</button>
-          <button class="arrow-btn" id="nextBtn" aria-label="Next">&rarr;</button>
+        <div class="pager">
+          <button class="pager-arrow" id="prevBtn" aria-label="Previous">&larr;</button>
+          <div class="pager-track" id="pagerTrack"></div>
+          <button class="pager-arrow" id="nextBtn" aria-label="Next">&rarr;</button>
         </div>
-        <div class="dots" id="dots"></div>
-        <span class="key-hint">use &larr; &rarr; keys</span>
       </div>
     </div>
 
@@ -218,17 +251,14 @@
     </div>
   </div>
 
-  <div class="strip" id="strip"></div>
-
   <script>
     let projects = [];
     let i = 0;
 
-    const idxEl = document.getElementById('idx');
-    const yrEl = document.getElementById('yr');
     const content = document.getElementById('content');
-    const catEl = document.getElementById('cat');
+    const idxEl = document.getElementById('idx');
     const titleEl = document.getElementById('title');
+    const yrEl = document.getElementById('yr');
     const descEl = document.getElementById('desc');
     const roleEl = document.getElementById('role');
     const outcomeEl = document.getElementById('outcome');
@@ -239,34 +269,86 @@
     const floatTagsEl = document.getElementById('floatTags');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const dotsEl = document.getElementById('dots');
-    const stripEl = document.getElementById('strip');
+    const pagerTrack = document.getElementById('pagerTrack');
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
 
     function imgUrl(id) {
+      if (/^https?:/.test(id)) return id;
       return 'https://images.unsplash.com/photo-' + id + '?w=1600&h=1000&fit=crop&auto=format';
+    }
+
+    function normalize(raw, pos) {
+      const hasOld = raw.image !== undefined || raw.stack !== undefined;
+      let photos = Array.isArray(raw.photos) ? raw.photos : [];
+      const single = raw.image || raw.img || '';
+      if (!photos.length && single) photos = [single];
+      return {
+        index: hasOld ? raw.index : String(pos + 1).padStart(3, '0'),
+        title: raw.title || 'untitled',
+        slug: raw.slug || '',
+        category: raw.category || raw.tag || '',
+        year: raw.year || '',
+        description: raw.description || raw.desc || '',
+        role: raw.role || '',
+        stack: raw.stack || [],
+        outcome: raw.outcome || '',
+        photos: photos
+      };
+    }
+
+    const roleWrap = document.querySelector('.meta-role');
+    const outcomeWrap = document.querySelector('.meta-outcome');
+
+    // pi = indeks foto aktif dalam project
+    let pi = 0;
+
+    function renderPager() {
+      const n = projects[i].photos.length;
+      pagerTrack.innerHTML = projects[i].photos.map((_, j) => `<span class="pager-seg${j === pi ? ' on' : ''}" data-p="${j}"></span>`).join('');
+      prevBtn.disabled = pi === 0;
+      nextBtn.disabled = pi === n - 1;
+      pagerTrack.style.display = n > 1 ? '' : 'none';
     }
 
     function render() {
       const p = projects[i];
 
       idxEl.textContent = p.index;
-      yrEl.textContent = p.year;
-      catEl.textContent = p.category;
       titleEl.textContent = p.title;
+      yrEl.textContent = p.year;
+      yrEl.style.display = p.year ? '' : 'none';
+
       descEl.textContent = p.description;
       roleEl.textContent = p.role;
       outcomeEl.textContent = p.outcome;
-      stackEl.innerHTML = p.stack.map(s => `<span>${s}</span>`).join('');
+      stackEl.innerHTML = p.stack.map(s => `<span class="tag">${s}</span>`).join('');
 
       watermarkEl.textContent = p.index;
       floatTagsEl.innerHTML = p.stack.slice(0, 3).map(s => `<div class="float-tag">${s}</div>`).join('');
-      imgEl.src = imgUrl(p.image);
-      imgEl.alt = p.title;
 
-      dotsEl.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i));
-      stripEl.querySelectorAll('.strip-item').forEach((s, j) => s.classList.toggle('active', j === i));
-      prevBtn.disabled = i === 0;
-      nextBtn.disabled = i === projects.length - 1;
+      // meta-grid: jika hanya satu field yang ada, lebarkan jadi full width
+      const hasRole = !!p.role;
+      const hasOutcome = !!p.outcome;
+      roleWrap.style.display = hasRole ? '' : 'none';
+      outcomeWrap.style.display = hasOutcome ? '' : 'none';
+      roleWrap.className = 'meta-role' + (hasRole && !hasOutcome ? ' full' : '');
+      outcomeWrap.className = 'meta-outcome' + (hasOutcome && !hasRole ? ' full' : '');
+
+      stackEl.style.display = p.stack.length ? '' : 'none';
+      floatTagsEl.style.display = p.stack.length ? '' : 'none';
+
+      menuDropdown.querySelectorAll('.menu-item').forEach((s, j) => s.classList.toggle('active', j === i));
+      renderPager();
+    }
+
+    function setPhoto(j, animate) {
+      pi = (j + projects[i].photos.length) % projects[i].photos.length;
+      if (animate) imgWrap.classList.add('hidden');
+      imgEl.src = imgUrl(projects[i].photos[pi]);
+      imgEl.alt = projects[i].title + ' photo ' + (pi + 1);
+      renderPager();
+      if (animate) setTimeout(() => imgWrap.classList.remove('hidden'), 260);
     }
 
     function goTo(n) {
@@ -275,43 +357,63 @@
       imgWrap.classList.add('hidden');
       setTimeout(() => {
         i = n;
+        pi = 0;
         render();
         content.classList.remove('hidden');
         imgWrap.classList.remove('hidden');
-      }, 260);
+        content.setAttribute('aria-live', 'polite');
+      }, 280);
     }
 
-    fetch('showcase-prototype.json')
+    fetch('projects.json')
       .then(r => r.json())
       .then(data => {
-        projects = data;
-        dotsEl.innerHTML = projects.map((_, j) => `<button class="dot${j === 0 ? ' active' : ''}" data-i="${j}"></button>`).join('');
-        stripEl.innerHTML = projects.map((p, j) =>
-          `<button class="strip-item${j === 0 ? ' active' : ''}" data-i="${j}">
-            <div class="strip-num">${p.index}</div>
-            <div class="strip-title">${p.title}</div>
+        projects = data.filter(p => !p.hidden).map(normalize);
+        menuDropdown.innerHTML = projects.map((p, j) =>
+          `<button class="menu-item${j === 0 ? ' active' : ''}" data-i="${j}" role="menuitem">
+            <span class="menu-idx">${p.index}</span><span>${p.title}</span>
           </button>`).join('');
 
-        dotsEl.addEventListener('click', e => {
-          const d = e.target.closest('.dot');
-          if (d) goTo(+d.dataset.i);
+        menuBtn.addEventListener('click', () => {
+          const open = menuDropdown.classList.toggle('open');
+          menuBtn.setAttribute('aria-expanded', open);
         });
-        stripEl.addEventListener('click', e => {
-          const s = e.target.closest('.strip-item');
-          if (s) goTo(+s.dataset.i);
+        menuDropdown.addEventListener('click', e => {
+          const s = e.target.closest('.menu-item');
+          if (!s) return;
+          menuDropdown.classList.remove('open');
+          menuBtn.setAttribute('aria-expanded', 'false');
+          goTo(+s.dataset.i);
         });
-        prevBtn.addEventListener('click', () => goTo(i - 1));
-        nextBtn.addEventListener('click', () => goTo(i + 1));
+        document.addEventListener('click', e => {
+          if (!e.target.closest('.project-menu')) {
+            menuDropdown.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
         document.addEventListener('keydown', e => {
-          if (e.key === 'ArrowLeft') goTo(i - 1);
-          if (e.key === 'ArrowRight') goTo(i + 1);
+          if (e.key === 'Escape') {
+            menuDropdown.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          }
+          if (e.target.closest('input, textarea, select')) return;
+          if (e.key === 'ArrowLeft') setPhoto(pi - 1, true);
+          if (e.key === 'ArrowRight') setPhoto(pi + 1, true);
         });
+        pagerTrack.addEventListener('click', e => {
+          const seg = e.target.closest('.pager-seg');
+          if (seg) setPhoto(+seg.dataset.p, true);
+        });
+        prevBtn.addEventListener('click', () => setPhoto(pi - 1, true));
+        nextBtn.addEventListener('click', () => setPhoto(pi + 1, true));
 
         render();
+        imgEl.src = imgUrl(projects[0].photos[0]);
+        imgEl.alt = projects[0].title + ' photo 1';
       })
       .catch(() => {
         titleEl.textContent = 'data not found';
-        descEl.textContent = 'showcase-prototype.json tidak ketemu — deeym.';
+        descEl.textContent = 'projects.json tidak ketemu — deeym.';
       });
   </script>
 </body>

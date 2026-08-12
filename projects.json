@@ -3,7 +3,13 @@
     "category": "branding",
     "tag": "Branding",
     "slug": "nasi-uduk-raya",
+    "year": "2025",
     "img": "https://i.ibb.co.com/WvW15SHN/nur-hero.jpg",
+    "photos": [
+      "https://i.ibb.co.com/WvW15SHN/nur-hero.jpg",
+      "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&h=1000&fit=crop&auto=format"
+    ],
     "title": "Nasi Uduk Raya",
     "desc": "Helped Nasi Uduk Raya stop looking like they belonged in 2005. Brand strategy, visual identity, tone of voice was built from zero. Gen-Z and Millennials actually eat there now."
   },
@@ -11,7 +17,13 @@
     "category": "branding",
     "tag": "Branding",
     "slug": "roastery-rebrand",
+    "year": "2025",
     "img": "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&h=375&fit=crop&auto=format",
+    "photos": [
+      "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600&h=1000&fit=crop&auto=format"
+    ],
     "title": "Roastery Rebrand",
     "desc": "Full brand identity including logo, stationery, and brand guidelines for a local specialty coffee roaster."
   },
@@ -20,6 +32,11 @@
     "tag": "Print",
     "slug": "menu-system",
     "img": "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=500&h=375&fit=crop&auto=format",
+    "photos": [
+      "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=1600&h=1000&fit=crop&auto=format"
+    ],
     "title": "Menu System",
     "desc": "Food & beverage menu layout, food photography direction, and print production management."
   },
@@ -28,6 +45,11 @@
     "tag": "Digital",
     "slug": "social-media-kit",
     "img": "https://images.unsplash.com/photo-1613909207039-6b173b4c7c5e?w=500&h=375&fit=crop&auto=format",
+    "photos": [
+      "https://images.unsplash.com/photo-1613909207039-6b173b4c7c5e?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&h=1000&fit=crop&auto=format"
+    ],
     "title": "Social Media Kit",
     "desc": "Campaign visuals, Instagram templates, and content strategy for F&B brand."
   }

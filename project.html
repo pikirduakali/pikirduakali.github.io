@@ -23,79 +23,396 @@
       --border: rgba(240, 237, 232, 0.1);
       --font-body: 'DM Sans', sans-serif;
       --font-display: 'Bricolage Grotesque', sans-serif;
-      }
-    html { scroll-behavior: smooth; font-size: 16px; }
-    body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--background); }
-    ::-webkit-scrollbar-thumb { background: var(--border); }
+    }
+    html { font-size: 16px; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; overflow: hidden; height: 100vh; }
 
-    .page { max-width: 720px; margin: 0 auto; padding: 64px 80px; }
-    .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); text-decoration: none; margin-bottom: 48px; transition: color 0.2s; }
-    .back:hover { color: var(--foreground); }
+    /* Header */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 56px; height: 56px;
+      border-bottom: 1px solid var(--border);
+      background: var(--background);
+    }
+    .logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    .logo:hover { color: var(--foreground); }
+    header nav { display: flex; gap: 24px; }
+    header nav a { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted-foreground); text-decoration: none; transition: color 0.2s; }
+    header nav a:hover, header nav a.active { color: var(--foreground); }
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .project-menu { position: relative; }
+    .menu-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: none; background: none; padding: 0; cursor: pointer;
+      font-family: var(--font-body); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted-foreground); transition: color 0.2s;
+      line-height: 1; height: 34px;
+    }
+    .menu-btn:hover, .menu-btn[aria-expanded="true"] { color: var(--foreground); }
+    .menu-btn .caret { transition: transform 0.2s; }
+    .menu-btn[aria-expanded="true"] .caret { transform: rotate(180deg); }
+    .menu-btn .caret svg { display: block; }
+    .menu-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
+      min-width: 240px; background: var(--card); border: 1px solid var(--border);
+      opacity: 0; visibility: hidden; transform: translateY(-6px);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    }
+    .menu-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .menu-item {
+      display: flex; align-items: baseline; gap: 12px; width: 100%;
+      padding: 10px 16px; text-align: left; background: none; border: none; cursor: pointer;
+      font-family: var(--font-body); font-size: 13px; color: var(--muted-foreground);
+      transition: background 0.2s, color 0.2s;
+    }
+    .menu-item:hover, .menu-item.active { color: var(--foreground); background: var(--background); }
+    .menu-item.active { color: var(--accent); }
+    .menu-idx { font-family: monospace; font-size: 10px; color: var(--muted-foreground); flex-shrink: 0; }
+    .menu-item.active .menu-idx { color: var(--accent); }
 
-    .project-hero { width: 100%; aspect-ratio: 16/9; background: var(--card); margin-bottom: 40px; overflow: hidden; }
-    .project-hero img { width: 100%; height: 100%; object-fit: cover; }
+    /* Layout */
+    .layout { display: flex; height: 100vh; padding-top: 56px; }
 
-    .project-tag { font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
-    .project-meta { font-size: 12px; color: var(--muted-foreground); margin-bottom: 32px; }
-    h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.15; margin-bottom: 16px; }
-    .content { font-size: 17px; color: var(--foreground); line-height: 1.8; }
-    .content p { margin-bottom: 1.5em; }
-    .content-img { width: 100%; aspect-ratio: 16/9; background: var(--card); margin: 32px 0; overflow: hidden; }
-    .content-img img { width: 100%; height: 100%; object-fit: cover; }
+    /* Left panel */
+    .left {
+      width: 42%; min-width: 380px;
+      display: flex; flex-direction: column; justify-content: flex-start;
+      padding: 48px 56px;
+      overflow-y: auto;
+    }
+    .top-meta { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+    .idx { font-size: 11px; font-family: monospace; color: var(--muted-foreground); margin-bottom: 12px; }
+    .top-meta h1 {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 0.95;
+      color: var(--accent); margin-bottom: 12px; overflow-wrap: break-word;
+    }
+    .top-meta .yr  { font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted-foreground); }
+
+    .content { transition: opacity 0.28s, transform 0.28s; }
+    .content.hidden { opacity: 0; transform: translateY(16px); }
+
+    .desc {
+      font-size: 15px; color: var(--muted-foreground); line-height: 1.75;
+      margin-bottom: 32px; max-width: 440px;
+    }
+
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      padding: 24px 0 0; border-top: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .meta-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 4px; }
+    .meta-value { font-size: 13px; font-weight: 500; }
+    .meta-value.accent { color: var(--accent); }
+    .meta-grid .full { grid-column: 1 / -1; }
+
+    .stack { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .tag { font-size: 11px; padding: 4px 8px; border: 1px solid var(--border); color: var(--muted-foreground); transition: border-color 0.2s, color 0.2s; }
+    .tag:hover { border-color: var(--accent); color: var(--foreground); }
+
+    /* Nav controls — pager: ←  ─ ─ ─  → navigasi foto dalam project */
+    .controls { display: flex; align-items: center; justify-content: center; margin-top: auto; }
+    .pager { display: flex; align-items: center; gap: 16px; }
+    .pager-arrow {
+      background: none; border: none; cursor: pointer; color: var(--muted-foreground);
+      padding: 0; font-size: 16px; font-family: var(--font-body); line-height: 1;
+      transition: color 0.2s;
+    }
+    .pager-arrow:hover { color: var(--accent); }
+    .pager-arrow:disabled { opacity: 0.3; cursor: default; }
+    .pager-track { display: flex; align-items: center; gap: 6px; }
+    .pager-seg { width: 18px; height: 3px; background: var(--border); transition: background 0.3s; }
+    .pager-seg.on { background: var(--accent); }
+
+    :is(.pager-arrow, .menu-item, .menu-btn):focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+    /* Right panel */
+    .right { flex: 1; position: relative; overflow: hidden; }
+    .img-wrap {
+      position: absolute; inset: 0;
+      transition: opacity 0.28s;
+    }
+    .img-wrap.hidden { opacity: 0; }
+    .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.5); transition: filter 0.5s; }
+    .img-wrap:hover img { filter: grayscale(0) brightness(0.7); }
+    .img-grad {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, var(--background) 0%, rgba(14,14,14,0.25) 55%, transparent 100%);
+    }
+    .watermark {
+      position: absolute; bottom: 32px; right: 32px;
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(6rem, 14vw, 11rem); line-height: 1;
+      color: rgba(232,61,42,0.1); pointer-events: none; user-select: none;
+      transition: opacity 0.28s;
+    }
+    .float-tags {
+      position: absolute; top: 32px; right: 32px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      transition: opacity 0.28s;
+    }
+    .float-tag {
+      font-size: 11px; padding: 6px 12px; color: var(--foreground);
+      background: rgba(240,237,232,0.07);
+      border: 1px solid rgba(240,237,232,0.12); letter-spacing: 0.05em;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Layout saat mobil */
+    @media (pointer: coarse) {
+      .pager-track { gap: 5px; }
+    }
+
+    /* Reduced motion: matikan animasi */
+    @media (prefers-reduced-motion: reduce) {
+      .content, .img-wrap { transition: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; overflow-y: auto; }
+      .left { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--border); overflow: visible; }
+      .right { flex: 0 0 40vh; order: -1; }
+      .img-wrap img { object-position: center; }
+      .content { max-width: 560px; }
+    }
+    @media (max-width: 640px) {
+      header { padding: 0 24px; }
+      .left { padding: 32px 24px; }
+      .controls { flex-wrap: wrap; gap: 16px; }
+      .watermark { font-size: 5rem; }
+    }
 
     .not-found { text-align: center; padding: 80px 0; }
     .not-found h2 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 16px; }
     .not-found p { color: var(--muted-foreground); }
-
-    @media (max-width: 768px) { .page { padding: 48px 24px; } }
   </style>
 </head>
 <body>
-  <div class="page" id="page">
-    <a href="showcase.html" class="back">&larr; Back to Showcase</a>
-    <div id="projectContent"></div>
+  <header>
+    <a href="index.html" class="logo">P2X</a>
+    <div class="header-right">
+      <nav>
+        <a href="showcase.html">Showcase</a>
+        <a href="articles.html">Articles</a>
+        <a href="index.html">Home</a>
+      </nav>
+      <div class="project-menu" id="projectMenu">
+        <button class="menu-btn" id="menuBtn" aria-label="Project list" aria-haspopup="true" aria-expanded="false"><span>projects</span><span class="caret"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span></button>
+        <div class="menu-dropdown" id="menuDropdown"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="left">
+      <div class="top-meta">
+        <span class="idx" id="idx">001</span>
+        <h1 id="title">—</h1>
+        <span class="yr" id="yr">2025</span>
+      </div>
+
+      <div class="content" id="content" aria-live="polite">
+        <p class="desc" id="desc"></p>
+        <div class="meta-grid">
+          <div class="meta-role">
+            <div class="meta-label">Role</div>
+            <div class="meta-value" id="role">—</div>
+          </div>
+          <div class="meta-outcome">
+            <div class="meta-label">Outcome</div>
+            <div class="meta-value accent" id="outcome">—</div>
+          </div>
+        </div>
+        <div class="stack" id="stack"></div>
+      </div>
+
+      <div class="controls">
+        <div class="pager">
+          <button class="pager-arrow" id="prevBtn" aria-label="Previous">&larr;</button>
+          <div class="pager-track" id="pagerTrack"></div>
+          <button class="pager-arrow" id="nextBtn" aria-label="Next">&rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="img-wrap" id="imgWrap">
+        <img id="img" src="" alt="" />
+        <div class="img-grad"></div>
+      </div>
+      <div class="watermark" id="watermark">001</div>
+      <div class="float-tags" id="floatTags"></div>
+    </div>
   </div>
 
   <script>
     const slug = new URLSearchParams(window.location.search).get('slug');
-    const container = document.getElementById('projectContent');
+    let projects = [];
+    let i = -1;
+    let pi = 0;
 
-    if (!slug) {
-      container.innerHTML = '<div class="not-found"><h2>no project specified</h2><p>go back and pick one.</p></div>';
-    } else {
-      fetch(`projects/${slug}.txt`)
-        .then(r => {
-          if (!r.ok) throw new Error('not found');
-          return r.text();
-        })
-        .then(text => {
-          const lines = text.split('\n').map(l => l.trim());
-          const title = lines[0] || 'untitled';
-          const meta = lines[1] || '';
-          const parts = meta.split('|').map(s => s.trim());
-          const tag = parts[0] || '';
-          const year = parts[1] || '';
-          const client = parts[2] || '';
-          const imgLine = lines[2] || '';
-          const heroImg = imgLine.startsWith('img:') ? imgLine.slice(4) : '';
-          const body = lines.slice(3).filter(l => l !== '').map(l => {
-            if (l.startsWith('img:')) return `<div class="content-img"><img src="${l.slice(4)}" alt=""></div>`;
-            return `<p>${l}</p>`;
-          }).join('');
+    const content = document.getElementById('content');
+    const idxEl = document.getElementById('idx');
+    const titleEl = document.getElementById('title');
+    const yrEl = document.getElementById('yr');
+    const descEl = document.getElementById('desc');
+    const roleEl = document.getElementById('role');
+    const outcomeEl = document.getElementById('outcome');
+    const stackEl = document.getElementById('stack');
+    const imgWrap = document.getElementById('imgWrap');
+    const imgEl = document.getElementById('img');
+    const watermarkEl = document.getElementById('watermark');
+    const floatTagsEl = document.getElementById('floatTags');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pagerTrack = document.getElementById('pagerTrack');
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
 
-          container.innerHTML = `
-            ${heroImg ? `<div class="project-hero"><img src="${heroImg}" alt="${title}"></div>` : ''}
-            <div class="project-tag">${tag}</div>
-            <h1>${title}</h1>
-            <div class="project-meta">${year}${client ? ' &middot; ' + client : ''}</div>
-            <div class="content">${body}</div>`;
-        })
-        .catch(() => {
-          container.innerHTML = '<div class="not-found"><h2>project not found</h2><p>deeym, i forgot where i put the file.</p></div>';
-        });
+    const roleWrap = document.querySelector('.meta-role');
+    const outcomeWrap = document.querySelector('.meta-outcome');
+
+    function imgUrl(id) {
+      if (/^https?:/.test(id)) return id;
+      return 'https://images.unsplash.com/photo-' + id + '?w=1600&h=1000&fit=crop&auto=format';
     }
+
+    function normalize(raw, pos) {
+      const hasOld = raw.image !== undefined || raw.stack !== undefined;
+      let photos = Array.isArray(raw.photos) ? raw.photos : [];
+      const single = raw.image || raw.img || '';
+      if (!photos.length && single) photos = [single];
+      return {
+        index: hasOld ? raw.index : String(pos + 1).padStart(3, '0'),
+        title: raw.title || 'untitled',
+        slug: raw.slug || '',
+        category: raw.category || raw.tag || '',
+        year: raw.year || '',
+        description: raw.description || raw.desc || '',
+        role: raw.role || '',
+        stack: raw.stack || [],
+        outcome: raw.outcome || '',
+        photos: photos
+      };
+    }
+
+    function renderPager() {
+      const n = projects[i].photos.length;
+      pagerTrack.innerHTML = projects[i].photos.map((_, j) => `<span class="pager-seg${j === pi ? ' on' : ''}" data-p="${j}"></span>`).join('');
+      prevBtn.disabled = pi === 0;
+      nextBtn.disabled = pi === n - 1;
+      pagerTrack.style.display = n > 1 ? '' : 'none';
+    }
+
+    function render() {
+      const p = projects[i];
+
+      idxEl.textContent = p.index;
+      titleEl.textContent = p.title;
+      yrEl.textContent = p.year;
+      yrEl.style.display = p.year ? '' : 'none';
+
+      descEl.textContent = p.description;
+      roleEl.textContent = p.role;
+      outcomeEl.textContent = p.outcome;
+      stackEl.innerHTML = p.stack.map(s => `<span class="tag">${s}</span>`).join('');
+
+      watermarkEl.textContent = p.index;
+      floatTagsEl.innerHTML = p.stack.slice(0, 3).map(s => `<div class="float-tag">${s}</div>`).join('');
+
+      const hasRole = !!p.role;
+      const hasOutcome = !!p.outcome;
+      roleWrap.style.display = hasRole ? '' : 'none';
+      outcomeWrap.style.display = hasOutcome ? '' : 'none';
+      roleWrap.className = 'meta-role' + (hasRole && !hasOutcome ? ' full' : '');
+      outcomeWrap.className = 'meta-outcome' + (hasOutcome && !hasRole ? ' full' : '');
+
+      stackEl.style.display = p.stack.length ? '' : 'none';
+      floatTagsEl.style.display = p.stack.length ? '' : 'none';
+
+      menuDropdown.querySelectorAll('.menu-item').forEach((s, j) => s.classList.toggle('active', j === i));
+      renderPager();
+    }
+
+    function setPhoto(j, animate) {
+      pi = (j + projects[i].photos.length) % projects[i].photos.length;
+      if (animate) imgWrap.classList.add('hidden');
+      imgEl.src = imgUrl(projects[i].photos[pi]);
+      imgEl.alt = projects[i].title + ' photo ' + (pi + 1);
+      renderPager();
+      if (animate) setTimeout(() => imgWrap.classList.remove('hidden'), 260);
+    }
+
+    function switchProject(n, fromMenu) {
+      if (n < 0 || n >= projects.length) return;
+      content.classList.add('hidden');
+      imgWrap.classList.add('hidden');
+      setTimeout(() => {
+        i = n;
+        pi = 0;
+        render();
+        content.classList.remove('hidden');
+        imgWrap.classList.remove('hidden');
+        if (fromMenu) history.replaceState(null, '', '?slug=' + projects[n].slug);
+      }, 280);
+    }
+
+    fetch('projects.json')
+      .then(r => r.json())
+      .then(data => {
+        projects = data.filter(p => !p.hidden).map(normalize);
+        i = projects.findIndex(p => p.slug === slug);
+        if (i < 0) i = 0;
+
+        menuDropdown.innerHTML = projects.map((p, j) =>
+          `<button class="menu-item${j === i ? ' active' : ''}" data-i="${j}" role="menuitem">
+            <span class="menu-idx">${p.index}</span><span>${p.title}</span>
+          </button>`).join('');
+
+        menuBtn.addEventListener('click', () => {
+          const open = menuDropdown.classList.toggle('open');
+          menuBtn.setAttribute('aria-expanded', open);
+        });
+        menuDropdown.addEventListener('click', e => {
+          const s = e.target.closest('.menu-item');
+          if (!s) return;
+          menuDropdown.classList.remove('open');
+          menuBtn.setAttribute('aria-expanded', 'false');
+          switchProject(+s.dataset.i, true);
+        });
+        document.addEventListener('click', e => {
+          if (!e.target.closest('.project-menu')) {
+            menuDropdown.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            menuDropdown.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          }
+          if (e.target.closest('input, textarea, select')) return;
+          if (e.key === 'ArrowLeft') setPhoto(pi - 1, true);
+          if (e.key === 'ArrowRight') setPhoto(pi + 1, true);
+        });
+        prevBtn.addEventListener('click', () => setPhoto(pi - 1, true));
+        nextBtn.addEventListener('click', () => setPhoto(pi + 1, true));
+        pagerTrack.addEventListener('click', e => {
+          const seg = e.target.closest('.pager-seg');
+          if (seg) setPhoto(+seg.dataset.p, true);
+        });
+
+        render();
+        imgEl.src = imgUrl(projects[i].photos[0]);
+        imgEl.alt = projects[i].title + ' photo 1';
+      })
+      .catch(() => {
+        titleEl.textContent = 'data not found';
+        descEl.textContent = 'projects.json tidak ketemu — deeym.';
+      });
   </script>
 </body>
 </html>
