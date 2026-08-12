@@ -1044,9 +1044,10 @@ Ini paragraf setelah gambar.</pre>
       const year = document.getElementById('fieldYear').value.trim();
       const client = document.getElementById('fieldClient').value.trim();
       const link = document.getElementById('fieldLink').value.trim();
+      const linkUrl = link && !/^https?:\/\//i.test(link) ? 'https://' + link : link;
       const headline = document.getElementById('fieldHeadline').value.trim();
       const thumb = document.getElementById('fieldThumb').value.trim();
-      return { title, category, year, client, link, headline, thumb, body, slug, mode: 'project' };
+      return { title, category, year, client, link: linkUrl, headline, thumb, body, slug, mode: 'project' };
     }
   }
 

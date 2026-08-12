@@ -295,6 +295,11 @@
       return 'https://images.unsplash.com/photo-' + id + '?w=1600&h=1000&fit=crop&auto=format';
     }
 
+    function absUrl(u) {
+      if (!u) return '';
+      return /^https?:\/\//i.test(u) ? u : 'https://' + u;
+    }
+
     function normalize(raw, pos) {
       const hasOld = raw.image !== undefined || raw.stack !== undefined;
       let photos = Array.isArray(raw.photos) ? raw.photos : [];
@@ -328,7 +333,7 @@
       const p = projects[i];
 
       idxEl.textContent = p.index;
-      titleEl.innerHTML = p.link ? `<a href="${p.link}" target="_blank" rel="noopener" class="title-link">${p.title}</a>` : p.title;
+      titleEl.innerHTML = p.link ? `<a href="${absUrl(p.link)}" target="_blank" rel="noopener" class="title-link">${p.title}</a>` : p.title;
       yrEl.textContent = p.year;
       yrEl.style.display = p.year ? '' : 'none';
       metaTop.style.display = p.year ? '' : 'none';
