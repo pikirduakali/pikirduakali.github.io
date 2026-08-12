@@ -28,7 +28,9 @@
     body { background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--background); }
-    ::-webkit-scrollbar-thumb { background: var(--border); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); opacity: 0; border-radius: 4px; transition: opacity 0.3s; }
+    .sb-active ::-webkit-scrollbar-thumb { opacity: 0.6; }
+    .sb-active ::-webkit-scrollbar-thumb:hover { opacity: 1; }
 
     .page { max-width: 896px; margin: 0 auto; padding: 64px 80px; }
     .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); text-decoration: none; margin-bottom: 48px; transition: color 0.2s; }
@@ -74,6 +76,7 @@
     <div id="articleList"></div>
   </div>
 
+  <script src="scrollbar.js"></script>
   <script>
     let articles = [];
 
